@@ -1,6 +1,5 @@
-package com.example.conectadamente.screens
+package com.example.conectadamente.screensLogin
 
-import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
