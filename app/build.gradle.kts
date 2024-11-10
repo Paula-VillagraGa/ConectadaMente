@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.jetbrainsKotlinSerialization)
 }
 
 android {
@@ -52,8 +53,12 @@ dependencies {
     implementation(libs.ui)                  // Última versión de Compose UI
     implementation(libs.material3)    // Material 3 para Compose
     implementation(libs.ui.tooling.preview)  // Previsualización de Compose
-    implementation(libs.androidx.activity.compose.v172)      // Integración con componentes de actividad
+    implementation(libs.androidx.activity.compose.v172)
+    // Integración con componentes de actividad
+
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
