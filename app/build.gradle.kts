@@ -12,6 +12,7 @@ android {
     defaultConfig {
         applicationId = "com.example.conectadamente"
         minSdk = 28
+        //noinspection OldTargetApi
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
