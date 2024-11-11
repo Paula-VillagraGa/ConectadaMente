@@ -18,6 +18,9 @@ import com.example.conectadamente.screensLogin.CreateAccountScreen
 import com.example.conectadamente.screensLogin.SignInScreen
 import com.example.conectadamente.screensMenu.HomeScreen
 import com.example.conectadamente.ui.theme.MyApplicationTheme
+import com.example.conectadamente.core.navigation. *
+import com.example.conectadamente.components. *
+import com.example.conectadamente.navegation. *
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
