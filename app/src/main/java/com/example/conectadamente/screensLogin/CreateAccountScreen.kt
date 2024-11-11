@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun CreateAccountScreen(navController: NavController) {
+fun CreateAccountScreen(navigateToLoginScreen: ()-> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +56,7 @@ fun CreateAccountScreen(navController: NavController) {
         Text(
             text = "¿Ya tienes cuenta? Iniciar sesión",
             modifier = Modifier.clickable {
-                navController.popBackStack() // Volver a la pantalla anterior (login)
+                navigateToLoginScreen() // Volver a la pantalla anterior (login)
             },
             style = TextStyle(color = Color(0xFF6200EE))
         )

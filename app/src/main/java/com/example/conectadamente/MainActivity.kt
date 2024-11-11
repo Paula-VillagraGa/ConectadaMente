@@ -13,8 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.conectadamente.components.NavigationInferior
-import com.example.conectadamente.navegation.BancoNavigation
 import com.example.conectadamente.screensLogin.LoginScreen
 import com.example.conectadamente.screensLogin.CreateAccountScreen
 import com.example.conectadamente.screensLogin.SignInScreen
@@ -26,14 +24,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme() {
-                val navController = rememberNavController()
-
-                // Configura el NavHost con las pantallas
-                NavHost(navController = navController, startDestination = "login_screen") {
-                    composable("login_screen") { LoginScreen(navController = navController) }
-                    composable("create_account_screen") { CreateAccountScreen(navController = navController) }
-                    composable("sign_in_screen") { SignInScreen(navController = navController) } // Aquí si tienes una pantalla para inicio de sesión
-                }
+                NavigationWrapper()
             }
             MainScreen()
         }
