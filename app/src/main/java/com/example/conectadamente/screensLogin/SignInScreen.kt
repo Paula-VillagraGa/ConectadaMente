@@ -21,7 +21,7 @@ import androidx.navigation.compose.rememberNavController
 
 
 @Composable
-fun SignInScreen(navController: NavController) {
+fun SignInScreen(navigateToCreateAccount: ()-> Unit) {
     val email = remember { TextFieldValue() }
     val password = remember { TextFieldValue() }
 
@@ -76,7 +76,7 @@ fun SignInScreen(navController: NavController) {
         Text(
             text = "¿No tienes cuenta? Crear Cuenta",
             modifier = Modifier.clickable {
-                navController.navigate("create_account_screen") // Navegar a la pantalla de crear cuenta
+                navigateToCreateAccount() // Navegar a la pantalla de crear cuenta
             },
             style = TextStyle(
                 color = Color(0xFF6200EE),
@@ -86,8 +86,4 @@ fun SignInScreen(navController: NavController) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SignInScreenPreview() {
-    SignInScreen(navController = rememberNavController()) // Usando NavController para navegar
-}
+

@@ -9,14 +9,35 @@ import com.example.conectadamente.screensLogin.LoginScreen
 import com.example.conectadamente.screensLogin.SignInScreen
 
 
+
 @Composable
 fun NavigationWrapper(){
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "login_screen"){
-        composable("login_screen") { LoginScreen(navController = navController) }
-        composable("create_account_screen") { CreateAccountScreen(navController = navController) }
-        composable("sign_in_screen") { SignInScreen(navController = navController)
+    NavHost(navController = navController, startDestination = Login){
+        composable<Login>{
+            LoginScreen(
+                navigateToSignIn = { navController.navigate(SignIn) },
+                navigateToGoogleSignIn = { navController.navigate(GoogleSignIn) },
+                navigateToCreateAccount = { navController.navigate(CreateAccount)})
+
+        }
+        composable<SignIn> {
+            SignInScreen(
+                navigateToCreateAccount = {navController.navigate(CreateAccount)}
+            ) // Define esta pantalla según lo necesites
+        }
+
+
+
+        composable<CreateAccount> {
+            CreateAccountScreen(
+                navigateToLoginScreen = {navController.navigate(Login) }
+            ) // Define esta pantalla según lo necesites
+        }
+
+
 
             }
+
         }
-    }
+

@@ -21,7 +21,7 @@ import com.example.conectadamente.R
 
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navigateToSignIn: () ->Unit, navigateToGoogleSignIn:() -> Unit, navigateToCreateAccount: ()-> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -40,7 +40,7 @@ fun LoginScreen(navController: NavController) {
 
         // Botón para ir a la pantalla de iniciar sesión
         Button(
-            onClick = { navController.navigate("sign_in_screen") },
+            onClick = { navigateToSignIn() },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -53,7 +53,7 @@ fun LoginScreen(navController: NavController) {
 
         // Botón para ingresar con cuenta de Google
         Button(
-            onClick = { navController.navigate("sign_in_with_google") }, // Añadir la navegación a la pantalla de Google
+            onClick = { navigateToGoogleSignIn() }, // Añadir la navegación a la pantalla de Google
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -79,7 +79,7 @@ fun LoginScreen(navController: NavController) {
         Text(
             text = "¿No tienes cuenta? Crear Cuenta",
             modifier = Modifier.clickable {
-                navController.navigate("create_account_screen") // Navegar a la pantalla de crear cuenta
+                navigateToCreateAccount() // Navegar a la pantalla de crear cuenta
             },
             style = TextStyle(
                 color = Color(0xFF6200EE),
@@ -87,10 +87,4 @@ fun LoginScreen(navController: NavController) {
             )
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen(navController = rememberNavController()) // Usando NavController para navegar
 }
