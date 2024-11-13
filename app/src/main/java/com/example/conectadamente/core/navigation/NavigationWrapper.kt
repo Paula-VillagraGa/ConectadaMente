@@ -4,9 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.conectadamente.screensLogin.CreateAccountScreen
-import com.example.conectadamente.screensLogin.LoginScreen
-import com.example.conectadamente.screensLogin.SignInScreen
+import com.example.conectadamente.ui.auth.CreateAccountScreen
+import com.example.conectadamente.ui.auth.LoginScreen
+import com.example.conectadamente.ui.auth.SignInScreen
 
 
 
