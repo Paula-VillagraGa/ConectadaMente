@@ -10,13 +10,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.conectadamente.screensLogin.LoginScreen
-import com.example.conectadamente.screensLogin.CreateAccountScreen
-import com.example.conectadamente.screensLogin.SignInScreen
-import com.example.conectadamente.screensMenu.HomeScreen
 import com.example.conectadamente.ui.theme.MyApplicationTheme
 import com.example.conectadamente.core.navigation. *
 import com.example.conectadamente.components. *

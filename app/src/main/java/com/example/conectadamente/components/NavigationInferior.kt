@@ -17,6 +17,7 @@ fun NavigationInferior(
     val menu_items = listOf(
         Item_bottom_nav1,
         Item_bottom_nav2,
+        Item_Home_nav,
         Item_bottom_nav3,
         Item_bottom_nav4
     )

@@ -3,6 +3,7 @@ package com.example.conectadamente.models
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -22,6 +23,11 @@ sealed class Items_bottom_nav(
         Icons.Outlined.Email,
         "Chats",
         NavScreen.ChatScreen.name
+    )
+    object Item_Home_nav: Items_bottom_nav(
+        Icons.Outlined.Home,
+        "Home",
+        NavScreen.HomeScreen.name
     )
     object Item_bottom_nav3: Items_bottom_nav(
         Icons.Outlined.Face,
