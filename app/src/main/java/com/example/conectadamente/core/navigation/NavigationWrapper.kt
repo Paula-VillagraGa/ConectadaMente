@@ -33,7 +33,7 @@ fun NavigationWrapper(){
         composable("sign_in") {
 
             SignInScreen(
-                navigateToCreateAccount = { navController.navigate("create_account") }
+                navigateToRegisterPacient = { navController.navigate("register_patient") }
             ) // Define esta pantalla según lo necesites
         }
 

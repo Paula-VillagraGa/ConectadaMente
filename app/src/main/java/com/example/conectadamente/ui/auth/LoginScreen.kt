@@ -1,7 +1,6 @@
 package com.example.conectadamente.ui.auth
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -12,14 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.conectadamente.R
-import com.example.conectadamente.ui.theme.primaryColor
-import com.example.conectadamente.ui.theme.secondaryColor
+import com.example.conectadamente.ui.theme.PoppinsFontFamily
+import com.example.conectadamente.ui.theme.Purple20
+import com.example.conectadamente.ui.theme.Purple30
 
 
 @Composable
@@ -42,7 +43,7 @@ fun LoginScreen(navController: NavController, navigateToSignIn: () ->Unit, navig
                 horizontalAlignment = Alignment.CenterHorizontally // Alinea la imagen y el texto al centro dentro del Column
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.salud_mental), // Reemplaza con tu imagen
+                    painter = painterResource(id = R.drawable.meditacion), // Reemplaza con tu imagen
                     contentDescription = "Logo",
                     modifier = Modifier
                         .size(300.dp) // Tamaño de la imagen
@@ -51,9 +52,10 @@ fun LoginScreen(navController: NavController, navigateToSignIn: () ->Unit, navig
                 Text(
                     text = "Bienvenido a ConectadaMente", // Reemplaza con tu texto
                     style = TextStyle(
-                        fontSize = 30.sp, // Tamaño de fuente
-                        fontWeight = FontWeight.Medium,
-                        color = secondaryColor // Color del texto
+                        fontFamily = PoppinsFontFamily,   // Usar la familia de fuentes definida
+                        fontStyle = FontStyle.Italic,    // Asegura que se usa el estilo itálico
+                        fontSize = 30.sp,                // Tamaño de la fuente
+                        color = Purple20,
                     ),
                     textAlign = TextAlign.Center // Centrar el texto
                 )
@@ -69,9 +71,10 @@ fun LoginScreen(navController: NavController, navigateToSignIn: () ->Unit, navig
                 .fillMaxWidth()
                 .height(48.dp),
 
-            colors = ButtonDefaults.buttonColors(containerColor = primaryColor)
+            colors = ButtonDefaults.buttonColors(containerColor = Purple20)
         ) {
-            Text(text = "Iniciar Sesión", fontWeight = FontWeight.Normal, color = Color.White)
+            Text(text = "Iniciar Sesión", style = TextStyle(color = Color.White,fontWeight = FontWeight.Normal,
+                fontFamily = PoppinsFontFamily, fontStyle = FontStyle.Normal, fontSize = 16.sp))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -82,14 +85,15 @@ fun LoginScreen(navController: NavController, navigateToSignIn: () ->Unit, navig
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = secondaryColor)
+            colors = ButtonDefaults.buttonColors(containerColor = Purple30)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Ícono de Google
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Registrarse", fontWeight = FontWeight.Normal, color = Color.White)
+                Text(text = "Registrarse",  style = TextStyle(color = Color.White,fontWeight = FontWeight.Normal,
+                    fontFamily = PoppinsFontFamily, fontStyle = FontStyle.Normal, fontSize = 16.sp))
             }
         }
 
