@@ -16,3 +16,6 @@ object GoogleSignIn
 
 @Serializable
 object CreateAccount
+
+@Serializable
+object RegisterPatient

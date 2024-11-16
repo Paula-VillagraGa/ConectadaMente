@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.conectadamente.ui.auth.CreateAccountScreen
 import com.example.conectadamente.ui.auth.LoginScreen
 import com.example.conectadamente.ui.auth.SignInScreen
+import com.example.conectadamente.ui.register.RegisterPatientScreen
 
 
 
@@ -18,7 +19,9 @@ fun NavigationWrapper(){
             LoginScreen(
                 navigateToSignIn = { navController.navigate(SignIn) },
                 navigateToGoogleSignIn = { navController.navigate(GoogleSignIn) },
-                navigateToCreateAccount = { navController.navigate(CreateAccount)})
+                navigateToCreateAccount = {navController.navigate(CreateAccount)},
+                navigateToPatientRegistration = { navController.navigate(RegisterPatient)}
+            )
 
         }
         composable<SignIn> {

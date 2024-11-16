@@ -1,20 +1,20 @@
 [versions]
-activityComposeVersion = "1.9.3"
+activityComposeVersion = "1.7.2"
 agp = "8.7.2"
-kotlin = "2.0.0"
-ksp = "2.0.0-1.0.21"
+#noinspection GradleDependency
+kotlin = "1.9.20"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.9.3"
 composeBom = "2024.04.01"
 material3 = "1.3.1"
 navigationCompose = "2.8.3"
 ui = "1.7.5"
 uiToolingPreview = "1.7.5"
 kotlinxSerialization = "1.7.0"
+kotlinCompose= "2.0.10"
 
 
 [libraries]
@@ -25,7 +25,6 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
@@ -35,16 +34,21 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 #nuevo este de abajo#
-    kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref= "kotlinxSerialization"}
-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref= "kotlinxSerialization"}
 ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 
 
+
 [plugins]
+
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinCompose" }
 jetbrainsKotlinSerialization = {id= "org.jetbrains.kotlin.plugin.serialization", version.ref= "kotlin"}
-kotlin-ksp = {id = "com.google.devtools.ksp", version.ref = "ksp"}
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
+kotlin-ksp = {id = "com.google.devtools.ksp", version = "2.0.21-1.0.25"}
+#Room
+
+
+
+

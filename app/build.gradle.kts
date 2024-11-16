@@ -48,14 +48,12 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.ui)                  // Última versión de Compose UI
-    implementation(libs.material3)    // Material 3 para Compose
     implementation(libs.ui.tooling.preview)  // Previsualización de Compose
     implementation(libs.androidx.activity.compose.v172)
     // Integración con componentes de actividad
@@ -66,6 +64,11 @@ dependencies {
     //Room
     implementation("androidx.room:room-runtime:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+
+    //Otros
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

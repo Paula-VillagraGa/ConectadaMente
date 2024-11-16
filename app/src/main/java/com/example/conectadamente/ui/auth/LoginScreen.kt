@@ -18,7 +18,7 @@ import com.example.conectadamente.R
 
 
 @Composable
-fun LoginScreen(navigateToSignIn: () ->Unit, navigateToGoogleSignIn:() -> Unit, navigateToCreateAccount: ()-> Unit) {
+fun LoginScreen(navigateToSignIn: () ->Unit, navigateToGoogleSignIn:() -> Unit, navigateToCreateAccount: ()-> Unit, navigateToPatientRegistration:()-> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,7 +76,7 @@ fun LoginScreen(navigateToSignIn: () ->Unit, navigateToGoogleSignIn:() -> Unit, 
         Text(
             text = "¿No tienes cuenta? Crear Cuenta",
             modifier = Modifier.clickable {
-                navigateToCreateAccount() // Navegar a la pantalla de crear cuenta
+                navigateToPatientRegistration() // Navegar a la pantalla de crear cuenta
             },
             style = TextStyle(
                 color = Color(0xFF6200EE),
