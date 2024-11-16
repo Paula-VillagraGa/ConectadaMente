@@ -1,7 +1,7 @@
 package com.example.conectadamente.ui.auth
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -12,13 +12,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.conectadamente.R
+import com.example.conectadamente.ui.theme.primaryColor
+import com.example.conectadamente.ui.theme.secondaryColor
 
 
 @Composable
-fun LoginScreen(navigateToSignIn: () ->Unit, navigateToGoogleSignIn:() -> Unit, navigateToCreateAccount: ()-> Unit, navigateToPatientRegistration:()-> Unit) {
+fun LoginScreen(navController: NavController, navigateToSignIn: () ->Unit, navigateToGoogleSignIn:() -> Unit, navigateToCreateAccount: ()-> Unit, navigateToRegisterPatient:()-> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -27,61 +32,70 @@ fun LoginScreen(navigateToSignIn: () ->Unit, navigateToGoogleSignIn:() -> Unit, 
         verticalArrangement = Arrangement.Center
     ) {
 
-        Image(
-            painter = painterResource(id = R.drawable.salud_mental), // Reemplaza con el nombre de tu imagen
-            contentDescription = "Logo",
+        Box(
             modifier = Modifier
-                .size(150.dp) // Ajusta el tamaño de la imagen según tus necesidades
-                .padding(bottom = 32.dp) // Espacio debajo de la imagen
-        )
+                .fillMaxWidth()
+                .padding(16.dp), // Espaciado alrededor del Box
+            contentAlignment = Alignment.Center // Centra el contenido dentro del Box
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally // Alinea la imagen y el texto al centro dentro del Column
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.salud_mental), // Reemplaza con tu imagen
+                    contentDescription = "Logo",
+                    modifier = Modifier
+                        .size(300.dp) // Tamaño de la imagen
+                        .padding(bottom = 16.dp) // Espacio entre la imagen y el texto
+                )
+                Text(
+                    text = "Bienvenido a ConectadaMente", // Reemplaza con tu texto
+                    style = TextStyle(
+                        fontSize = 30.sp, // Tamaño de fuente
+                        fontWeight = FontWeight.Medium,
+                        color = secondaryColor // Color del texto
+                    ),
+                    textAlign = TextAlign.Center // Centrar el texto
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(40.dp))
 
         // Botón para ir a la pantalla de iniciar sesión
         Button(
-            onClick = { navigateToSignIn() },
+            onClick = { navController.navigate("sign_in") },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
+
+            colors = ButtonDefaults.buttonColors(containerColor = primaryColor)
         ) {
-            Text(text = "Iniciar Sesión", color = Color.White)
+            Text(text = "Iniciar Sesión", fontWeight = FontWeight.Normal, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Botón para ingresar con cuenta de Google
         Button(
-            onClick = { navigateToGoogleSignIn() }, // Añadir la navegación a la pantalla de Google
+            onClick = { navigateToRegisterPatient() }, // Añadir la navegación a la pantalla de Google
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDB4437))
+            colors = ButtonDefaults.buttonColors(containerColor = secondaryColor)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Ícono de Google
-                Image(
-                    painter = painterResource(id = R.drawable.ic_google),
-                    contentDescription = "Google",
-                    modifier = Modifier.size(24.dp)
-                )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Ingresar con Google", color = Color.White)
+                Text(text = "Registrarse", fontWeight = FontWeight.Normal, color = Color.White)
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Texto cliqueable para crear cuenta
-        Text(
-            text = "¿No tienes cuenta? Crear Cuenta",
-            modifier = Modifier.clickable {
-                navigateToPatientRegistration() // Navegar a la pantalla de crear cuenta
-            },
-            style = TextStyle(
-                color = Color(0xFF6200EE),
-                fontSize = 16.sp
-            )
-        )
+
+
     }
 }

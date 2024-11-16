@@ -1,46 +1,57 @@
 package com.example.conectadamente.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.conectadamente.data.database.AppDatabase
 import com.example.conectadamente.ui.auth.CreateAccountScreen
 import com.example.conectadamente.ui.auth.LoginScreen
 import com.example.conectadamente.ui.auth.SignInScreen
 import com.example.conectadamente.ui.register.RegisterPatientScreen
+import com.example.conectadamente.ui.viewModel.UserViewModel
+import com.example.conectadamente.ui.viewModel.UserViewModelFactory
 
 
 
 @Composable
 fun NavigationWrapper(){
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Login){
-        composable<Login>{
+    NavHost(navController = navController, startDestination = "login"){
+        composable("login") {
             LoginScreen(
-                navigateToSignIn = { navController.navigate(SignIn) },
-                navigateToGoogleSignIn = { navController.navigate(GoogleSignIn) },
-                navigateToCreateAccount = {navController.navigate(CreateAccount)},
-                navigateToPatientRegistration = { navController.navigate(RegisterPatient)}
+                navController = navController,
+                navigateToSignIn = { navController.navigate("sign_in") },
+                navigateToGoogleSignIn = { navController.navigate("google_sign_in") },
+                navigateToCreateAccount = { navController.navigate("create_account") },
+                navigateToRegisterPatient = { navController.navigate("register_patient") }
             )
-
         }
-        composable<SignIn> {
+
+        composable("sign_in") {
+
             SignInScreen(
-                navigateToCreateAccount = {navController.navigate(CreateAccount)}
+                navigateToCreateAccount = { navController.navigate("create_account") }
             ) // Define esta pantalla según lo necesites
         }
 
-
-
-        composable<CreateAccount> {
+        composable("create_account") {
             CreateAccountScreen(
-                navigateToLoginScreen = {navController.navigate(Login) }
+                navigateToLoginScreen = { navController.navigate("login") }
             ) // Define esta pantalla según lo necesites
         }
 
-
-
-            }
-
+        composable("register_patient") {
+            val context = LocalContext.current
+            val userViewModel: UserViewModel = viewModel(
+                factory = UserViewModelFactory(AppDatabase.getDatabase(context).patientDao())
+            )
+            // Ahora se pasa el navController como parámetro
+            RegisterPatientScreen(viewModel = userViewModel)
         }
 
+
+    }
+}

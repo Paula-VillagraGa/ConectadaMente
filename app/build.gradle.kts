@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.conectadamente"
-        minSdk = 28
+        minSdk = 29
         //noinspection OldTargetApi
         targetSdk = 34
         versionCode = 1
@@ -63,6 +63,8 @@ dependencies {
 
     //Room
     implementation("androidx.room:room-runtime:$room_version")
+    implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.foundation.android)
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
 
