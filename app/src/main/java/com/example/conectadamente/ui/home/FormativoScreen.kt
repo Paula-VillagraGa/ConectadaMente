@@ -1,4 +1,4 @@
-package com.example.conectadamente.screensMenu
+package com.example.conectadamente.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +12,7 @@ import androidx.compose.ui.res.painterResource
 import com.example.conectadamente.R
 
 @Composable
-fun Chats(){
+fun Formativo(){
     Column (
         modifier = Modifier
             .fillMaxSize(),
@@ -21,8 +21,8 @@ fun Chats(){
     ){
         Image(
             painter = painterResource(
-                id = R.drawable.ico_chat),
+                id = R.drawable.ico_forma),
             contentDescription = null)
-        Text(text = "Chats")
+        Text(text = "Formativo")
     }
 }

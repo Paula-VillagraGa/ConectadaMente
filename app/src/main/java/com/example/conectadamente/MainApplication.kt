@@ -1,7 +1,5 @@
 package com.example.conectadamente
 
-
-
 import android.app.Application
 import androidx.room.Room
 import com.example.conectadamente.data.database.AppDatabase

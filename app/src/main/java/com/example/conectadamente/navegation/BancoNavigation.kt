@@ -1,11 +1,14 @@
 package com.example.conectadamente.navegation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.conectadamente.screensMenu. *
+import com.example.conectadamente.ui.home.Chats
+import com.example.conectadamente.ui.home.Formativo
+import com.example.conectadamente.ui.home.HomeScreen
+import com.example.conectadamente.ui.home.Perfil
+import com.example.conectadamente.ui.home.Recomendacion
 
 @Composable
 fun BancoNavigation(

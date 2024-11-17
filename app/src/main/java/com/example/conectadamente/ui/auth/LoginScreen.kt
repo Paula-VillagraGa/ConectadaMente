@@ -18,9 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.conectadamente.R
-import com.example.conectadamente.ui.theme.PoppinsFontFamily
-import com.example.conectadamente.ui.theme.Purple20
-import com.example.conectadamente.ui.theme.Purple30
+import com.example.conectadamente.ui.theme.*
+
 
 
 @Composable

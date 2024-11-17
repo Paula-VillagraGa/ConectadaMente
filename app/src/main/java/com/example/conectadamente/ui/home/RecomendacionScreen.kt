@@ -1,4 +1,5 @@
-package com.example.conectadamente.screensMenu
+package com.example.conectadamente.ui.home
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +12,7 @@ import androidx.compose.ui.res.painterResource
 import com.example.conectadamente.R
 
 @Composable
-fun Perfil(){
+fun Recomendacion(){
     Column (
         modifier = Modifier
             .fillMaxSize(),
@@ -20,8 +21,8 @@ fun Perfil(){
     ){
         Image(
             painter = painterResource(
-                id = R.drawable.ico_perfil),
+                id = R.drawable.ico_recomen),
             contentDescription = null)
-        Text(text = "Perfil")
+        Text(text = "Recomendaciones")
     }
 }
