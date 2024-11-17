@@ -10,15 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.conectadamente.R
+import com.example.conectadamente.ui.theme.*
 
 @Composable
 fun ResumeScreen() {
@@ -34,10 +33,10 @@ fun ResumeScreen() {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Resume",
-                color = Color(0xFF111418),
+                text = "Perfil Profesional",
+                color = Blue50,
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Light,
                 modifier = Modifier.weight(1f),
                 lineHeight = 24.sp
             )
@@ -92,15 +91,15 @@ fun ResumeScreen() {
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF0F2F4)),
             modifier = Modifier.fillMaxWidth().height(40.dp)
         ) {
-            Text("Edit", color = Color(0xFF111418))
+            Text("Editar", color = Color(0xFF111418))
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         // About Section
         Text(
-            text = "About",
-            color = Color(0xFF111418),
+            text = "Sobre mí",
+            color = Blue30,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold
         )
@@ -114,8 +113,8 @@ fun ResumeScreen() {
 
         // Experience Section
         Text(
-            text = "Experience",
-            color = Color(0xFF111418),
+            text = "Experiencia",
+            color = Blue40,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold
         )
