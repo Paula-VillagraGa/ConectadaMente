@@ -10,7 +10,6 @@
         @Insert
         suspend fun insertPatient(patient: PatientModel)
 
-        // Definir el método para obtener un paciente por RUT
-        @Query("SELECT * FROM patient WHERE rut = :rut LIMIT 1")
-        suspend fun getPatientByRut(rut: String): PatientModel?
+        @Query("SELECT * FROM patient WHERE email = :email LIMIT 1")
+        suspend fun getPatientByEmail(email: String): PatientModel?
     }

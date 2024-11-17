@@ -7,7 +7,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Build
+
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
@@ -30,11 +31,12 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.conectadamente.data.model.PatientModel
 import com.example.conectadamente.ui.theme.*
 
 
 @Composable
-fun Perfil() {
+fun Perfil(patient: PatientModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -115,12 +117,12 @@ fun Perfil() {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Información del usuario
-        UserInfoItem(icon = Icons.Default.Person, label = "Allison Wu", isLarge = false)
-        UserInfoItem(icon = Icons.Default.Email, label = "@allisonwu")
-        UserInfoItem(icon = Icons.Default.Build, label = "Software Engineer at Netflix")
+        UserInfoItem(icon = Icons.Default.Person, label = "Nombre: ${patient.firstName} ${patient.lastName}")
+        UserInfoItem(icon = Icons.Default.Email, label = "Correo: ${patient.email}")
+        UserInfoItem(icon = Icons.Default.Call, label = "Teléfono: ${patient.phoneNumber}")
         UserInfoItem(
             icon = Icons.Default.Home,
-            label = "San Francisco, California\nalisonw2043@gmail.com",
+            label = "Dirección: San Francisco, California\n${patient.email}",
             isLarge = true
         )
         UserInfoItem(
@@ -188,5 +190,26 @@ fun UserInfoItem(icon: ImageVector, label: String, isLarge: Boolean = false) {
 @Preview(showBackground = true)
 @Composable
 fun UserProfileScreenPreview() {
-    Perfil()
+    // Crear un objeto de ejemplo de PatientModel
+    val samplePatient = PatientModel(
+        rut = "12345678-9",
+        firstName = "Allison",
+        lastName = "Wu",
+        email = "allisonwu@example.com",
+        phoneNumber = "+123456789"
+    )
+
+    // Llamar a la pantalla de perfil pasándole el paciente de ejemplo
+    ProfileScreen(patient = samplePatient)
+}
+
+@Composable
+fun ProfileScreen(patient: PatientModel) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(text = "Nombre: ${patient.firstName} ${patient.lastName}")
+        Text(text = "Correo: ${patient.email}")
+        Text(text = "Teléfono: ${patient.phoneNumber}")
+
+        // Aquí puedes agregar más información del paciente
+    }
 }

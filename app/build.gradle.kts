@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrainsKotlinSerialization)
     alias(libs.plugins.kotlin.ksp)
+    id("com.google.gms.google-services")
 
 }
 
@@ -46,6 +47,13 @@ android {
 val room_version = "2.6.1"
 dependencies {
 
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
+    //
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(platform(libs.androidx.compose.bom))
@@ -69,9 +77,15 @@ dependencies {
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
 
+    //Material3
+    implementation ("androidx.compose.material3:material3:1.0.1")  // Material3
+    implementation ("androidx.compose.ui:ui:1.4.0")  // Jetpack Compose UI
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.4.0")  // Para previsualización
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")  // Si usas ViewModel o LiveData
+    // Otras dependencias necesarias
+
     //Otros
     implementation(libs.androidx.lifecycle.runtime.ktx)
-
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -82,7 +96,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
 
+
 }
+
 
 
 
