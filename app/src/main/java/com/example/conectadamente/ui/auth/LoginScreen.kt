@@ -78,9 +78,9 @@ fun LoginScreen(navController: NavController, navigateToSignIn: () ->Unit, navig
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botón para ingresar con cuenta de Google
+        // Botón para registrarse
         Button(
-            onClick = { navigateToRegisterPatient() }, // Añadir la navegación a la pantalla de Google
+            onClick = { navigateToRegisterPatient() }, //Registrar Paciente
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),

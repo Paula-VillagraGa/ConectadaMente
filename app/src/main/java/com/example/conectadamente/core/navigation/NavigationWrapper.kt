@@ -10,6 +10,7 @@ import com.example.conectadamente.data.database.AppDatabase
 import com.example.conectadamente.ui.auth.CreateAccountScreen
 import com.example.conectadamente.ui.auth.LoginScreen
 import com.example.conectadamente.ui.auth.SignInScreen
+import com.example.conectadamente.ui.home.HomeScreen
 import com.example.conectadamente.ui.register.RegisterPatientScreen
 import com.example.conectadamente.ui.viewModel.UserViewModel
 import com.example.conectadamente.ui.viewModel.UserViewModelFactory
@@ -33,7 +34,8 @@ fun NavigationWrapper(){
         composable("sign_in") {
 
             SignInScreen(
-                navigateToRegisterPacient = { navController.navigate("register_patient") }
+                navigateToRegisterPacient = { navController.navigate("register_patient") },
+                navigateToHomeScreen = { navController.navigate("home_screen") }
             ) // Define esta pantalla según lo necesites
         }
 
@@ -50,6 +52,10 @@ fun NavigationWrapper(){
             )
             // Ahora se pasa el navController como parámetro
             RegisterPatientScreen(viewModel = userViewModel)
+        }
+
+        composable("home_screen") {
+            HomeScreen(navController = navController)
         }
 
 

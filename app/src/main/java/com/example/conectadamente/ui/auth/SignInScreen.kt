@@ -19,16 +19,20 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.example.conectadamente.ui.theme.*
 import com.example.conectadamente.R
 
 
 
+import com.example.conectadamente.ui.home.HomeScreen
+
 
 @Composable
-fun SignInScreen(navigateToRegisterPacient : ()-> Unit) {
+fun SignInScreen(navigateToRegisterPacient : ()-> Unit ={}, navigateToHomeScreen: () -> Unit ={}) {
     val email = remember { TextFieldValue() }
     val password = remember { TextFieldValue() }
 
@@ -118,9 +122,7 @@ fun SignInScreen(navigateToRegisterPacient : ()-> Unit) {
 
                 // Botón de iniciar sesión
                 Button(
-                    onClick = {
-                        // Acción para iniciar sesión
-                    },
+                    onClick = { navigateToHomeScreen() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp),
@@ -145,5 +147,16 @@ fun SignInScreen(navigateToRegisterPacient : ()-> Unit) {
                 )
             }
         }
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun SignInScreenPreview() {
+    // Envuelve tu pantalla en un tema si lo estás utilizando
+    MyApplicationTheme {
+        // Llama a SignInScreen pasando una función vacía como lambda para evitar errores de navegación
+        SignInScreen()
     }
 }

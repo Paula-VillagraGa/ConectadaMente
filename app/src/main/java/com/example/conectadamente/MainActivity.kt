@@ -35,28 +35,11 @@ class MainActivity : ComponentActivity() {
         // Establecemos el contenido con el wrapper de navegación
         setContent {
             MyApplicationTheme {
+                //Navegación acá
                 NavigationWrapper()
             }
-            MainScreen()
+
         }
     }
 
-}
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MainScreen(){
-    val navController = rememberNavController()
-    Scaffold (
-        bottomBar = {
-            NavigationInferior(navController)
-        }
-    ) {padding->
-        Box(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-        ){
-            BancoNavigation(navController = navController)
-        }
-    }
 }
