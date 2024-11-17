@@ -3,10 +3,12 @@ package com.example.conectadamente.ui.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
@@ -32,7 +34,7 @@ import com.example.conectadamente.ui.theme.*
 
 
 @Composable
-fun UserProfileScreen() {
+fun Perfil() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -47,58 +49,72 @@ fun UserProfileScreen() {
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = "Volver",
                 tint = Color(0xFF0e141b)
             )
             Text(
-                text = "Profile",
+                text = "Perfil",
                 style = TextStyle(
                     fontFamily = PoppinsFontFamily,   // Usar la familia de fuentes definida
                     fontStyle = FontStyle.Italic,    // Asegura que se usa el estilo itálico
-                    fontSize = 30.sp,                // Tamaño de la fuente
-                    color = Color.White,
+                    fontSize = 26.sp,                // Tamaño de la fuente
                 ),
-                color = Color(0xFF0e141b)
+                color = Purple30
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Profile Picture Section
+        //
         Text(
-            text = "Profile Picture",
+            text = "Foto de Perfil",
             style = TextStyle(
                 fontFamily = PoppinsFontFamily,   // Usar la familia de fuentes definida
                 fontStyle = FontStyle.Italic,    // Asegura que se usa el estilo itálico
-                fontSize = 30.sp,                // Tamaño de la fuente
+                fontSize = 20.sp,                // Tamaño de la fuente
                 color = Color.White,
             ),
             color = Color(0xFF0e141b)
         )
         Spacer(modifier = Modifier.height(16.dp))
         Box(
+
+            modifier = Modifier
+                .size(100.dp) // Tamaño del círculo
+                .clip(CircleShape) // Hace que sea completamente redondo
+                .background(Color.Gray) // Color de fondo para simular la foto
+                .clickable { /* Acción para cambiar la foto */ },
+        ) {
+            // Contenido interno, por ejemplo, un texto o icono de cámara
+            Icon(
+                imageVector = Icons.Default.Person, // Icono predeterminado para representar el perfil
+                contentDescription = "Foto de perfil",
+                tint = Color.White,
+                modifier = Modifier
+                    .size(50.dp),// Tamaño del ícono
+            )
+        }
+
+        // Botón para editar la foto de perfil
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(3f / 2f)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.Gray)
-                .clickable { /* Edit Profile Photo Action */ },
+                .padding(top = 40.dp), // Separación debajo del círculo
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Editar Foto de Perfil",
-                modifier = Modifier.clickable {},
-                style = TextStyle(
-                    color = Purple40,
-                    fontSize = 12.sp,
-                    fontFamily = PoppinsFontFamily,
-                    fontStyle = FontStyle.Normal
-
+            Button(
+                onClick = { /* Acción para editar foto */ },
+                shape = RoundedCornerShape(50) // Borde redondeado
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Create,
+                    contentDescription = "Editar foto",
+                    modifier = Modifier.padding(end = 8.dp)
                 )
-            )
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        // User Info Section
+        // Información del usuario
         UserInfoItem(icon = Icons.Default.Person, label = "Allison Wu", isLarge = false)
         UserInfoItem(icon = Icons.Default.Email, label = "@allisonwu")
         UserInfoItem(icon = Icons.Default.Build, label = "Software Engineer at Netflix")
@@ -127,13 +143,13 @@ fun UserProfileScreen() {
                 .padding(vertical = 8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Purple20)
         ) {
-            Text(text = "Edit Profile", color = Color(0xFF0e141b))
+            Text(text = "Editar Perfil", color = Color.White)
         }
         OutlinedButton(
             onClick = { /* Change Password Action */ },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Change Password", color = Color(0xFF0e141b))
+            Text(text = "Cambiar Contraseña", color = Color(0xFF0e141b))
         }
     }
 }
@@ -151,7 +167,7 @@ fun UserInfoItem(icon: ImageVector, label: String, isLarge: Boolean = false) {
             contentDescription = null,
             tint = Color(0xFF0e141b),
             modifier = Modifier
-                .size(40.dp)
+                .size(30.dp)
                 .background(Color(0xFFE7EDF3), shape = RoundedCornerShape(8.dp))
                 .padding(8.dp)
         )
@@ -161,7 +177,7 @@ fun UserInfoItem(icon: ImageVector, label: String, isLarge: Boolean = false) {
             style = TextStyle(
                 fontFamily = PoppinsFontFamily,
                 fontStyle = FontStyle.Italic,
-                fontSize = 30.sp,
+                fontSize = 20.sp,
                 color = Color.White,
             ),
             color = Color(0xFF0e141b)
@@ -172,5 +188,5 @@ fun UserInfoItem(icon: ImageVector, label: String, isLarge: Boolean = false) {
 @Preview(showBackground = true)
 @Composable
 fun UserProfileScreenPreview() {
-    UserProfileScreen()
+    Perfil()
 }
