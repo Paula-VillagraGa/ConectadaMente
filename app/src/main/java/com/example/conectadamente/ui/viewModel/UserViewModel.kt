@@ -8,9 +8,9 @@ import com.example.conectadamente.data.model.PatientModel
 import kotlinx.coroutines.launch
 
 
-class UserViewModel(private val patientDao: PatientDao) : ViewModel() {
+open class UserViewModel(private val patientDao: PatientDao) : ViewModel() {
 
-    fun registerPatient(patient: PatientModel, onSuccess: () -> Unit, onError: () -> Unit) {
+    open fun registerPatient(patient: PatientModel, onSuccess: () -> Unit, onError: () -> Unit) {
         viewModelScope.launch {
             try {
                 patientDao.insertPatient(patient)
