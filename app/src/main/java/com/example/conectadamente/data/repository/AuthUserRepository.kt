@@ -1,45 +1,41 @@
 package com.example.conectadamente.data.repository
 
+import com.example.conectadamente.data.model.PatientModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
+import com.example.conectadamente.utils.isValidEmail
 
 class AuthUserRepository {
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 
-    private val auth = FirebaseAuth.getInstance()
+    // Nueva función para registrar un paciente
+    fun registerPatient(
+        patient: PatientModel, // Pasamos el objeto PatientModel
+        password: String, // Contraseña
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
 
-    // Registra un nuevo usuario
-    fun registerUser(email: String, password: String, onComplete: (Boolean, String) -> Unit) {
-        auth.createUserWithEmailAndPassword(email, password)
+        auth.createUserWithEmailAndPassword(patient.email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-                    onComplete(true, "Registro exitoso")
+                    val uid = user?.uid ?: return@addOnCompleteListener onError("UID no encontrado")
+
+                    // Ahora guardamos los datos del paciente en Firestore
+                    db.collection("patients").document(uid)
+                        .set(patient) // Guardamos el PatientModel directamente en Firestore
+                        .addOnSuccessListener {
+                            onSuccess("Paciente registrado correctamente")
+                        }
+                        .addOnFailureListener { e ->
+                            onError("Error al guardar datos: ${e.message}")
+                        }
                 } else {
-                    onComplete(false, task.exception?.message ?: "Error desconocido")
+                    onError("Error al registrar paciente: ${task.exception?.message}")
                 }
             }
-    }
-
-    // Iniciar sesión con correo y contraseña
-    fun loginUser(email: String, password: String, onComplete: (Boolean, String) -> Unit) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val user = auth.currentUser
-                    onComplete(true, "Inicio de sesión exitoso")
-                } else {
-                    onComplete(false, task.exception?.message ?: "Error desconocido")
-                }
-            }
-    }
-
-    // Obtener usuario actual
-    fun getCurrentUser(): FirebaseUser? {
-        return auth.currentUser
-    }
-
-    // Cerrar sesión
-    fun logout() {
-        auth.signOut()
     }
 }

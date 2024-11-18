@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import com.example.conectadamente.ui.home.Chats
 import com.example.conectadamente.ui.home.Formativo
 import com.example.conectadamente.ui.home.HomeScreen
-import com.example.conectadamente.ui.home.Perfil
+/*import com.example.conectadamente.ui.home.Perfil*/
 import com.example.conectadamente.ui.home.Recomendacion
 
 @Composable
@@ -21,9 +21,10 @@ fun BancoNavigation(
         composable(NavScreen.HomeScreen.name){
             HomeScreen(navController)
         }
+        /*
         composable(NavScreen.PerfilScreen.name){
             Perfil()
-        }
+        }*/
         composable(NavScreen.ChatScreen.name){
             Chats()
         }
