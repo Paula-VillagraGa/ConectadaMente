@@ -33,7 +33,7 @@ import com.example.conectadamente.utils.validations.isValidEmail
 import com.example.conectadamente.utils.validations.isRutValid
 import com.example.conectadamente.utils.validations.isPasswordValid
 
-
+//funciona
 @Composable
 fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
     var name by remember { mutableStateOf("") }
