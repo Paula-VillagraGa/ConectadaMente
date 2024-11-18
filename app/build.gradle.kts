@@ -55,10 +55,10 @@ val room_version = "2.6.1"
 dependencies {
 
     //Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
 
     //Icons
     implementation("androidx.compose.material:material-icons-extended:1.5.3")

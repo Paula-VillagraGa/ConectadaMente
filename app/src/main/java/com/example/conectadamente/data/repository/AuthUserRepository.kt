@@ -11,6 +11,7 @@ class AuthUserRepository @Inject constructor() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 
+
     // Nueva función para registrar un paciente
     fun registerPatientInFirebase(
         patient: PatientModel, // Pasamos el objeto PatientModel
@@ -18,16 +19,6 @@ class AuthUserRepository @Inject constructor() {
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
-        // Validaciones
-        if (!isValidEmail(patient.email)) {
-            onError("El correo electrónico no tiene un formato válido")
-            return
-        }
-
-        if (password.length < 8) {
-            onError("La contraseña debe tener al menos 8 caracteres")
-            return
-        }
 
         // Registro del usuario en Firebase Authentication
         auth.createUserWithEmailAndPassword(patient.email, password)

@@ -27,8 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.conectadamente.R
 import com.example.conectadamente.data.model.PatientModel
-import com.example.conectadamente.utils.*
-import com.example.conectadamente.data.repository.AuthUserRepository.*
 import com.example.conectadamente.ui.theme.*
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
 import com.example.conectadamente.utils.validations.isValidEmail
@@ -175,9 +173,7 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
                                 val patient = PatientModel(
                                     email = email,
                                     rut = rut,
-                                    firstName = name,
-                                    lastName = "", // Puedes agregar un campo para apellido si lo necesitas
-                                    phoneNumber = "" // Puedes agregar un campo para número de teléfono si lo necesitas
+                                    name = name
                                 )
 
                                 viewModel.registerPatient(
@@ -203,7 +199,7 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
 
                 Text(
                     text = message,
-                    color = if (message.contains("Error")) Color.Red else Color.Green,
+                    color = Blue40,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
