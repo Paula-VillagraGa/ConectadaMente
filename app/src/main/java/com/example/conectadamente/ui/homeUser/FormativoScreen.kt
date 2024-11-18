@@ -1,4 +1,4 @@
-package com.example.conectadamente.ui.home
+package com.example.conectadamente.ui.homeUser
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement

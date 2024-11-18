@@ -1,4 +1,4 @@
-package com.example.conectadamente.ui.home
+package com.example.conectadamente.ui.homeUser
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +12,7 @@ import androidx.compose.ui.res.painterResource
 import com.example.conectadamente.R
 
 @Composable
-fun Recomendacion(){
+fun Chats(){
     Column (
         modifier = Modifier
             .fillMaxSize(),
@@ -21,8 +21,8 @@ fun Recomendacion(){
     ){
         Image(
             painter = painterResource(
-                id = R.drawable.ico_recomen),
+                id = R.drawable.ico_chat),
             contentDescription = null)
-        Text(text = "Recomendaciones")
+        Text(text = "Chats")
     }
 }

@@ -8,8 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.conectadamente.ui.auth.CreateAccountScreen
 import com.example.conectadamente.ui.auth.LoginScreen
 import com.example.conectadamente.ui.auth.SignInScreen
-import com.example.conectadamente.ui.home.HomeScreen
-import com.example.conectadamente.ui.register.RegisterPatientScreen
+import com.example.conectadamente.ui.homeUser.HomeScreen
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
 
 

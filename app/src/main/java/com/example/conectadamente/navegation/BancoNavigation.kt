@@ -4,11 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.conectadamente.ui.home.Chats
-import com.example.conectadamente.ui.home.Formativo
-import com.example.conectadamente.ui.home.HomeScreen
+import com.example.conectadamente.ui.homeUser.Chats
+import com.example.conectadamente.ui.homeUser.Formativo
+import com.example.conectadamente.ui.homeUser.HomeScreen
 /*import com.example.conectadamente.ui.home.Perfil*/
-import com.example.conectadamente.ui.home.Recomendacion
+import com.example.conectadamente.ui.homeUser.Recomendacion
 
 @Composable
 fun BancoNavigation(
