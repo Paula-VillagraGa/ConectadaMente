@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
     id("com.google.gms.google-services")
     id ("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
 
 
 }
@@ -59,7 +60,10 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
 
-    //
+    //Icons
+    implementation("androidx.compose.material:material-icons-extended:1.5.3")
+
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(platform(libs.androidx.compose.bom))
@@ -67,8 +71,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.ui)                  // Última versión de Compose UI
-    implementation(libs.ui.tooling.preview)  // Previsualización de Compose
+    implementation(libs.ui)
+    implementation(libs.ui.tooling.preview)
     implementation(libs.androidx.activity.compose.v172)
     // Integración con componentes de actividad
 
@@ -104,6 +108,8 @@ dependencies {
     //varios Hilt
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")  // ViewModel Compose
     implementation ("androidx.activity:activity-compose:1.7.2")  // Activity Compose
+
+
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")  // Hilt para Compose
     implementation ("com.google.dagger:hilt-android:2.43.2")  // Hilt Android
     kapt ("com.google.dagger:hilt-compiler:2.43.2")  // Hilt Kapt
