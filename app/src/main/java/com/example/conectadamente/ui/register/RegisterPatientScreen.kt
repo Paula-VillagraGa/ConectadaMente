@@ -23,24 +23,27 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.conectadamente.R
-import com.example.conectadamente.data.repository.AuthUserRepository
+import com.example.conectadamente.data.model.PatientModel
+import com.example.conectadamente.utils.*
+import com.example.conectadamente.data.repository.AuthUserRepository.*
 import com.example.conectadamente.ui.theme.*
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
+import com.example.conectadamente.utils.validations.isValidEmail
+import com.example.conectadamente.utils.validations.isRutValid
+import com.example.conectadamente.utils.validations.isPasswordValid
 
 
 @Composable
-fun RegisterPatientScreen() {
+fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
     var name by remember { mutableStateOf("") }
     var rut by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
-
 
     Box(
         modifier = Modifier.fillMaxSize() // Ocupa toda la pantalla
@@ -74,22 +77,22 @@ fun RegisterPatientScreen() {
                     .background(Color(0xFFD7D7D7))
             )
         }
-        // Box centrado con el formulario de login
+
+        // Box centrado con el formulario de registro
         Box(
             modifier = Modifier
                 .align(Alignment.Center) // Centra el formulario en toda la pantalla
                 .padding(16.dp)
                 .background(color = Color.White, shape = RoundedCornerShape(16.dp)) // Fondo blanco con bordes redondeados
                 .fillMaxWidth(0.9f) // Ocupa el 90% del ancho de la pantalla
-        ){
-
+        ) {
             Column(
                 modifier = Modifier
                     .padding(16.dp),
                 verticalArrangement = Arrangement.Center
             ) {
                 Image(
-                    painter = painterResource(id= R.drawable.relajarse1),
+                    painter = painterResource(id = R.drawable.relajarse1),
                     contentDescription = "Logo",
                     modifier = Modifier
                         .size(150.dp) // Tamaño de la imagen
@@ -105,6 +108,7 @@ fun RegisterPatientScreen() {
                     ),
                     textAlign = TextAlign.Center // Centrar el texto
                 )
+
                 // Campo para el nombre
                 OutlinedTextField(
                     value = name,
@@ -112,6 +116,7 @@ fun RegisterPatientScreen() {
                     label = { Text("Nombre Completo") },
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 // Campo para el RUT
                 OutlinedTextField(
                     value = rut,
@@ -119,6 +124,7 @@ fun RegisterPatientScreen() {
                     label = { Text("RUT") },
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 // Campo para el correo electrónico
                 OutlinedTextField(
                     value = email,
@@ -126,6 +132,7 @@ fun RegisterPatientScreen() {
                     label = { Text("Correo Electrónico") },
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 // Campo para la contraseña
                 OutlinedTextField(
                     value = password,
@@ -134,6 +141,7 @@ fun RegisterPatientScreen() {
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 // Campo para confirmar la contraseña
                 OutlinedTextField(
                     value = confirmPassword,
@@ -146,39 +154,59 @@ fun RegisterPatientScreen() {
                 // Botón de registro
                 Button(
                     onClick = {
-                        if (name.isNotEmpty() && rut.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()) {
-                            if (password == confirmPassword) {
-                                message = "Registro exitoso"
-                            } else {
+                        // Validaciones
+                        when {
+                            name.isEmpty() || rut.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() -> {
+                                message = "Todos los campos son obligatorios"
+                            }
+                            !isValidEmail(email) -> {
+                                message = "El correo electrónico no tiene un formato válido"
+                            }
+                            !isRutValid(rut) -> {
+                                message = "El RUT no tiene un formato válido"
+                            }
+                            !isPasswordValid(password) -> {
+                                message = "La contraseña debe tener al menos 8 caracteres"
+                            }
+                            password != confirmPassword -> {
                                 message = "Las contraseñas no coinciden"
                             }
-                        } else {
-                            message = "Todos los campos son obligatorios"
+                            else -> {
+                                val patient = PatientModel(
+                                    email = email,
+                                    rut = rut,
+                                    firstName = name,
+                                    lastName = "", // Puedes agregar un campo para apellido si lo necesitas
+                                    phoneNumber = "" // Puedes agregar un campo para número de teléfono si lo necesitas
+                                )
+
+                                viewModel.registerPatient(
+                                    patient = patient,
+                                    password = password,
+                                    onSuccess = {
+                                        message = "Registro exitoso"
+                                    },
+                                    onError = { error ->
+                                        message = "Error: $error"
+                                    }
+                                )
+                            }
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp) ,
+                        .padding(top = 16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Blue30)
                 ) {
                     Text("Registrar")
                 }
 
-                // Mostrar mensaje de éxito o error
-                if (message.isNotEmpty()) {
-                    Text(
-                        text = message,
-                        modifier = Modifier.padding(top = 8.dp),
-                        color = if (message == "Registro exitoso") Color.Black else Color.Black
-                    )
-                }
+                Text(
+                    text = message,
+                    color = if (message.contains("Error")) Color.Red else Color.Green,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
             }
         }
+    }
 }
-}
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun RegisterPatientScreenPreview() {
-    RegisterPatientScreen()
-}
-

@@ -1,44 +1,36 @@
 package com.example.conectadamente.ui.viewModel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.conectadamente.utils.isValidEmail
+import com.example.conectadamente.data.model.PatientModel
+import com.example.conectadamente.data.repository.AuthUserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 
-import com.google.firebase.auth.FirebaseAuth
+@HiltViewModel
+class UserAuthViewModel @Inject constructor(
+    private val authUserRepository: AuthUserRepository // Inyección de dependencias
+) : ViewModel() {
 
-
-open class UserAuthViewModel : ViewModel() {
-
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
-    // Método para registrar un usuario
-    open fun registerUser(
-        rut: String,
-        name: String,
-        email: String,
+    // Aquí, puedes manejar el registro del paciente
+    fun registerPatient(
+        patient: PatientModel,
         password: String,
-        onSuccess: (String) -> Unit,
+        onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        // Verificar si el email tiene un formato válido
-        if (!isValidEmail(email)) {
-            onError("El correo electrónico no tiene un formato válido.")
-            return
-        }
-        // Registro en Firebase Authentication
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Usuario registrado con éxito
-                    onSuccess("Usuario registrado correctamente.")
-                    //Revisar en LogCat por posibles errores
-                    Log.d("RegisterUser", "Registro exitoso para el usuario: $email")
-                } else {
-                    // Error durante el registro
-                    onError(task.exception?.message ?: "Error desconocido.")
-                }
+        // Llamamos al método del repositorio para registrar al paciente en Firebase
+        authUserRepository.registerPatientInFirebase(
+            patient = patient,
+            password = password,
+            onSuccess = {
+                // Si el registro fue exitoso, ejecutamos la acción de éxito
+                onSuccess()
+            },
+            onError = { errorMessage ->
+                // Si ocurrió un error, pasamos el mensaje de error al callback
+                onError(errorMessage)
             }
+        )
     }
 }
-

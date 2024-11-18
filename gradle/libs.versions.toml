@@ -17,6 +17,7 @@ kotlinxSerialization = "1.7.0"
 kotlinCompose= "2.0.10"
 foundationAndroidVersion = "1.7.2"
 roomKtxVersion = "2.6.1"
+hiltVersion = "2.43.2"
 
 
 [libraries]
@@ -41,6 +42,10 @@ ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroidVersion" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtxVersion" }
+# Agregar dependencias de Hilt
+dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltVersion" }
+dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hiltVersion" }
+
 
 
 
@@ -51,7 +56,9 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinCompose" }
 jetbrainsKotlinSerialization = {id= "org.jetbrains.kotlin.plugin.serialization", version.ref= "kotlin"}
 kotlin-ksp = {id = "com.google.devtools.ksp", version = "2.0.21-1.0.25"}
-#Room
+#Hilt
+dagger-hilt-plugin = { id = "dagger.hilt.android.plugin", version.ref = "hiltVersion" }
+
 
 
 

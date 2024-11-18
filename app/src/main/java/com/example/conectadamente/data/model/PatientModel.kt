@@ -9,11 +9,10 @@ data class PatientModel(
     val email: String,  // Usamos el correo electrónico como identificador
     val rut: String,
     val firstName: String,
-    val lastName: String,
-    val phoneNumber: String,
-    val password: String,
-    val profileImageUri: String? = null // Foto de perfil opcional
+    val lastName: String = "", // Campo opcional
+    val phoneNumber: String = "" // Campo opcional
+
 ) {
     // Constructor vacío necesario para Firebase
-    constructor() : this("", "", "", "", "", "")
+    constructor() : this("", "", "")
 }

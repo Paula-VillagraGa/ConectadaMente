@@ -1,7 +1,7 @@
 package com.example.conectadamente.core.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -9,6 +9,7 @@ import com.example.conectadamente.ui.auth.CreateAccountScreen
 import com.example.conectadamente.ui.auth.LoginScreen
 import com.example.conectadamente.ui.auth.SignInScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
+import com.example.conectadamente.ui.register.RegisterPatientScreen
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
 
 
@@ -42,8 +43,8 @@ fun NavigationWrapper(){
         }
 
         composable("register_patient") {
-            val userAuthViewModel: UserAuthViewModel = viewModel() // Instanciamos el ViewModel correcto
-            /*RegisterPatientScreen(viewModel = userAuthViewModel) // Pasamos el ViewModel aquí*/
+            val userAuthViewModel: UserAuthViewModel = hiltViewModel()  // Cambié esto a hiltViewModel()
+            RegisterPatientScreen(viewModel = userAuthViewModel)  // Ahora pasas el ViewModel a la pantalla
         }
 
         composable("home_screen") {

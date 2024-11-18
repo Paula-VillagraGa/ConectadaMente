@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinSerialization)
     alias(libs.plugins.kotlin.ksp)
     id("com.google.gms.google-services")
+    id ("kotlin-kapt")
+
 
 }
 
@@ -42,6 +44,10 @@ android {
     buildFeatures {
         compose = true
     }
+}
+
+kapt {
+    correctErrorTypes = true
 }
 //Room
 val room_version = "2.6.1"
@@ -94,6 +100,13 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    //varios Hilt
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")  // ViewModel Compose
+    implementation ("androidx.activity:activity-compose:1.7.2")  // Activity Compose
+    implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")  // Hilt para Compose
+    implementation ("com.google.dagger:hilt-android:2.43.2")  // Hilt Android
+    kapt ("com.google.dagger:hilt-compiler:2.43.2")  // Hilt Kapt
 
 
 

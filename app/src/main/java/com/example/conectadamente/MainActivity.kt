@@ -19,7 +19,10 @@ import com.example.conectadamente.ui.theme.MyApplicationTheme
 import com.example.conectadamente.core.navigation. *
 import com.example.conectadamente.components. *
 import com.example.conectadamente.navegation. *
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
 
