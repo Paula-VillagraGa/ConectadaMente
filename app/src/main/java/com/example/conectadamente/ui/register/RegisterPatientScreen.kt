@@ -57,28 +57,12 @@ fun RegisterPatientScreen() {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 100.dp), // Ajuste para posicionar más abajo
+                        .padding(top = 30.dp), // Ajuste para posicionar más abajo
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
                 ) {
                     Spacer(modifier = Modifier.height(16.dp)) // Espaciado opcional
-                    Image(
-                        painter = painterResource(id= R.drawable.logo3),
-                        contentDescription = "Logo",
-                        modifier = Modifier
-                            .size(80.dp) // Tamaño de la imagen
-                            .padding(bottom = 16.dp) // Espacio entre la imagen y el texto
-                    )
-                    Text(
-                        text = "Iniciar Sesión", // Reemplaza con tu texto
-                        style = TextStyle(
-                            fontFamily = PoppinsFontFamily,   // Usar la familia de fuentes definida
-                            fontStyle = FontStyle.Italic,    // Asegura que se usa el estilo itálico
-                            fontSize = 30.sp,                // Tamaño de la fuente
-                            color = Color.White,
-                        ),
-                        textAlign = TextAlign.Center // Centrar el texto
-                    )
+
                 }
             }
 
@@ -101,10 +85,26 @@ fun RegisterPatientScreen() {
 
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
                     .padding(16.dp),
                 verticalArrangement = Arrangement.Center
             ) {
+                Image(
+                    painter = painterResource(id= R.drawable.relajarse1),
+                    contentDescription = "Logo",
+                    modifier = Modifier
+                        .size(150.dp) // Tamaño de la imagen
+                        .padding(bottom = 6.dp) // Espacio entre la imagen y el texto
+                )
+                Text(
+                    text = "Regístrate",
+                    style = TextStyle(
+                        fontFamily = PoppinsFontFamily,   // Usar la familia de fuentes definida
+                        fontStyle = FontStyle.Italic,    // Asegura que se usa el estilo itálico
+                        fontSize = 30.sp,                // Tamaño de la fuente
+                        color = Blue20,
+                    ),
+                    textAlign = TextAlign.Center // Centrar el texto
+                )
                 // Campo para el nombre
                 OutlinedTextField(
                     value = name,
@@ -159,7 +159,7 @@ fun RegisterPatientScreen() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp) ,
-                    colors = ButtonDefaults.buttonColors(containerColor = Blue40)
+                    colors = ButtonDefaults.buttonColors(containerColor = Blue30)
                 ) {
                     Text("Registrar")
                 }

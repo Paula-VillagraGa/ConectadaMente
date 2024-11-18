@@ -44,7 +44,7 @@ fun NavigationWrapper(){
 
         composable("register_patient") {
             val userAuthViewModel: UserAuthViewModel = viewModel() // Instanciamos el ViewModel correcto
-            RegisterPatientScreen(viewModel = userAuthViewModel) // Pasamos el ViewModel aquí
+            /*RegisterPatientScreen(viewModel = userAuthViewModel) // Pasamos el ViewModel aquí*/
         }
 
         composable("home_screen") {
