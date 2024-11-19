@@ -1,5 +1,6 @@
 package com.example.conectadamente.ui.auth
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,32 +16,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
-import com.example.conectadamente.ui.theme.Purple30
-import com.example.conectadamente.ui.theme.PoppinsFontFamily
+import com.example.conectadamente.ui.theme.*
 import com.example.conectadamente.R
 import com.example.conectadamente.ui.theme.MyApplicationTheme
-import com.example.conectadamente.ui.theme.Purple40
 
 
 
 @Composable
 fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScreen: () -> Unit = {}) {
-    var email by remember { mutableStateOf<String>("") }
-    var password by remember { mutableStateOf<String>("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
 
     Box(
@@ -56,6 +52,24 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                     .fillMaxWidth()
                     .background(Purple30)
             ) {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    for (i in 0 until 5) { // Menos círculos
+                        drawCircle(
+                            color = Purple60,
+                            radius = 40f,
+                            center = Offset(
+                                x = (100f * i + 50f), // Posiciones en X desplazadas
+                                y = (200f * i + 30f)  // Posiciones en Y desplazadas
+                            )
+                        )
+                    }
+
+                    // Ejemplo de un círculo decorativo sobre el fondo
+                    drawCircle(
+                        color = Purple40,
+                        radius = 150f,
+                        center = Offset(x = size.width / 2, y = size.height / 3) // Ajusta la posición del círculo
+                    )}
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -68,18 +82,18 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                         painter = painterResource(id=R.drawable.usuario1),
                         contentDescription = "Logo",
                         modifier = Modifier
-                            .size(150.dp) // Tamaño de la imagen
+                            .size(200.dp) // Tamaño de la imagen
                             .padding(bottom = 16.dp) // Espacio entre la imagen y el texto
                     )
                     Text(
                         text = "Iniciar Sesión", // Reemplaza con tu texto
                         style = TextStyle(
                             fontFamily = PoppinsFontFamily,   // Usar la familia de fuentes definida
-                            fontStyle = FontStyle.Italic,    // Asegura que se usa el estilo itálico
+                            fontStyle = FontStyle.Normal,    // Asegura que se usa el estilo itálico
                             fontSize = 30.sp,                // Tamaño de la fuente
                             color = Color.White,
                         ),
-                        textAlign = TextAlign.Center // Centrar el texto
+                        textAlign = TextAlign.Left // Centrar el texto
                     )
                 }
             }
@@ -89,7 +103,7 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                 modifier = Modifier
                     .weight(1f) // Ocupa la mitad de la pantalla
                     .fillMaxWidth()
-                    .background(Color(0xFFD7D7D7)) // Lila claro
+                    .background(Color(0xFFD7D7D7))
             )
         }
 
@@ -98,6 +112,7 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
             modifier = Modifier
                 .align(Alignment.Center) // Centra el formulario en toda la pantalla
                 .padding(16.dp)
+                .padding(top = 100.dp)
                 .background(color = Color.White, shape = RoundedCornerShape(16.dp)) // Fondo blanco con bordes redondeados
                 .fillMaxWidth(0.9f) // Ocupa el 90% del ancho de la pantalla
         ) {
@@ -112,8 +127,11 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Correo Electrónico") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp)
                 )
+
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -123,7 +141,9 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                     onValueChange = { password = it },
                     label = { Text("Contraseña") },
                     visualTransformation = PasswordVisualTransformation(), // Para ocultar la contraseña
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp)
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -146,9 +166,11 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Mensaje de error
-                Text(text = message)
+                Text(text = message,
+                        color = Purple60,
+                    modifier = Modifier.padding(top = 4.dp))
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Texto para crear una cuenta
                 Text(
@@ -173,13 +195,3 @@ fun SignInScreenPreview() {
         SignInScreen()
     }
 }
-val passwordVisualTransformation = VisualTransformation { text ->
-    TransformedText(
-        text = buildAnnotatedString {
-            append("*".repeat(text.text.length)) // Mostrar asteriscos en lugar de texto
-        },
-        offsetMapping = OffsetMapping.Identity
-    )
-}
-
-

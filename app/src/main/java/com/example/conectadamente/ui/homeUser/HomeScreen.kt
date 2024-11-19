@@ -92,7 +92,7 @@ fun SearchField() {
             .padding(16.dp)
             .background(Color(0xFFE9E7F3), RoundedCornerShape(16.dp)),
         placeholder = {
-            Text("Buscar", color = Color(0xFF5A4E97))
+            Text("Buscar", color = Color(0xFF3E4398))
         },
         leadingIcon = {
             Icon(
