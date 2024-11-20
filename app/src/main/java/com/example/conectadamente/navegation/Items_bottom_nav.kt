@@ -1,4 +1,4 @@
-package com.example.conectadamente.models
+package com.example.conectadamente.navegation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
@@ -7,7 +7,6 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.conectadamente.navegation.NavScreen
 
 sealed class Items_bottom_nav(
     val icon: ImageVector,
@@ -17,7 +16,7 @@ sealed class Items_bottom_nav(
     object Item_bottom_nav1: Items_bottom_nav(
         Icons.Outlined.Person,
         "Perfil",
-        NavScreen.PerfilScreen.name
+        NavScreen.PerfilUsuarioScreen.name
     )
     object Item_bottom_nav2: Items_bottom_nav(
         Icons.Outlined.Email,

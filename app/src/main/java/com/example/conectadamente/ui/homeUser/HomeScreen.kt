@@ -23,7 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.conectadamente.components.NavigationInferior
+import com.example.conectadamente.navegation.NavigationInferior
 import com.example.conectadamente.ui.theme.*
 
 
@@ -116,10 +116,37 @@ fun ContentSection() {
             modifier = Modifier.padding(vertical = 8.dp)
         )
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { RecommendationCard("Relaxing Soundscapes", R.drawable.ic_google) }
-            item { RecommendationCard("Meditative Art", R.drawable.ico_perfil) }
-            item { RecommendationCard("Stress Relief Music", R.drawable.ico_forma) }
+            items(3) { index -> // Usamos `items` para manejar dinámicamente
+                RecommendationCard("Recomendación ${index + 1}", R.drawable.ic_google)
+            }
         }
+    }
+}
+
+@Composable
+fun SupportCard(title: String, subtitle: String, imageRes: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFE9E7F3), RoundedCornerShape(16.dp))
+            .padding(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(8.dp)
+        ) {
+            Text(text = title, color = Color(0xFF100E1B), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(text = subtitle, color = Color(0xFF5A4E97), fontSize = 12.sp)
+        }
+        Image(
+            painter = painterResource(id = imageRes),
+            contentDescription = title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(80.dp)
+                .clip(RoundedCornerShape(12.dp))
+        )
     }
 }
 
@@ -145,7 +172,7 @@ fun MentalHealthSection() {
 fun RecommendationCard(title: String, imageRes: Int) {
     Column(modifier = Modifier.width(150.dp)) {
         Image(
-            painter = painterResource(id = R.drawable.emocion_triste),
+            painter = painterResource(id = imageRes),
             contentDescription = title,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -161,35 +188,6 @@ fun RecommendationCard(title: String, imageRes: Int) {
             fontWeight = FontWeight.Normal
         )
         Spacer(modifier = Modifier.height(10.dp))
-    }
-}
-
-
-// Tarjetas de soporte
-@Composable
-fun SupportCard(title: String, subtitle: String, imageRes: Int) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFFE9E7F3), RoundedCornerShape(16.dp))
-            .padding(8.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(8.dp)
-        ) {
-            Text(text = title, color = Color(0xFF100E1B), fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Text(text = subtitle, color = Color(0xFF5A4E97), fontSize = 12.sp)
-        }
-        Image(
-            painter = painterResource(id = imageRes),
-            contentDescription = title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(80.dp)
-                .clip(RoundedCornerShape(12.dp))
-        )
     }
 }
 

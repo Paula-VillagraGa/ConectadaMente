@@ -4,11 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.conectadamente.ui.homeUser.Chats
-import com.example.conectadamente.ui.homeUser.Formativo
+import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
+import com.example.conectadamente.ui.homeUser.FormativoUsuarioScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
-/*import com.example.conectadamente.ui.home.Perfil*/
-import com.example.conectadamente.ui.homeUser.Recomendacion
+import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
+import com.example.conectadamente.ui.homeUser.RecomendacionUsuarioScreen
 
 @Composable
 fun BancoNavigation(
@@ -21,18 +21,18 @@ fun BancoNavigation(
         composable(NavScreen.HomeScreen.name){
             HomeScreen(navController)
         }
-        /*
-        composable(NavScreen.PerfilScreen.name){
-            Perfil()
-        }*/
+
+        composable(NavScreen.PerfilUsuarioScreen.name){
+            PerfilUsuarioScreen(navController)
+        }
         composable(NavScreen.ChatScreen.name){
-            Chats()
+            ChatUsuarioScreen(navController)
         }
         composable(NavScreen.RecomendacionScreen.name){
-            Recomendacion()
+            RecomendacionUsuarioScreen(navController)
         }
         composable(NavScreen.FormativoScreen.name){
-            Formativo()
+            FormativoUsuarioScreen(navController)
         }
     }
 

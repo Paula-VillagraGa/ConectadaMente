@@ -1,4 +1,4 @@
-package com.example.conectadamente.components
+package com.example.conectadamente.navegation
 
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
@@ -7,8 +7,12 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import com.example.conectadamente.models.Items_bottom_nav. *
-import com.example.conectadamente.navegation.currentRoute
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import com.example.conectadamente.navegation.Items_bottom_nav. *
+
+
+
 
 @Composable
 fun NavigationInferior(
