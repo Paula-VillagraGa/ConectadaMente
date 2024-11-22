@@ -5,12 +5,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.conectadamente.utils.validations.isValidEmail
 import javax.inject.Inject
-
 class AuthUserRepository @Inject constructor() {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
-
 
     // Nueva función para registrar un paciente
     fun registerPatientInFirebase(
@@ -19,7 +17,6 @@ class AuthUserRepository @Inject constructor() {
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
-
         // Registro del usuario en Firebase Authentication
         auth.createUserWithEmailAndPassword(patient.email, password)
             .addOnCompleteListener { task ->
@@ -27,7 +24,7 @@ class AuthUserRepository @Inject constructor() {
                     val user = auth.currentUser
                     val uid = user?.uid ?: return@addOnCompleteListener onError("UID no encontrado")
 
-                    // Ahora guardamos los datos del paciente en Firestore
+                    // Guardamos los datos del paciente en Firestore
                     db.collection("patients").document(uid)
                         .set(patient) // Guardamos el modelo de paciente con el UID como identificador
                         .addOnSuccessListener {
@@ -40,4 +37,10 @@ class AuthUserRepository @Inject constructor() {
                     onError("Error al registrar paciente: ${task.exception?.message}")
                 }
             }
-    }}
+    }
+
+    // Obtener el UID del usuario actual autenticado
+    fun getCurrentUserId(): String? {
+        return auth.currentUser?.uid
+    }
+}

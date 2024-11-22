@@ -17,7 +17,8 @@ kotlinxSerialization = "1.7.0"
 kotlinCompose= "2.0.10"
 foundationAndroidVersion = "1.7.2"
 roomKtxVersion = "2.6.1"
-hiltVersion = "2.43.2"
+hiltVersion = "2.51.1"
+firebaseStorageKtxVersion = "21.0.1"
 
 
 [libraries]
@@ -45,6 +46,7 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 # Agregar dependencias de Hilt
 dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltVersion" }
 dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hiltVersion" }
+firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtxVersion" }
 
 
 

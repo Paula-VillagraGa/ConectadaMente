@@ -20,10 +20,14 @@ import androidx.navigation.NavController
 import com.example.conectadamente.R
 import com.example.conectadamente.ui.theme.*
 
-
-
 @Composable
-fun LoginScreen(navController: NavController, navigateToSignIn: () ->Unit, navigateToGoogleSignIn:() -> Unit, navigateToCreateAccount: ()-> Unit, navigateToRegisterPatient:()-> Unit) {
+fun LoginScreen(
+    navController: NavController,
+    navigateToSignIn: () -> Unit,
+    navigateToGoogleSignIn: () -> Unit,
+    navigateToCreateAccount: () -> Unit,
+    navigateToRegisterPatient: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -35,70 +39,56 @@ fun LoginScreen(navController: NavController, navigateToSignIn: () ->Unit, navig
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp), // Espaciado alrededor del Box
-            contentAlignment = Alignment.Center // Centra el contenido dentro del Box
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
         ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally // Alinea la imagen y el texto al centro dentro del Column
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.meditacion), // Reemplaza con tu imagen
+                    painter = painterResource(id = R.drawable.meditacion),
                     contentDescription = "Logo",
                     modifier = Modifier
-                        .size(300.dp) // Tamaño de la imagen
-                        .padding(bottom = 16.dp) // Espacio entre la imagen y el texto
+                        .size(300.dp)
+                        .padding(bottom = 16.dp)
                 )
                 Text(
-                    text = "Bienvenido a ConectadaMente", // Reemplaza con tu texto
+                    text = "Bienvenido a ConectadaMente",
                     style = TextStyle(
-                        fontFamily = PoppinsFontFamily,   // Usar la familia de fuentes definida
-                        fontStyle = FontStyle.Italic,    // Asegura que se usa el estilo itálico
-                        fontSize = 30.sp,                // Tamaño de la fuente
+                        fontFamily = PoppinsFontFamily,
+                        fontStyle = FontStyle.Italic,
+                        fontSize = 30.sp,
                         color = Purple20,
                     ),
-                    textAlign = TextAlign.Center // Centrar el texto
+                    textAlign = TextAlign.Center
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        // Botón para ir a la pantalla de iniciar sesión
         Button(
-            onClick = { navController.navigate("sign_in") },
+            onClick = { navigateToSignIn() },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-
             colors = ButtonDefaults.buttonColors(containerColor = Purple20)
         ) {
-            Text(text = "Iniciar Sesión", style = TextStyle(color = Color.White,fontWeight = FontWeight.Normal,
-                fontFamily = PoppinsFontFamily, fontStyle = FontStyle.Normal, fontSize = 16.sp))
+            Text(text = "Iniciar Sesión", style = TextStyle(color = Color.White, fontSize = 16.sp))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botón para registrarse
         Button(
-            onClick = { navigateToRegisterPatient() }, //Registrar Paciente
+            onClick = { navigateToRegisterPatient() },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Purple30)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Ícono de Google
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Registrarse",  style = TextStyle(color = Color.White,fontWeight = FontWeight.Normal,
-                    fontFamily = PoppinsFontFamily, fontStyle = FontStyle.Normal, fontSize = 16.sp))
-            }
+            Text(text = "Registrarse", style = TextStyle(color = Color.White, fontSize = 16.sp))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-
-
     }
 }

@@ -3,12 +3,10 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrainsKotlinSerialization)
-    alias(libs.plugins.kotlin.ksp)
-    id("com.google.gms.google-services")
-    id ("kotlin-kapt")
-    id("dagger.hilt.android.plugin")
-
-
+    alias(libs.plugins.kotlin.ksp)  // Hilt y KSP para Kotlin
+    id("com.google.gms.google-services")  // Para Firebase (si lo usas)
+    id("kotlin-kapt")  // KAPT para Hilt
+    id("dagger.hilt.android.plugin")  // Plugin de Hilt
 }
 
 android {
@@ -52,13 +50,16 @@ kapt {
 }
 //Room
 val room_version = "2.6.1"
+val hiltVersion = "2.51.1"
 dependencies {
 
     //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
+
+
 
     //Icons
     implementation("androidx.compose.material:material-icons-extended:1.5.3")
@@ -74,6 +75,7 @@ dependencies {
     implementation(libs.ui)
     implementation(libs.ui.tooling.preview)
     implementation(libs.androidx.activity.compose.v172)
+
     // Integración con componentes de actividad
 
     implementation(libs.androidx.navigation.compose)
@@ -84,6 +86,7 @@ dependencies {
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.foundation.android)
+    implementation(libs.firebase.storage.ktx)
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
 
@@ -105,15 +108,16 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    //varios Hilt
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")  // ViewModel Compose
-    implementation ("androidx.activity:activity-compose:1.7.2")  // Activity Compose
+    // Hilt y KSP
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0") // ViewModel Compose
+    implementation("androidx.activity:activity-compose:1.7.2") // Activity Compose
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0") // Hilt para Compose
+    implementation ("com.google.dagger:hilt-android:$hiltVersion")
 
+    kapt("com.google.dagger:hilt-compiler:2.51.1") // Hilt KAPT (No KSP necesario)
 
-    implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")  // Hilt para Compose
-    implementation ("com.google.dagger:hilt-android:2.43.2")  // Hilt Android
-    kapt ("com.google.dagger:hilt-compiler:2.43.2")  // Hilt Kapt
-
+    // Si usas KSP para otras tareas, manténlo configurado de esta forma:
+    implementation("com.google.devtools.ksp:symbol-processing-api:2.0.21-1.0.27")
 
 
 }

@@ -8,10 +8,8 @@ import com.example.conectadamente.navegation.NavigationWrapper
 import com.example.conectadamente.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,8 +20,6 @@ class MainActivity : ComponentActivity() {
                 //Navegación acá
                 NavigationWrapper()
             }
-
         }
     }
-
 }

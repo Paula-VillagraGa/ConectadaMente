@@ -5,7 +5,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.conectadamente.ui.auth.CreateAccountScreen
 import com.example.conectadamente.ui.auth.LoginScreen
 import com.example.conectadamente.ui.auth.SignInScreen
 import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
@@ -16,66 +15,65 @@ import com.example.conectadamente.ui.viewModel.UserAuthViewModel
 import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
 import com.example.conectadamente.ui.homeUser.RecomendacionUsuarioScreen
 
-
 @Composable
 fun NavigationWrapper() {
     val navController = rememberNavController()
 
-    // Usamos el NavHost para definir las rutas y pantallas
+    // Definimos el NavHost con las rutas y pantallas
     NavHost(navController = navController, startDestination = "login") {
 
-        // Definimos las pantallas de la navegación, como lo tenías antes
-        composable("perfil_usuario") {
-            PerfilUsuarioScreen(navController = navController)
-        }
-
-        composable("chat_usuario") {
-            ChatUsuarioScreen(navController = navController)
-        }
-
-        composable("home_screen") {
-            HomeScreen(navController = navController)
-        }
-
-        composable("recomendaciones_usuario") {
-            RecomendacionUsuarioScreen(navController = navController)
-        }
-
-        composable("formativo_usuario") {
-            FormativoUsuarioScreen(navController = navController)
-        }
-
-        // Pantallas que ya tenías configuradas
+        // Pantalla de Login
         composable("login") {
             LoginScreen(
                 navController = navController,
                 navigateToSignIn = { navController.navigate("sign_in") },
-                navigateToGoogleSignIn = { navController.navigate("google_sign_in") },
-                navigateToCreateAccount = { navController.navigate("create_account") },
+                navigateToGoogleSignIn = { /* Implementar lógica de Google Sign-In aquí */ },
+                navigateToCreateAccount = { /* Implementar lógica para crear cuenta */ },
                 navigateToRegisterPatient = { navController.navigate("register_patient") }
             )
         }
 
+        // Pantalla de Iniciar Sesión
         composable("sign_in") {
             SignInScreen(
                 navigateToRegisterPacient = { navController.navigate("register_patient") },
-                navigateToHomeScreen = { navController.navigate("home_screen") }
+                navigateToHomeScreen = {
+                    navController.navigate("home_screen") {
+                        popUpTo("login") { inclusive = true } // Limpia el login de la pila
+                    }
+                }
             )
         }
 
-        composable("create_account") {
-            CreateAccountScreen(
-                navigateToLoginScreen = { navController.navigate("login") }
-            )
-        }
-
+        // Pantalla de Registro de Paciente
         composable("register_patient") {
             val userAuthViewModel: UserAuthViewModel = hiltViewModel()
             RegisterPatientScreen(viewModel = userAuthViewModel)
         }
 
+        // Pantalla Principal
         composable("home_screen") {
             HomeScreen(navController = navController)
+        }
+
+        // Pantalla de Perfil de Usuario
+        composable("perfil_usuario") {
+            PerfilUsuarioScreen(navController = navController)
+        }
+
+        // Pantalla de Chat de Usuario
+        composable("chat_usuario") {
+            ChatUsuarioScreen(navController = navController)
+        }
+
+        // Pantalla de Recomendaciones de Usuario
+        composable("recomendaciones_usuario") {
+            RecomendacionUsuarioScreen(navController = navController)
+        }
+
+        // Pantalla de Material Formativo para el Usuario
+        composable("formativo_usuario") {
+            FormativoUsuarioScreen(navController = navController)
         }
     }
 }
