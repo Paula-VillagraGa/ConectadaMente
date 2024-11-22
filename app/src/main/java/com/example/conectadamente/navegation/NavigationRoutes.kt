@@ -1,0 +1,30 @@
+package com.example.conectadamente.navegation
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.ui.graphics.vector.ImageVector
+
+
+sealed class NavScreen(val route: String, val title: String, val icon: ImageVector?) {
+    object Login : NavScreen("login", "Login", null)
+    object SignIn : NavScreen("sign_in", "Iniciar Sesión", null)
+    object RegisterPatient : NavScreen("register_patient", "Registro", null)
+    object Home : NavScreen("home_screen", "Inicio", Icons.Outlined.Home)
+    object Perfil : NavScreen("perfil_usuario", "Perfil", Icons.Outlined.Person)
+    object Chat : NavScreen("chat_usuario", "Chat", Icons.Outlined.Email)
+    object Recomendaciones : NavScreen("recomendaciones_usuario", "Recomendaciones", Icons.Outlined.Face)
+    object Formativo : NavScreen("formativo_usuario", "Formativo", Icons.Outlined.Info)
+}
+
+// Lista para navegación inferior
+val bottomNavItems = listOf(
+    NavScreen.Home,
+    NavScreen.Perfil,
+    NavScreen.Chat,
+    NavScreen.Recomendaciones,
+    NavScreen.Formativo
+)

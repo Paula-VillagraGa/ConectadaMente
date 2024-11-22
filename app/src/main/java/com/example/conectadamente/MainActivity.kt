@@ -4,7 +4,7 @@ package com.example.conectadamente
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.conectadamente.navegation.NavigationWrapper
+import com.example.conectadamente.navegation.AppNavigation
 import com.example.conectadamente.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 //Navegación acá
-                NavigationWrapper()
+                AppNavigation()
             }
         }
     }

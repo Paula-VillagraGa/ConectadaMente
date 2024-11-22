@@ -24,8 +24,6 @@ import com.example.conectadamente.ui.theme.*
 fun LoginScreen(
     navController: NavController,
     navigateToSignIn: () -> Unit,
-    navigateToGoogleSignIn: () -> Unit,
-    navigateToCreateAccount: () -> Unit,
     navigateToRegisterPatient: () -> Unit
 ) {
     Column(

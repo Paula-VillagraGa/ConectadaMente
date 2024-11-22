@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -33,7 +34,6 @@ import com.example.conectadamente.ui.theme.*
 fun HomeScreen(navController: NavHostController) {
     Scaffold(
         topBar = { TopAppBar() },
-        bottomBar = { BottomNavigationBar(navController) }
     ) { paddingValues ->
         Surface(
             modifier = Modifier
@@ -75,11 +75,7 @@ fun TopAppBar() {
     )
 }
 
-// Barra de navegación inferior
-@Composable
-fun BottomNavigationBar(navController: NavHostController) {
-    NavigationInferior(navController)
-}
+
 
 // Campo de búsqueda
 @Composable
@@ -104,10 +100,43 @@ fun SearchField() {
     )
 }
 
-// Sección de contenido recomendado
+// Tarjeta de recomendación utilizando aspectRatio para tamaño flexible
+@Composable
+fun RecommendationCardHome(title: String, imageRes: Int) {
+    Column(
+        modifier = Modifier
+            .width(200.dp)  // Controla el ancho de la tarjeta
+            .padding(8.dp)
+            .background(Color(0xFFE9E7F3), RoundedCornerShape(12.dp))
+    ) {
+        // Imagen con una relación de aspecto más alta que ancha (1:1.5)
+        Image(
+            painter = painterResource(id = imageRes),
+            contentDescription = title,
+            contentScale = ContentScale.Crop,  // Asegura que la imagen se recorte para llenar el espacio
+            modifier = Modifier
+                .fillMaxWidth()  // La imagen ocupa todo el ancho disponible
+                .aspectRatio(1f / 1.5f)  // Relación de aspecto invertida para que sea más larga que ancha
+                .clip(RoundedCornerShape(12.dp))  // Redondea las esquinas de la imagen
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = title,
+            color = Color(0xFF100E1B),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+    }
+}
 @Composable
 fun ContentSection() {
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()  // Asegura que la columna ocupe todo el ancho
+            .padding(horizontal = 16.dp)
+            .height(300.dp)  // Define una altura específica para la sección
+    ) {
         Text(
             text = "Recomendaciones para ti",
             color = Blue30,
@@ -115,13 +144,19 @@ fun ContentSection() {
             fontWeight = FontWeight.Normal,
             modifier = Modifier.padding(vertical = 8.dp)
         )
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(3) { index -> // Usamos `items` para manejar dinámicamente
-                RecommendationCard("Recomendación ${index + 1}", R.drawable.ic_google)
+        Spacer(modifier = Modifier.height(16.dp)) // Espaciado entre el título y las tarjetas
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth() // Asegura que el LazyRow ocupe todo el ancho
+        ) {
+            items(3) { index ->
+                RecommendationCardHome("Recomendación ${index + 1}", R.drawable.ic_google)
             }
         }
+
     }
 }
+
 
 @Composable
 fun SupportCard(title: String, subtitle: String, imageRes: Int) {
@@ -136,7 +171,12 @@ fun SupportCard(title: String, subtitle: String, imageRes: Int) {
                 .weight(1f)
                 .padding(8.dp)
         ) {
-            Text(text = title, color = Color(0xFF100E1B), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(
+                text = title,
+                color = Color(0xFF100E1B),
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
             Text(text = subtitle, color = Color(0xFF5A4E97), fontSize = 12.sp)
         }
         Image(
@@ -146,7 +186,9 @@ fun SupportCard(title: String, subtitle: String, imageRes: Int) {
             modifier = Modifier
                 .size(80.dp)
                 .clip(RoundedCornerShape(12.dp))
+
         )
+        Spacer(modifier = Modifier.width(16.dp)) // Espacio hacia abajo
     }
 }
 
