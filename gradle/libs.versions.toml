@@ -19,6 +19,9 @@ foundationAndroidVersion = "1.7.2"
 roomKtxVersion = "2.6.1"
 hiltVersion = "2.51.1"
 firebaseStorageKtxVersion = "21.0.1"
+runtimeLivedataVersion = "1.7.5"
+foundationLayoutAndroidVersion = "1.7.2"
+navigationSafeArgsGeneratorVersion = "2.8.4"
 
 
 [libraries]
@@ -47,6 +50,9 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltVersion" }
 dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hiltVersion" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtxVersion" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedataVersion" }
+androidx-foundation-layout-android = { group = "androidx.compose.foundation", name = "foundation-layout-android", version.ref = "foundationLayoutAndroidVersion" }
+androidx-navigation-safe-args-generator = { group = "androidx.navigation", name = "navigation-safe-args-generator", version.ref = "navigationSafeArgsGeneratorVersion" }
 
 
 

@@ -44,6 +44,15 @@ android {
         compose = true
     }
 }
+configurations.all {
+    exclude (group= "xmlpull", module= "xmlpull")
+}
+configurations.all {
+    resolutionStrategy {
+        force ("xpp3:xpp3:1.1.4c")
+    }
+}
+
 
 kapt {
     correctErrorTypes = true
@@ -81,12 +90,24 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
+        //Solución temporal para los duplicados jajaja
+    implementation("xmlpull:xmlpull:1.1.3.1") {
+        exclude(group = "xpp3", module = "xpp3")
+    }
+    implementation("xpp3:xpp3:1.1.4c") {
+        exclude(group = "xmlpull", module = "xmlpull")
+    }
+
+
     //Room
     implementation("androidx.room:room-runtime:$room_version")
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.foundation.android)
     implementation(libs.firebase.storage.ktx)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.navigation.safe.args.generator)
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
 

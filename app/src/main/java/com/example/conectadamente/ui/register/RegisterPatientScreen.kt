@@ -29,6 +29,7 @@ import com.example.conectadamente.R
 import com.example.conectadamente.data.model.PatientModel
 import com.example.conectadamente.ui.theme.*
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
+import com.example.conectadamente.utils.constants.DataState
 import com.example.conectadamente.utils.validations.isValidEmail
 import com.example.conectadamente.utils.validations.isRutValid
 import com.example.conectadamente.utils.validations.isPasswordValid
@@ -42,6 +43,10 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
+
+    val registerState by viewModel.authState.collectAsState()
+
+
 
     Box(
         modifier = Modifier.fillMaxSize() // Ocupa toda la pantalla
@@ -175,17 +180,7 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
                                     rut = rut,
                                     name = name
                                 )
-
-                                viewModel.registerPatient(
-                                    patient = patient,
-                                    password = password,
-                                    onSuccess = {
-                                        message = "Registro exitoso"
-                                    },
-                                    onError = { error ->
-                                        message = "Error: $error"
-                                    }
-                                )
+                                viewModel.registerPatient(patient, password)
                             }
                         }
                     },
@@ -197,6 +192,20 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
                     Text("Registrar")
                 }
 
+                // Mostrar mensajes según el estado
+                when (registerState) {
+                    is DataState.Loading -> Text("Registrando...", color = Color.Gray)
+                    is DataState.Success -> Text(
+                        (registerState as DataState.Success).data,
+                        color = Color.Green
+                    )
+                    is DataState.Error -> Text(
+                        "Error: ${(registerState as DataState.Error).exception.message}",
+                        color = Color.Red
+                    )
+                    DataState.Finished -> {}
+                }
+
                 Text(
                     text = message,
                     color = Blue40,
@@ -206,3 +215,4 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
         }
     }
 }
+

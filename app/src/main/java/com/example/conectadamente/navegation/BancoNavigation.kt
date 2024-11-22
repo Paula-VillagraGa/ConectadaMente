@@ -1,6 +1,7 @@
 package com.example.conectadamente.navegation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,7 +24,7 @@ fun BancoNavigation(
         }
 
         composable(NavScreen.PerfilUsuarioScreen.name){
-            PerfilUsuarioScreen(navController)
+            PerfilUsuarioScreen()
         }
         composable(NavScreen.ChatScreen.name){
             ChatUsuarioScreen(navController)

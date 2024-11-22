@@ -58,7 +58,7 @@ fun NavigationWrapper() {
 
         // Pantalla de Perfil de Usuario
         composable("perfil_usuario") {
-            PerfilUsuarioScreen(navController = navController)
+            PerfilUsuarioScreen()
         }
 
         // Pantalla de Chat de Usuario
