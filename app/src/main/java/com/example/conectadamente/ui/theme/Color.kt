@@ -2,12 +2,14 @@ package com.example.conectadamente.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple10 = Color(0xFF8B8BD1)
+val Purple10 = Color(0xFFB59CE0)
 val Purple20 = Color(0xFFA99ED4)
 val Purple30 = Color(0xFF8770B8)
 val Purple40= Color(0xFF8A6AB4)
 val Purple50 = Color(0xFF6E4CA6)
 val Purple60 = Color(0xFF8F7FB9)
+val Purple70 = Color(0xFFD896FF)
+val Purple80 = Color(0xFFB57EDC)
 
 
 

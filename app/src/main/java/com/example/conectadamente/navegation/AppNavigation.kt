@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -22,6 +23,8 @@ import com.example.conectadamente.ui.viewModel.UserAuthViewModel
 import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
 import com.example.conectadamente.ui.homeUser.RecomendacionUsuarioScreen
 import com.example.conectadamente.ui.authPsicologo.PsychologistLoginScreen
+import com.example.conectadamente.ui.authPsicologo.RegisterPsychoScreen
+import com.example.conectadamente.ui.viewModel.psychoAuthViewModel
 
 @Composable
 fun AppNavigation() {
@@ -59,9 +62,14 @@ fun AppNavigation() {
                 )
             }
 
-
             composable(NavScreen.PsychologistLogin.route) {
-                PsychologistLoginScreen()
+                PsychologistLoginScreen(
+                    navigateToRegisterPsycho = { navController.navigate(NavScreen.RegisterPsycho.route) },
+                )
+            }
+            composable(NavScreen.RegisterPsycho.route) {
+                val psychoAuthViewModel: psychoAuthViewModel = hiltViewModel()
+                RegisterPsychoScreen(viewModel = psychoAuthViewModel)
             }
             composable(NavScreen.RegisterPatient.route) {
                 val userAuthViewModel: UserAuthViewModel = hiltViewModel()

@@ -19,6 +19,7 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
     object Recomendaciones : NavScreen("recomendaciones_usuario", "Recomendaciones", Icons.Outlined.Face)
     object Formativo : NavScreen("formativo_usuario", "Formativo", Icons.Outlined.Info)
     object PsychologistLogin : NavScreen("psychologist_login", "Login", null)
+    object RegisterPsycho: NavScreen("register_psycho", "Registro", null)
 }
 
 // Lista para navegación inferior

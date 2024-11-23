@@ -23,8 +23,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.conectadamente.R
 import com.example.conectadamente.data.model.PatientModel
 import com.example.conectadamente.ui.theme.*
@@ -34,9 +36,10 @@ import com.example.conectadamente.utils.validations.isValidEmail
 import com.example.conectadamente.utils.validations.isRutValid
 import com.example.conectadamente.utils.validations.isPasswordValid
 
+
 //funciona
 @Composable
-fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
+fun RegisterPatientScreen(viewModel: UserAuthViewModel = hiltViewModel()) {
     var name by remember { mutableStateOf("") }
     var rut by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -45,7 +48,6 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
     var message by remember { mutableStateOf("") }
 
     val registerState by viewModel.authState.collectAsState()
-
 
 
     Box(
@@ -58,7 +60,7 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
                 modifier = Modifier
                     .weight(1f) // Ocupa la mitad de la pantalla
                     .fillMaxWidth()
-                    .background(Blue30)
+                    .background(Purple10)
             ) {
                 Column(
                     modifier = Modifier
@@ -86,7 +88,10 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
             modifier = Modifier
                 .align(Alignment.Center) // Centra el formulario en toda la pantalla
                 .padding(16.dp)
-                .background(color = Color.White, shape = RoundedCornerShape(16.dp)) // Fondo blanco con bordes redondeados
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(16.dp)
+                ) // Fondo blanco con bordes redondeados
                 .fillMaxWidth(0.9f) // Ocupa el 90% del ancho de la pantalla
         ) {
             Column(
@@ -99,15 +104,15 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
                     contentDescription = "Logo",
                     modifier = Modifier
                         .size(150.dp) // Tamaño de la imagen
-                        .padding(bottom = 6.dp) // Espacio entre la imagen y el texto
+                        .padding(bottom = 6.dp)
                 )
                 Text(
                     text = "Regístrate",
                     style = TextStyle(
-                        fontFamily = PoppinsFontFamily,   // Usar la familia de fuentes definida
-                        fontStyle = FontStyle.Italic,    // Asegura que se usa el estilo itálico
-                        fontSize = 30.sp,                // Tamaño de la fuente
-                        color = Blue20,
+                        fontFamily = PoppinsFontFamily,
+                        fontStyle = FontStyle.Italic,
+                        fontSize = 30.sp,
+                        color = Purple40,
                     ),
                     textAlign = TextAlign.Center // Centrar el texto
                 )
@@ -187,7 +192,7 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Blue30)
+                    colors = ButtonDefaults.buttonColors(containerColor = Purple80)
                 ) {
                     Text("Registrar")
                 }

@@ -4,7 +4,15 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -26,12 +34,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.firebase.auth.FirebaseAuth
-import com.example.conectadamente.ui.theme.*
 import com.example.conectadamente.R
-import com.example.conectadamente.ui.authPsicologo.PsychologistLoginScreen
 import com.example.conectadamente.ui.theme.MyApplicationTheme
-
+import com.example.conectadamente.ui.theme.PoppinsFontFamily
+import com.example.conectadamente.ui.theme.Purple30
+import com.example.conectadamente.ui.theme.Purple40
+import com.example.conectadamente.ui.theme.Purple60
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
@@ -39,6 +48,7 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
+
 
     Box(
         modifier = Modifier.fillMaxSize() // Ocupa toda la pantalla
@@ -63,13 +73,7 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                             )
                         )
                     }
-
-                    // Ejemplo de un círculo decorativo sobre el fondo
-                    drawCircle(
-                        color = Purple40,
-                        radius = 150f,
-                        center = Offset(x = size.width / 2, y = size.height / 3) // Ajusta la posición del círculo
-                    )}
+                }
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -107,6 +111,7 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
             )
         }
 
+
         // Box centrado con el formulario de login
         Box(
             modifier = Modifier
@@ -116,6 +121,10 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                 .background(color = Color.White, shape = RoundedCornerShape(16.dp)) // Fondo blanco con bordes redondeados
                 .fillMaxWidth(0.9f) // Ocupa el 90% del ancho de la pantalla
         ) {
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -134,7 +143,6 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
 
 
                 Spacer(modifier = Modifier.height(20.dp))
-
                 // Campo para ingresar la contraseña
                 TextField(
                     value = password,

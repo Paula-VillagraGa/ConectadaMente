@@ -1,5 +1,8 @@
 package com.example.conectadamente.ui.authPsicologo
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,9 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,31 +27,31 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
 import com.example.conectadamente.R
-import com.example.conectadamente.data.model.PatientModel
+import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.ui.theme.Blue20
 import com.example.conectadamente.ui.theme.Blue30
-import com.example.conectadamente.ui.theme.Blue40
 import com.example.conectadamente.ui.theme.PoppinsFontFamily
-import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
-import com.example.conectadamente.ui.viewModel.UserAuthViewModel
+import com.example.conectadamente.ui.theme.Purple50
+import com.example.conectadamente.ui.viewModel.psychoAuthViewModel
 import com.example.conectadamente.utils.constants.DataState
-import com.example.conectadamente.utils.validations.isPasswordValid
-import com.example.conectadamente.utils.validations.isRutValid
-import com.example.conectadamente.utils.validations.isValidEmail
+import com.example.conectadamente.utils.getImageSize
 
 
 @Composable
-fun RegisterPsychoScreen(viewModel: UserAuthViewModel) {
+fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
     var name by remember { mutableStateOf("") }
     var rut by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -56,10 +59,66 @@ fun RegisterPsychoScreen(viewModel: UserAuthViewModel) {
     var confirmPassword by remember { mutableStateOf("") }
     var numero by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
+    var selectedImages by remember { mutableStateOf<List<Uri>>(emptyList()) }
 
     val registerState by viewModel.authState.collectAsState()
 
+    val context = LocalContext.current
 
+    LazyRow(modifier = Modifier.padding(top = 16.dp)) {
+        items(selectedImages.size) { index ->
+            val uri = selectedImages[index]
+            Image(
+                painter = rememberAsyncImagePainter(uri), // Usamos Coil para cargar imágenes desde URI
+                contentDescription = "Imagen seleccionada",
+                modifier = Modifier
+                    .size(100.dp)
+                    .padding(4.dp)
+                    .clip(RoundedCornerShape(8.dp)) // Bordes redondeados para las imágenes
+            )
+        }
+    }
+
+// Botón de registro
+    Button(
+        onClick = {
+            // Validar cantidad y tamaño de imágenes
+            try {
+                if (selectedImages.size > 5) {
+                    throw IllegalArgumentException("No se pueden subir más de 5 documentos")
+                }
+                // Validar el tamaño de cada imagen
+                if (selectedImages.any { getImageSize(it, context) > 5 * 1024 * 1024 }) {
+                    throw IllegalArgumentException("Un documento excede el tamaño permitido (5 MB)")
+                }
+
+                // Registrar psicólogo
+                val psycho = PsychoModel(
+                    email = email,
+                    rut = rut,
+                    name = name
+                )
+                viewModel.registerPsycho(psycho, password, selectedImages)
+            } catch (e: IllegalArgumentException) {
+                message = e.message ?: "Error desconocido"
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp)
+    ) {
+        Text("Registrar")
+    }
+
+
+
+
+    // Launcher para seleccionar imágenes
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        selectedImages = uris
+    }
 
     Box(
         modifier = Modifier.fillMaxSize() // Ocupa toda la pantalla
@@ -108,10 +167,10 @@ fun RegisterPsychoScreen(viewModel: UserAuthViewModel) {
                 verticalArrangement = Arrangement.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.relajarse1),
+                    painter = painterResource(id = R.drawable.cinco2),
                     contentDescription = "Logo",
                     modifier = Modifier
-                        .size(150.dp) // Tamaño de la imagen
+                        .size(100.dp) // Tamaño de la imagen
                         .padding(bottom = 6.dp) // Espacio entre la imagen y el texto
                 )
                 Text(
@@ -144,7 +203,7 @@ fun RegisterPsychoScreen(viewModel: UserAuthViewModel) {
                 OutlinedTextField(
                     value = numero,
                     onValueChange = { numero = it },
-                    label = { Text("Número de Registro Prestador de Salud") },
+                    label = { Text("N° Registro Prestador de Salud") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -173,66 +232,88 @@ fun RegisterPsychoScreen(viewModel: UserAuthViewModel) {
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth()
                 )
+                // Botón para seleccionar imágenes
+                Button(
+                    onClick = { imagePickerLauncher.launch("image/*") },
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                ) {
+                    Text("Seleccionar Imágenes")
+                }
 
+                LazyRow(modifier = Modifier.padding(top = 16.dp)) {
+                    items(selectedImages.size) { index ->
+                        val uri = selectedImages[index]
+                        Image(
+                            painter = rememberAsyncImagePainter(uri), // Usamos Coil para cargar imágenes desde URI
+                            contentDescription = "Imagen seleccionada",
+                            modifier = Modifier
+                                .size(100.dp)
+                                .padding(4.dp)
+                                .clip(RoundedCornerShape(8.dp)) // Bordes redondeados para las imágenes
+                        )
+                    }
+                }
+
+                // Botón de registro
                 // Botón de registro
                 Button(
                     onClick = {
-                        // Validaciones
-                        when {
-                            name.isEmpty() || rut.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() -> {
-                                message = "Todos los campos son obligatorios"
+                        // Validar cantidad y tamaño de imágenes
+                        try {
+                            if (selectedImages.size > 5) {
+                                throw IllegalArgumentException("No se pueden subir más de 5 documentos")
                             }
-                            !isValidEmail(email) -> {
-                                message = "El correo electrónico no tiene un formato válido"
+                            // Simular validación de tamaño (puedes usar una función real para calcular tamaño)
+                            // Suponiendo que `uri.sizeInBytes` obtendría el tamaño del archivo
+                            if (selectedImages.any { getImageSize(it, context) > 5 * 1024 * 1024 }) {
+                                throw IllegalArgumentException("Un documento excede el tamaño permitido (5 MB)")
                             }
-                            !isRutValid(rut) -> {
-                                message = "El RUT no tiene un formato válido"
-                            }
-                            !isPasswordValid(password) -> {
-                                message = "La contraseña debe tener al menos 8 caracteres"
-                            }
-                            password != confirmPassword -> {
-                                message = "Las contraseñas no coinciden"
-                            }
-                            else -> {
-                                val patient = PatientModel(
-                                    email = email,
-                                    rut = rut,
-                                    name = name
-                                )
-                                viewModel.registerPatient(patient, password)
-                            }
+
+                            // Procesar registro
+                            val psycho = PsychoModel(
+                                email = email,
+                                rut = rut,
+                                name = name
+                            )
+                            viewModel.registerPsycho(psycho, password, selectedImages)
+                        } catch (e: IllegalArgumentException) {
+                            message = e.message ?: "Error desconocido"
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Blue30)
+                        .padding(top = 16.dp)
                 ) {
                     Text("Registrar")
                 }
 
-                // Mostrar mensajes según el estado
-                when (registerState) {
-                    is DataState.Loading -> Text("Registrando...", color = Color.Gray)
-                    is DataState.Success -> Text(
-                        (registerState as DataState.Success).data,
-                        color = Color.Green
-                    )
-                    is DataState.Error -> Text(
-                        "Error: ${(registerState as DataState.Error).exception.message}",
-                        color = Color.Red
-                    )
-                    DataState.Finished -> {}
-                }
-
+                // Mostrar mensajes
                 Text(
                     text = message,
-                    color = Blue40,
+                    color = Color.Red,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
         }
     }
-}
 
+
+    // Mostrar mensajes según el estado
+    when (registerState) {
+        is DataState.Loading -> Text("Registrando...", color = Purple50)
+        is DataState.Success -> {
+            Text(
+                "Registro exitoso. Tu cuenta será verificada en un plazo de 24 horas hábiles.",
+                color = Color.Green,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
+        is DataState.Error -> Text(
+            "Error: ${(registerState as DataState.Error).exception.message}",
+            color = Color.Red
+        )
+        DataState.Finished -> {}
+    }
+
+}

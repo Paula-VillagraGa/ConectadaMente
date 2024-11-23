@@ -31,7 +31,7 @@ import com.example.conectadamente.ui.theme.Purple30
 
 
 @Composable
-fun PsychologistLoginScreen(
+fun PsychologistLoginScreen( navigateToRegisterPsycho: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -51,7 +51,7 @@ fun PsychologistLoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.salud_mental2),
+                    painter = painterResource(id = R.drawable.salud_mental3),
                     contentDescription = "Logo",
                     modifier = Modifier
                         .size(300.dp)
@@ -77,7 +77,7 @@ fun PsychologistLoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Purple20)
+            colors = ButtonDefaults.buttonColors(containerColor = Purple30)
         ) {
             Text(text = "Iniciar Sesión", style = TextStyle(color = Color.White, fontSize = 16.sp))
         }
@@ -85,11 +85,11 @@ fun PsychologistLoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = {  },
+            onClick = {  navigateToRegisterPsycho() },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Purple30)
+            colors = ButtonDefaults.buttonColors(containerColor = Purple20)
         ) {
             Text(text = "Registrarse", style = TextStyle(color = Color.White, fontSize = 16.sp))
         }
