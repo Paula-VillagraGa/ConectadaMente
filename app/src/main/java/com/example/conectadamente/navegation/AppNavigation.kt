@@ -3,7 +3,6 @@ package com.example.conectadamente.navegation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,7 +17,7 @@ import com.example.conectadamente.ui.authPaciente.SignInScreen
 import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
 import com.example.conectadamente.ui.homeUser.FormativoUsuarioScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
-import com.example.conectadamente.ui.register.RegisterPatientScreen
+import com.example.conectadamente.ui.authPaciente.RegisterPatientScreen
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
 import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
 import com.example.conectadamente.ui.homeUser.RecomendacionUsuarioScreen
