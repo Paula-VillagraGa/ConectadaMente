@@ -1,4 +1,4 @@
-package com.example.conectadamente.ui.auth
+package com.example.conectadamente.ui.authPaciente
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -16,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -30,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.example.conectadamente.ui.theme.*
 import com.example.conectadamente.R
+import com.example.conectadamente.ui.authPsicologo.PsychologistLoginScreen
 import com.example.conectadamente.ui.theme.MyApplicationTheme
 
 
@@ -43,17 +43,17 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
     Box(
         modifier = Modifier.fillMaxSize() // Ocupa toda la pantalla
     ) {
-        // Fondo dividido en dos mitades
+        // Fondo dividido en dos
         Column(modifier = Modifier.fillMaxSize()) {
-            // Parte superior (mitad de arriba)
+            // Parte superior
             Box(
                 modifier = Modifier
-                    .weight(1f) // Ocupa la mitad de la pantalla
+                    .weight(1f)
                     .fillMaxWidth()
                     .background(Purple30)
             ) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
-                    for (i in 0 until 5) { // Menos círculos
+                    for (i in 0 until 5) {
                         drawCircle(
                             color = Purple60,
                             radius = 40f,
