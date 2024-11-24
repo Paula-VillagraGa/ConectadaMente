@@ -4,7 +4,6 @@ import com.example.conectadamente.data.model.PatientModel
 import com.example.conectadamente.utils.constants.DataState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.example.conectadamente.utils.validations.isValidEmail
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -61,30 +60,5 @@ class AuthUserRepository @Inject constructor() {
     }
 
 
-
-    // Iniciar sesión con Flow
-    fun login(email: String, password: String): Flow<DataState<String>> = flow {
-        emit(DataState.Loading) // Emitir estado de carga
-        try {
-            auth.signInWithEmailAndPassword(email, password).await()
-            emit(DataState.Success("Inicio de sesión exitoso")) // Emitir éxito
-        } catch (e: Exception) {
-            emit(DataState.Error(e)) // Emitir error en caso de fallo
-        } finally {
-            emit(DataState.Finished) // Emitir estado finalizado
-        }
-    }
-
-    // Cerrar sesión del usuario actual
-    fun logout(): Flow<DataState<String>> = flow {
-        emit(DataState.Loading) // Emitir estado de carga
-        try {
-            auth.signOut()
-            emit(DataState.Success("Cierre de sesión exitoso")) // Emitir éxito
-        } catch (e: Exception) {
-            emit(DataState.Error(e)) // Emitir error en caso de fallo
-        } finally {
-            emit(DataState.Finished) // Emitir estado finalizado
-        }
-    }
 }
+

@@ -27,18 +27,15 @@ class AuthPsychoRepository @Inject constructor() {
     ): Flow<DataState<String>> = flow {
         emit(DataState.Loading) // Emitir estado de carga
         try {
+            if(documents.isEmpty()){
+                throw IllegalArgumentException("Debe subir al menos un documento")
+            }
+            val documentUrls = uploadDocumentsToStorage(documents)
+
             // Crear usuario en Firebase Authentication
             val authResult = auth.createUserWithEmailAndPassword(psycho.email, password).await()
             val uid = authResult.user?.uid ?: throw IllegalStateException("UID no encontrado")
 
-            // Subir documentos a Storage y obtener las URLs
-            val documentUrls = mutableListOf<String>()
-            for ((index, document) in documents.withIndex()) {
-                val storageRef = storage.reference.child("psychos/$uid/document_$index.jpg")
-                val uploadTask = storageRef.putFile(document).await()
-                val url = storageRef.downloadUrl.await().toString()
-                documentUrls.add(url)
-            }
 
             // Crear modelo del psicólogo con documentos y estado de verificación
             val psychoWithDocuments = psycho.copy(
@@ -46,7 +43,6 @@ class AuthPsychoRepository @Inject constructor() {
                 documentUrls = documentUrls
             )
 
-            // Guardar datos en Firestore
             db.collection("psychos").document(uid).set(psychoWithDocuments).await()
 
             emit(DataState.Success("Registro exitoso. Tu cuenta será verificada en un plazo de 24 horas hábiles."))
@@ -57,6 +53,22 @@ class AuthPsychoRepository @Inject constructor() {
         }
     }
 
+    // Subir documentos a Firebase Storage
+    private suspend fun uploadDocumentsToStorage(documents: List<Uri>): List<String> {
+        val documentUrls = mutableListOf<String>()
+        try{
+            documents.forEachIndexed { index, uri ->
+                val storageRef = storage.reference
+                val documentRef = storageRef.child("documents/${uri.lastPathSegment}")
+                val uploadTask = documentRef.putFile(uri).await()
+
+        }
+    }catch (e: Exception){
+        throw IllegalArgumentException("Error al subir los documentos", e)
+        }
+        return documentUrls
+    }
+
 
     // Obtener el UID
     fun getCurrentPsychoId(): String? {
@@ -64,7 +76,7 @@ class AuthPsychoRepository @Inject constructor() {
     }
 
     // Obtener datos del usuario actual
-    fun getUserData(): Flow<DataState<PatientModel>> = flow {
+    fun getPsychoData(): Flow<DataState<PatientModel>> = flow {
         emit(DataState.Loading) // Estado
         try {
             val userId = getCurrentPsychoId() ?: throw IllegalStateException("Psicólogo no autenticado")
@@ -80,31 +92,4 @@ class AuthPsychoRepository @Inject constructor() {
         }
     }
 
-
-
-    // Iniciar sesión con Flow
-    fun login(email: String, password: String): Flow<DataState<String>> = flow {
-        emit(DataState.Loading) // Emitir estado de carga
-        try {
-            auth.signInWithEmailAndPassword(email, password).await()
-            emit(DataState.Success("Inicio de sesión exitoso")) // Emitir éxito
-        } catch (e: Exception) {
-            emit(DataState.Error(e)) // Emitir error en caso de fallo
-        } finally {
-            emit(DataState.Finished) // Emitir estado finalizado
-        }
-    }
-
-    // Cerrar sesión del usuario actual
-    fun logout(): Flow<DataState<String>> = flow {
-        emit(DataState.Loading) // Emitir estado de carga
-        try {
-            auth.signOut()
-            emit(DataState.Success("Cierre de sesión exitoso")) // Emitir éxito
-        } catch (e: Exception) {
-            emit(DataState.Error(e)) // Emitir error en caso de fallo
-        } finally {
-            emit(DataState.Finished) // Emitir estado finalizado
-        }
-    }
 }

@@ -32,12 +32,9 @@ import com.example.conectadamente.data.model.PatientModel
 import com.example.conectadamente.ui.theme.*
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
 import com.example.conectadamente.utils.constants.DataState
-import com.example.conectadamente.utils.validations.isValidEmail
-import com.example.conectadamente.utils.validations.isRutValid
-import com.example.conectadamente.utils.validations.isPasswordValid
+import com.example.conectadamente.utils.validateRegistrationData
 
 
-//funciona
 @Composable
 fun RegisterPatientScreen(viewModel: UserAuthViewModel = hiltViewModel()) {
     var name by remember { mutableStateOf("") }
@@ -163,23 +160,11 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel = hiltViewModel()) {
                 Button(
                     onClick = {
                         // Validaciones
-                        when {
-                            name.isEmpty() || rut.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() -> {
-                                message = "Todos los campos son obligatorios"
-                            }
-                            !isValidEmail(email) -> {
-                                message = "El correo electrónico no tiene un formato válido"
-                            }
-                            !isRutValid(rut) -> {
-                                message = "El RUT no tiene un formato válido"
-                            }
-                            !isPasswordValid(password) -> {
-                                message = "La contraseña debe tener al menos 8 caracteres"
-                            }
-                            password != confirmPassword -> {
-                                message = "Las contraseñas no coinciden"
-                            }
-                            else -> {
+                        val validationMessage = validateRegistrationData(name, rut, email, password, confirmPassword)
+                        if (validationMessage != null) {
+                            message = validationMessage
+                        }
+                            else {
                                 val patient = PatientModel(
                                     email = email,
                                     rut = rut,
@@ -187,7 +172,7 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel = hiltViewModel()) {
                                 )
                                 viewModel.registerPatient(patient, password)
                             }
-                        }
+
                     },
                     modifier = Modifier
                         .fillMaxWidth()

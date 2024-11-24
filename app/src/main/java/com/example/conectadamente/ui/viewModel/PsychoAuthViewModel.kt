@@ -1,42 +1,76 @@
 package com.example.conectadamente.ui.viewModel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.data.repository.AuthPsychoRepository
-import com.example.conectadamente.data.repository.FirestoreRepository
 import com.example.conectadamente.utils.constants.DataState
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class psychoAuthViewModel @Inject constructor(
-    private val authPsychoRepository: AuthPsychoRepository
+    private val authPsychoRepository: AuthPsychoRepository,
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    private val storage: FirebaseStorage = FirebaseStorage.getInstance()
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<DataState<String>>(DataState.Finished)
     val authState: StateFlow<DataState<String>> = _authState.asStateFlow()
 
-    // Función para registrar psicólogos
-    fun registerPsycho(psycho: PsychoModel, password: String, documents: List<Uri>) {
-        viewModelScope.launch {
-            authPsychoRepository.registerPsycho(psycho, password, documents)
-                .onEach { state ->
-                    _authState.value = state
+    fun registerPsycho(psycho: PsychoModel, password: String, images: List<Uri>) {
+        uploadDocumentsToStorage(
+            uris = images,
+            onUploadSuccess = { urls ->
+                val psychoWithDocuments = psycho.copy(documentUrls = urls)
+                savePsychoToFirestore(psychoWithDocuments)
+            },
+            onUploadError = { exception ->
+                Log.e("StorageError", "Error al subir documentos", exception)
+            }
+        )
+    }
+
+    private fun uploadDocumentsToStorage(
+        uris: List<Uri>,
+        onUploadSuccess: (List<String>) -> Unit,
+        onUploadError: (Exception) -> Unit
+    ) {
+        val uploadedUrls = mutableListOf<String>()
+
+        uris.forEach { uri ->
+            val fileName = uri.lastPathSegment ?: System.currentTimeMillis().toString()
+            val fileRef = storage.reference.child("psychos/documents/$fileName")
+
+            fileRef.putFile(uri)
+                .addOnSuccessListener {
+                    fileRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                        uploadedUrls.add(downloadUri.toString())
+                        if (uploadedUrls.size == uris.size) {
+                            onUploadSuccess(uploadedUrls)
+                        }
+                    }
                 }
-                .launchIn(viewModelScope)
+                .addOnFailureListener { exception ->
+                    onUploadError(exception)
+                }
         }
     }
 
-    // Restablecer estado después de una operación
-    fun resetAuthState() {
-        _authState.value = DataState.Finished
+    private fun savePsychoToFirestore(psycho: PsychoModel) {
+        val docRef = firestore.collection("psychos").document()
+        docRef.set(psycho)
+            .addOnSuccessListener {
+                Log.d("Firestore", "Psicólogo registrado exitosamente")
+            }
+            .addOnFailureListener { exception ->
+                Log.e("FirestoreError", "Error al guardar en Firestore", exception)
+            }
     }
 }

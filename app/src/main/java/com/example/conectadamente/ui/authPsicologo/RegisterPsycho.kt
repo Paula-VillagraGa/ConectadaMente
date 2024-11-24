@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,11 +46,11 @@ import com.example.conectadamente.ui.theme.Blue20
 import com.example.conectadamente.ui.theme.Blue30
 import com.example.conectadamente.ui.theme.PoppinsFontFamily
 import com.example.conectadamente.ui.theme.Purple50
+import com.example.conectadamente.ui.theme.Purple80
 import com.example.conectadamente.ui.viewModel.psychoAuthViewModel
 import com.example.conectadamente.utils.constants.DataState
 import com.example.conectadamente.utils.getImageSize
 import com.example.conectadamente.utils.validateRegistrationData
-
 
 
 @Composable
@@ -179,12 +180,12 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                 Text(
                     text = "Regístrate",
                     style = TextStyle(
-                        fontFamily = PoppinsFontFamily,   // Usar la familia de fuentes definida
-                        fontStyle = FontStyle.Italic,    // Asegura que se usa el estilo itálico
-                        fontSize = 30.sp,                // Tamaño de la fuente
+                        fontFamily = PoppinsFontFamily,
+                        fontStyle = FontStyle.Italic,
+                        fontSize = 30.sp,
                         color = Blue20,
                     ),
-                    textAlign = TextAlign.Center // Centrar el texto
+                    textAlign = TextAlign.Center
                 )
 
                 // Campo para el nombre
@@ -192,7 +193,8 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Nombre Completo") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                 )
 
                 // Campo para el RUT
@@ -200,14 +202,16 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                     value = rut,
                     onValueChange = { rut = it },
                     label = { Text("RUT") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                 )
-                // Campo para el RUT
+                // Campo para el N°verificador
                 OutlinedTextField(
                     value = numero,
                     onValueChange = { numero = it },
                     label = { Text("N° Registro Prestador de Salud") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                 )
 
                 // Campo para el correo electrónico
@@ -215,7 +219,9 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Correo Electrónico") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+
                 )
 
                 // Campo para la contraseña
@@ -224,7 +230,8 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                     onValueChange = { password = it },
                     label = { Text("Contraseña") },
                     visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                 )
 
                 // Campo para confirmar la contraseña
@@ -233,7 +240,11 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                     onValueChange = { confirmPassword = it },
                     label = { Text("Confirmar Contraseña") },
                     visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth() .height(48.dp),
+                    textStyle = TextStyle(fontSize = 14.sp)
+
+
                 )
                 // Botón para seleccionar imágenes
                 Button(
@@ -243,35 +254,35 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                     Text("Seleccionar Imágenes")
                 }
 
+                //carga de imágenes con uri y Coil
                 LazyRow(modifier = Modifier.padding(top = 16.dp)) {
                     items(selectedImages.size) { index ->
                         val uri = selectedImages[index]
                         Image(
-                            painter = rememberAsyncImagePainter(uri), // Usamos Coil para cargar imágenes desde URI
+                            painter = rememberAsyncImagePainter(uri),
                             contentDescription = "Imagen seleccionada",
                             modifier = Modifier
                                 .size(100.dp)
                                 .padding(4.dp)
-                                .clip(RoundedCornerShape(8.dp)) // Bordes redondeados para las imágenes
-                        )
+                                .clip(RoundedCornerShape(8.dp)))
                     }
                 }
 
                 // Botón de registro
-                // Botón de registro
                 Button(
                     onClick = {
-
-                        // Validar cantidad y tamaño de imágenes
                         try {
+                            // Validar cantidad de imágenes
                             if (selectedImages.size > 2) {
                                 throw IllegalArgumentException("No se pueden subir más de 2 documentos")
                             }
 
-                            // función para restringir el tamaño
+                            // Validar tamaño de imágenes (máximo 5 MB por documento)
                             if (selectedImages.any { getImageSize(it, context) > 5 * 1024 * 1024 }) {
                                 throw IllegalArgumentException("Un documento excede el tamaño permitido (5 MB)")
                             }
+
+                            // Validar datos de registro
                             val validationMessage = validateRegistrationData(
                                 name = name,
                                 rut = rut,
@@ -279,20 +290,27 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                                 password = password,
                                 confirmPassword = confirmPassword
                             )
-                            //validar el formato
+
                             if (validationMessage != null) {
-                                message = validationMessage
+                                throw IllegalArgumentException(validationMessage)
                             }
 
-                            // Procesar registro del psicólogo
+                            // Crear objeto PsychoModel para registrar
                             val psycho = PsychoModel(
                                 email = email,
                                 rut = rut,
                                 name = name
                             )
+
+                            // Registrar psicólogo con documentos
                             viewModel.registerPsycho(psycho, password, selectedImages)
+
+                            message = "Registro en proceso. Por favor, espera..."
                         } catch (e: IllegalArgumentException) {
                             message = e.message ?: "Error desconocido"
+                        } catch (e: Exception) {
+                            // Para otros errores inesperados
+                            message = "Ocurrió un error inesperado: ${e.message}"
                         }
                     },
                     modifier = Modifier
@@ -302,33 +320,46 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                     Text("Registrar")
                 }
 
-                // Mostrar mensajes
-                Text(
-                    text = message,
-                    color = Color.Red,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-        }
-    }
+                if (message.isNotBlank()) {
+                    Text(
+                        text = message,
+                        color = if (message.startsWith("Error")) Color.Red else Color.Green,
+                        modifier = Modifier.padding(top = 8.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
 
+            }
+    }
 
     // Mostrar mensajes según el estado
     when (registerState) {
-        is DataState.Loading -> Text("Registrando...", color = Purple50)
+        is DataState.Loading -> {
+            Text("Registrando...", color = Purple50)
+        }
         is DataState.Success -> {
             Text(
                 "Registro exitoso. Tu cuenta será verificada en un plazo de 24 horas hábiles.",
-                color = Color.Green,
+                color = Purple80,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 16.dp)
             )
         }
-        is DataState.Error -> Text(
-            "Error: ${(registerState as DataState.Error).exception.message}",
-            color = Color.Red
-        )
-        DataState.Finished -> {}
+        is DataState.Error -> {
+            Text(
+                "Error: ${(registerState as DataState.Error).exception.message}",
+                color = Color.Red,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
+        DataState.Finished -> {
+            Text(
+                "Proceso finalizado",
+                color = Purple80,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
+    }}
     }
-
-}
