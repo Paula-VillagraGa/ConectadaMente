@@ -48,6 +48,8 @@ import com.example.conectadamente.ui.theme.Purple50
 import com.example.conectadamente.ui.viewModel.psychoAuthViewModel
 import com.example.conectadamente.utils.constants.DataState
 import com.example.conectadamente.utils.getImageSize
+import com.example.conectadamente.utils.validateRegistrationData
+
 
 
 @Composable
@@ -62,6 +64,7 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
     var selectedImages by remember { mutableStateOf<List<Uri>>(emptyList()) }
 
     val registerState by viewModel.authState.collectAsState()
+
 
     val context = LocalContext.current
 
@@ -258,18 +261,30 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                 // Botón de registro
                 Button(
                     onClick = {
+
                         // Validar cantidad y tamaño de imágenes
                         try {
-                            if (selectedImages.size > 5) {
-                                throw IllegalArgumentException("No se pueden subir más de 5 documentos")
+                            if (selectedImages.size > 2) {
+                                throw IllegalArgumentException("No se pueden subir más de 2 documentos")
                             }
-                            // Simular validación de tamaño (puedes usar una función real para calcular tamaño)
-                            // Suponiendo que `uri.sizeInBytes` obtendría el tamaño del archivo
+
+                            // función para restringir el tamaño
                             if (selectedImages.any { getImageSize(it, context) > 5 * 1024 * 1024 }) {
                                 throw IllegalArgumentException("Un documento excede el tamaño permitido (5 MB)")
                             }
+                            val validationMessage = validateRegistrationData(
+                                name = name,
+                                rut = rut,
+                                email = email,
+                                password = password,
+                                confirmPassword = confirmPassword
+                            )
+                            //validar el formato
+                            if (validationMessage != null) {
+                                message = validationMessage
+                            }
 
-                            // Procesar registro
+                            // Procesar registro del psicólogo
                             val psycho = PsychoModel(
                                 email = email,
                                 rut = rut,
