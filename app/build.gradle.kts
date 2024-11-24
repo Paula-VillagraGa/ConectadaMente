@@ -67,13 +67,12 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
-
-
+    implementation ("com.google.firebase:firebase-storage-ktx")
 
     //Icons
     implementation("androidx.compose.material:material-icons-extended:1.5.3")
 
-    //COil para imagenes
+    //Coil para imagenes
     implementation("io.coil-kt:coil-compose:2.4.0")
 
 

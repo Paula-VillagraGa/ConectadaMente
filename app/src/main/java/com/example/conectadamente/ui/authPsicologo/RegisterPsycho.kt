@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,14 +46,14 @@ import com.example.conectadamente.ui.theme.Blue30
 import com.example.conectadamente.ui.theme.PoppinsFontFamily
 import com.example.conectadamente.ui.theme.Purple50
 import com.example.conectadamente.ui.theme.Purple80
-import com.example.conectadamente.ui.viewModel.psychoAuthViewModel
+import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.utils.constants.DataState
 import com.example.conectadamente.utils.getImageSize
 import com.example.conectadamente.utils.validateRegistrationData
 
 
 @Composable
-fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
+fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
     var name by remember { mutableStateOf("") }
     var rut by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -68,6 +67,7 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
 
 
     val context = LocalContext.current
+
 
     LazyRow(modifier = Modifier.padding(top = 16.dp)) {
         items(selectedImages.size) { index ->
@@ -115,8 +115,6 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
     }
 
 
-
-
     // Launcher para seleccionar imágenes
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
@@ -162,7 +160,10 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
             modifier = Modifier
                 .align(Alignment.Center) // Centra el formulario en toda la pantalla
                 .padding(16.dp)
-                .background(color = Color.White, shape = RoundedCornerShape(16.dp)) // Fondo blanco con bordes redondeados
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(16.dp)
+                ) // Fondo blanco con bordes redondeados
                 .fillMaxWidth(0.9f) // Ocupa el 90% del ancho de la pantalla
         ) {
             Column(
@@ -241,8 +242,7 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                     label = { Text("Confirmar Contraseña") },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier
-                        .fillMaxWidth() .height(48.dp),
-                    textStyle = TextStyle(fontSize = 14.sp)
+                        .fillMaxWidth()
 
 
                 )
@@ -264,7 +264,8 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                             modifier = Modifier
                                 .size(100.dp)
                                 .padding(4.dp)
-                                .clip(RoundedCornerShape(8.dp)))
+                                .clip(RoundedCornerShape(8.dp))
+                        )
                     }
                 }
 
@@ -278,7 +279,12 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                             }
 
                             // Validar tamaño de imágenes (máximo 5 MB por documento)
-                            if (selectedImages.any { getImageSize(it, context) > 5 * 1024 * 1024 }) {
+                            if (selectedImages.any {
+                                    getImageSize(
+                                        it,
+                                        context
+                                    ) > 5 * 1024 * 1024
+                                }) {
                                 throw IllegalArgumentException("Un documento excede el tamaño permitido (5 MB)")
                             }
 
@@ -330,36 +336,40 @@ fun RegisterPsychoScreen(viewModel: psychoAuthViewModel = hiltViewModel()) {
                 }
 
             }
-    }
+        }
 
-    // Mostrar mensajes según el estado
-    when (registerState) {
-        is DataState.Loading -> {
-            Text("Registrando...", color = Purple50)
+        // Mostrar mensajes según el estado
+        when (registerState) {
+            is DataState.Loading -> {
+                Text("Registrando...", color = Purple50)
+            }
+
+            is DataState.Success -> {
+                Text(
+                    "Registro exitoso. Tu cuenta será verificada en un plazo de 24 horas hábiles.",
+                    color = Purple80,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            is DataState.Error -> {
+                Text(
+                    "Error: ${(registerState as DataState.Error).e.message}",
+                    color = Color.Red,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            DataState.Finished -> {
+                Text(
+                    "Proceso finalizado",
+                    color = Purple80,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
         }
-        is DataState.Success -> {
-            Text(
-                "Registro exitoso. Tu cuenta será verificada en un plazo de 24 horas hábiles.",
-                color = Purple80,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-        }
-        is DataState.Error -> {
-            Text(
-                "Error: ${(registerState as DataState.Error).exception.message}",
-                color = Color.Red,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-        }
-        DataState.Finished -> {
-            Text(
-                "Proceso finalizado",
-                color = Purple80,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-        }
-    }}
     }
+}

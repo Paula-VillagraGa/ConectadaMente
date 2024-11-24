@@ -30,12 +30,12 @@ class UserAuthViewModel @Inject constructor(
         }
     }
 
-    // Iniciar sesión
+    /*// Iniciar sesión
     fun login(email: String, password: String) {
         viewModelScope.launch {
             authUserRepository.login(email, password).collect { state ->
                 _authState.value = state
             }
-        }
-    }
+        }*/
 }
+

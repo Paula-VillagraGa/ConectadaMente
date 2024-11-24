@@ -24,7 +24,8 @@ import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
 import com.example.conectadamente.ui.homeUser.RecomendacionUsuarioScreen
 import com.example.conectadamente.ui.authPsicologo.PsychologistLoginScreen
 import com.example.conectadamente.ui.authPsicologo.RegisterPsychoScreen
-import com.example.conectadamente.ui.viewModel.psychoAuthViewModel
+import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
+
 
 @Composable
 fun AppNavigation() {
@@ -68,7 +69,7 @@ fun AppNavigation() {
                 )
             }
             composable(NavScreen.RegisterPsycho.route) {
-                val psychoAuthViewModel: psychoAuthViewModel = hiltViewModel()
+                val psychoAuthViewModel: PsychoAuthViewModel = hiltViewModel()
                 RegisterPsychoScreen(viewModel = psychoAuthViewModel)
             }
             composable(NavScreen.RegisterPatient.route) {
