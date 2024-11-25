@@ -18,6 +18,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,13 +36,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.conectadamente.R
 import com.example.conectadamente.ui.theme.MyApplicationTheme
 import com.example.conectadamente.ui.theme.PoppinsFontFamily
 import com.example.conectadamente.ui.theme.Purple30
 import com.example.conectadamente.ui.theme.Purple40
 import com.example.conectadamente.ui.theme.Purple60
-import com.google.firebase.auth.FirebaseAuth
+import com.example.conectadamente.ui.viewModel.AuthViewModel
+import com.example.conectadamente.utils.constants.DataState
 
 
 @Composable
@@ -49,6 +53,9 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
     var password by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
 
+
+    val viewModel: AuthViewModel = hiltViewModel()
+    val loginState by viewModel.loginState.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize() // Ocupa toda la pantalla
@@ -157,16 +164,10 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // Botón de iniciar sesión
+                // Botón de iniciar sesión
                 Button(onClick = {
                     // Llamar al método de autenticación de Firebase
-                    FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                navigateToHomeScreen() // Navegar al home después de iniciar sesión correctamente
-                            } else {
-                                message = "Correo o contraseña incorrectos"
-                            }
-                        }
+                    viewModel.handleLogin(email, password) // Llamar al método handleLogin desde el ViewModel
                 }) {
                     Text("Iniciar sesión")
                 }
@@ -193,8 +194,27 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                 )
             }
         }
+    } // Comprobación del estado de login
+    LaunchedEffect(loginState) {
+        when (val state = loginState) {
+            is DataState.Success -> {
+                // Navegar según el rol
+                when (state.data) {
+                    "psicologo" -> navigateToHomeScreen()
+                    "paciente" -> navigateToHomeScreen()
+                    "unverified" -> message = "Cuenta no verificada. Por favor, espera la validación."
+                    "none" -> message = "No tienes una cuenta registrada."
+                    else -> message = "Ocurrió un error inesperado."
+                }
+            }
+            is DataState.Error -> {
+                message = state.e.message ?: "Error desconocido"
+            }
+            else -> {}
+        }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

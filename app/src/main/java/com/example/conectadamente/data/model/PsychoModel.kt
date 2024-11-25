@@ -10,6 +10,7 @@ data class PsychoModel(
     val isVerified: Boolean = false,
     val documentUrls: List<String> = emptyList(),
     val id: String = "",
-    val rut: String = ""
+    val rut: String = "",
+    val rol: String = "psicologo"
 )
 

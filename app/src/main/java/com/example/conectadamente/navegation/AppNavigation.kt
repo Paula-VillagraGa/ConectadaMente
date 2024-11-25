@@ -19,6 +19,7 @@ import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
 import com.example.conectadamente.ui.homeUser.FormativoUsuarioScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
 import com.example.conectadamente.ui.authPaciente.RegisterPatientScreen
+import com.example.conectadamente.ui.authPsicologo.PsychoSignInScreen
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
 import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
 import com.example.conectadamente.ui.homeUser.RecomendacionUsuarioScreen
@@ -72,6 +73,13 @@ fun AppNavigation() {
                 val psychoAuthViewModel: PsychoAuthViewModel = hiltViewModel()
                 RegisterPsychoScreen(viewModel = psychoAuthViewModel)
             }
+
+            composable (NavScreen.PsychoSignIn.route) {
+                PsychoSignInScreen(
+                    navigateToRegisterPsycho = { navController.navigate(NavScreen.RegisterPsycho.route) },
+                    /*navigateToPsychoHomeScreen ={navController.navigate(NavScreen.PsychoHome.route) {} */)
+            }
+
             composable(NavScreen.RegisterPatient.route) {
                 val userAuthViewModel: UserAuthViewModel = hiltViewModel()
                 RegisterPatientScreen(viewModel = userAuthViewModel)

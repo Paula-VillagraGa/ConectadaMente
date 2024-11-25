@@ -30,7 +30,6 @@ import com.example.conectadamente.ui.theme.*
 
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun HomeScreen(navController: NavHostController) {
     Scaffold(
         topBar = { TopAppBar() },

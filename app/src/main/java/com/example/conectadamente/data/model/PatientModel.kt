@@ -10,6 +10,7 @@ data class PatientModel(
     val name: String,
     val rut: String,
     val id: String = "",
+    val rol: String= "paciente"
 
 ) {
     // Constructor vacío necesario para Firebase
