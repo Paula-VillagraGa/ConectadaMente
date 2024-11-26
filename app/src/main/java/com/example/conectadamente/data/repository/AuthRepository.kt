@@ -13,6 +13,7 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
 @Singleton
 class AuthRepository @Inject constructor(
     private val auth: FirebaseAuth,
@@ -21,31 +22,19 @@ class AuthRepository @Inject constructor(
 
     suspend fun handleLogin(): String {
         val user = auth.currentUser ?: return "unauthenticated"
-
         val uid = user.uid
 
         return try {
-            // Buscar en la colección de psicólogos
-            val psychoDoc = db.collection("psychos").document(uid).get().await()
-            if (psychoDoc.exists()) {
-                val isVerified = psychoDoc.getBoolean("isVerified") ?: false
-                if (isVerified) {
-                    "psicologo"
-                } else {
-                    "unverified"
-                }
+            // Obtener el rol del usuario, centralizando la lógica
+            val role = getRoleForUser(uid)
+            if (role == "none") {
+                return "sin_rol"
             } else {
-                // Si no está en psicólogos, buscar en pacientes
-                val patientDoc = db.collection("patients").document(uid).get().await()
-                if (patientDoc.exists()) {
-                    "paciente"
-                } else {
-                    "none"
-                }
+                return role
             }
         } catch (e: Exception) {
             Log.e("AuthRepository", "Error al determinar el rol del usuario", e)
-            "error"
+            return "error"
         }
     }
 
@@ -60,10 +49,12 @@ class AuthRepository @Inject constructor(
             emit(DataState.Finished)
         }
     }
+
     suspend fun signInWithEmailAndPassword(email: String, password: String): FirebaseUser {
         return try {
             val authResult = auth.signInWithEmailAndPassword(email, password).await()
-            authResult.user ?: throw Exception("No se pudo obtener el usuario después del inicio de sesión")
+            authResult.user
+                ?: throw Exception("No se pudo obtener el usuario después del inicio de sesión")
         } catch (e: FirebaseAuthInvalidUserException) {
             throw Exception("Usuario no encontrado. Verifica el correo.")
         } catch (e: FirebaseAuthInvalidCredentialsException) {
@@ -73,27 +64,32 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    // Obtener rol del usuario actual
-    suspend fun getRoleForUser(uid: String): String{
+    suspend fun getRoleForUser(uid: String): String {
         return try {
-            // Verificar si el usuario es psicólogo
-            val psychoDoc = db.collection("psychos").document(uid).get().await()
-            if (psychoDoc.exists()) {
-                val isVerified = psychoDoc.getBoolean("isVerified") ?: false
-                return if (isVerified) "psicologo" else "unverified"
-            }
-
-            // Verificar si el usuario es paciente
+            // Primero, intentar obtener el documento en la colección "patients"
             val patientDoc = db.collection("patients").document(uid).get().await()
-            if (patientDoc.exists()) {
-                return "paciente"
-            }
+            // Luego intentar en la colección "psychos"
+            val psychoDoc = db.collection("psychos").document(uid).get().await()
 
-            // Si no es ninguno de los dos, devolver "none"
-            "none"
+            if (patientDoc.exists()) {
+                // Si el documento existe en "patients", es un paciente
+                Log.d("AuthRepository", "Documento encontrado en pacientes: ${patientDoc.data}")
+                return "paciente"
+            } else if (psychoDoc.exists()) {
+                // Si el usuario es psicólogo, validar su estado de verificación
+                Log.d("AuthRepository", "Usuario encontrado en 'psychos': ${psychoDoc.data}")
+                val isVerified = psychoDoc.getBoolean("verified") ?: false
+                Log.d("AuthRepository", "verified: $isVerified")
+                return if (isVerified) "psicologo" else "unverified"
+
+            } else {
+                // Si no se encuentra en ninguna de las colecciones, no tiene rol
+                Log.d("AuthRepository", "Documento no encontrado para UID: $uid")
+                return "none" // No tiene acceso porque no tiene rol
+            }
         } catch (e: Exception) {
             Log.e("AuthRepository", "Error al obtener el rol del usuario", e)
-            "error"
+            return "error" // Manejo de errores
         }
     }
 }

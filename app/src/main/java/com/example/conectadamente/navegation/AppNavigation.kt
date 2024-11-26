@@ -25,6 +25,7 @@ import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
 import com.example.conectadamente.ui.homeUser.RecomendacionUsuarioScreen
 import com.example.conectadamente.ui.authPsicologo.PsychologistLoginScreen
 import com.example.conectadamente.ui.authPsicologo.RegisterPsychoScreen
+import com.example.conectadamente.ui.homePsycho.PsychoProfileScreen
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 
 
@@ -56,6 +57,7 @@ fun AppNavigation() {
             composable(NavScreen.SignIn.route) {
                 SignInScreen(
                     navigateToRegisterPacient = { navController.navigate(NavScreen.RegisterPatient.route) },
+                    navigateToPsychoProfile = {navController.navigate(NavScreen.PsychoProfile.route)},
                     navigateToHomeScreen = {
                         navController.navigate(NavScreen.Home.route) {
                             popUpTo(NavScreen.Login.route) { inclusive = true }
@@ -77,13 +79,17 @@ fun AppNavigation() {
             composable (NavScreen.PsychoSignIn.route) {
                 PsychoSignInScreen(
                     navigateToRegisterPsycho = { navController.navigate(NavScreen.RegisterPsycho.route) },
-                    /*navigateToPsychoHomeScreen ={navController.navigate(NavScreen.PsychoHome.route) {} */)
+                    /*navigateToPsychoProfile = { ={navController.navigate(NavScreen.PsychoHome.route) */)
             }
 
             composable(NavScreen.RegisterPatient.route) {
                 val userAuthViewModel: UserAuthViewModel = hiltViewModel()
                 RegisterPatientScreen(viewModel = userAuthViewModel)
             }
+            composable(NavScreen.PsychoProfile.route){
+                PsychoProfileScreen()
+            }
+
             composable(NavScreen.Home.route) { HomeScreen(navController) }
             composable(NavScreen.Perfil.route) { PerfilUsuarioScreen() }
             composable(NavScreen.Chat.route) { ChatUsuarioScreen(navController) }

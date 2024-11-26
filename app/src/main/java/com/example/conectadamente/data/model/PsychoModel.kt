@@ -6,11 +6,12 @@ data class PsychoModel(
     val email: String = "",
     val name: String = "",
     val phone: String? = null,
-    val age: String? = null,
-    val isVerified: Boolean = false,
+    val experience: String? = null,
+    val verified: Boolean = true,
     val documentUrls: List<String> = emptyList(),
     val id: String = "",
     val rut: String = "",
-    val rol: String = "psicologo"
+    val rol: String = "psicologo",
+    val specialization : String? = null,
 )
 

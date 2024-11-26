@@ -194,6 +194,7 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel = hiltViewModel()) {
                         color = Color.Red
                     )
                     DataState.Finished -> {}
+                    DataState.Idle -> {}
                 }
 
                 Text(

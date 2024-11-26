@@ -33,26 +33,24 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.conectadamente.R
-import com.example.conectadamente.ui.theme.MyApplicationTheme
 import com.example.conectadamente.ui.theme.PoppinsFontFamily
-import com.example.conectadamente.ui.theme.Purple30
-import com.example.conectadamente.ui.theme.Purple40
-import com.example.conectadamente.ui.theme.Purple60
+import com.example.conectadamente.ui.theme.*
 import com.example.conectadamente.ui.viewModel.AuthViewModel
 import com.example.conectadamente.utils.constants.DataState
 
-
 @Composable
-fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScreen: () -> Unit = {}) {
+fun SignInScreen(
+    navigateToRegisterPacient: () -> Unit = {},
+    navigateToHomeScreen: () -> Unit = {},
+    navigateToPsychoProfile: () -> Unit
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
-
 
     val viewModel: AuthViewModel = hiltViewModel()
     val loginState by viewModel.loginState.collectAsState()
@@ -90,7 +88,7 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                 ) {
                     Spacer(modifier = Modifier.height(16.dp)) // Espaciado opcional
                     Image(
-                        painter = painterResource(id=R.drawable.usuario1),
+                        painter = painterResource(id = R.drawable.usuario1),
                         contentDescription = "Logo",
                         modifier = Modifier
                             .size(200.dp) // Tamaño de la imagen
@@ -118,7 +116,6 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
             )
         }
 
-
         // Box centrado con el formulario de login
         Box(
             modifier = Modifier
@@ -130,7 +127,6 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
         ) {
 
             Spacer(modifier = Modifier.height(20.dp))
-
 
             Column(
                 modifier = Modifier
@@ -148,7 +144,6 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                     shape = RoundedCornerShape(8.dp)
                 )
 
-
                 Spacer(modifier = Modifier.height(20.dp))
                 // Campo para ingresar la contraseña
                 TextField(
@@ -164,7 +159,6 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // Botón de iniciar sesión
-                // Botón de iniciar sesión
                 Button(onClick = {
                     // Llamar al método de autenticación de Firebase
                     viewModel.handleLogin(email, password) // Llamar al método handleLogin desde el ViewModel
@@ -175,9 +169,11 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Mensaje de error
-                Text(text = message,
-                        color = Purple60,
-                    modifier = Modifier.padding(top = 4.dp))
+                Text(
+                    text = message,
+                    color = Purple60,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -194,13 +190,15 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
                 )
             }
         }
-    } // Comprobación del estado de login
+    }
+
+    // Comprobación del estado de login
     LaunchedEffect(loginState) {
         when (val state = loginState) {
             is DataState.Success -> {
                 // Navegar según el rol
                 when (state.data) {
-                    "psicologo" -> navigateToHomeScreen()
+                    "psicologo" -> navigateToPsychoProfile()
                     "paciente" -> navigateToHomeScreen()
                     "unverified" -> message = "Cuenta no verificada. Por favor, espera la validación."
                     "none" -> message = "No tienes una cuenta registrada."
@@ -212,14 +210,5 @@ fun SignInScreen(navigateToRegisterPacient: () -> Unit = {}, navigateToHomeScree
             }
             else -> {}
         }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun SignInScreenPreview() {
-    MyApplicationTheme {
-        SignInScreen()
     }
 }

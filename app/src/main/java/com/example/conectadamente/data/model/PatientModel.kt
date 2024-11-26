@@ -12,7 +12,4 @@ data class PatientModel(
     val id: String = "",
     val rol: String= "paciente"
 
-) {
-    // Constructor vacío necesario para Firebase
-    constructor() : this("", "", "","")
-}
+)

@@ -29,17 +29,15 @@ class AuthViewModel @Inject constructor(
                 _loginState.value = DataState.Success(role)
             } catch (e: Exception) {
                 _loginState.value = DataState.Error(e)
-            } finally {
-                _loginState.value = DataState.Finished
             }
         }
     }
 
-    fun logout() {
-        viewModelScope.launch {
-            authRepository.logout().collect { state ->
-                _loginState.value = state
+        fun logout() {
+            viewModelScope.launch {
+                authRepository.logout().collect { state ->
+                    _loginState.value = state
+                }
             }
         }
     }
-}

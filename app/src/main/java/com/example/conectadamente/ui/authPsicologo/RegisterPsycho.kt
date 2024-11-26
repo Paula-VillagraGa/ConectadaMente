@@ -370,6 +370,7 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
                     modifier = Modifier.padding(top = 16.dp)
                 )
             }
+            DataState.Idle -> {} // Agregar esta rama
         }
     }
 }

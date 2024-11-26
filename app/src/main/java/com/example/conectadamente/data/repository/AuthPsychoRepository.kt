@@ -14,6 +14,8 @@ import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -26,6 +28,11 @@ class AuthPsychoRepository @Inject constructor() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val storage: FirebaseStorage = FirebaseStorage.getInstance()
+
+    // Definir el estado del perfil
+    private val _profileState = MutableStateFlow<DataState<PsychoModel>>(DataState.Idle)
+    val profileState: StateFlow<DataState<PsychoModel>> = _profileState
+
 
     fun registerPsycho(
         psycho: PsychoModel,
@@ -65,7 +72,7 @@ class AuthPsychoRepository @Inject constructor() {
 
             // Crear modelo del psicólogo con documentos y estado de verificación
             val psychoWithDocuments = psycho.copy(
-                isVerified = false,
+                verified = false,
                 documentUrls = documentUrls,
                 id = uid
             )
@@ -80,6 +87,9 @@ class AuthPsychoRepository @Inject constructor() {
         } finally {
             emit(DataState.Finished)
         }
+    }  // Obtener el UID del Psycho
+    fun getCurrentPsychoId(): String? {
+        return auth.currentUser?.uid
     }
 
     private suspend fun uploadDocumentsToStorage(uid: String, documents: List<Uri>): List<String> {
@@ -106,5 +116,20 @@ class AuthPsychoRepository @Inject constructor() {
         }
 
         return documentUrls
+    } suspend fun getCurrentPsychologistProfile(): PsychoModel? {
+        return try {
+            val currentUser = auth.currentUser // Usuario autenticado
+            val uid = currentUser?.uid ?: throw Exception("Usuario no autenticado")
+            val doc = db.collection("psychos").document(uid).get().await()
+            if (doc.exists()) {
+                doc.toObject(PsychoModel::class.java)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("AuthRepository", "Error al obtener el perfil del usuario actual", e)
+            null
+        }
     }
+
 }

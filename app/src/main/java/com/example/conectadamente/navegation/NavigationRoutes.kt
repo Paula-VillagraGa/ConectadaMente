@@ -16,13 +16,12 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
     object Home : NavScreen("home_screen", "Inicio", Icons.Outlined.Home)
     object Perfil : NavScreen("perfil_usuario", "Perfil", Icons.Outlined.Person)
     object Chat : NavScreen("chat_usuario", "Chat", Icons.Outlined.Email)
-    object Recomendaciones :
-        NavScreen("recomendaciones_usuario", "Recomendaciones", Icons.Outlined.Face)
-
+    object Recomendaciones : NavScreen("recomendaciones_usuario", "Recomendaciones", Icons.Outlined.Face)
     object Formativo : NavScreen("formativo_usuario", "Formativo", Icons.Outlined.Info)
     object PsychologistLogin : NavScreen("psychologist_login", "Login", null)
     object RegisterPsycho : NavScreen("register_psycho", "Registro", null)
     object PsychoSignIn : NavScreen("psycho_sign_in", "Iniciar Sesión Psicólogo", null)
+    object PsychoProfile: NavScreen("psycho_profile", "psychoprofile", null)
 
 }
 // Lista para navegación inferior
