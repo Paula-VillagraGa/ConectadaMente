@@ -2,7 +2,6 @@ package com.example.conectadamente.data.repository
 
 import android.net.Uri
 import android.util.Log
-import com.example.conectadamente.data.model.PatientModel
 import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.utils.constants.DataState
 import com.google.firebase.auth.FirebaseAuth
@@ -11,7 +10,6 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +18,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.io.File
 import javax.inject.Inject
 
 class AuthPsychoRepository @Inject constructor() {
@@ -84,7 +81,7 @@ class AuthPsychoRepository @Inject constructor() {
             emit(DataState.Success("Registro exitoso. Tu cuenta será verificada en un plazo de 24 horas hábiles."))
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "Error en registerPsycho", e)
-            emit(DataState.Error(e))
+            emit(DataState.Error(e = "e"))
         } finally {
             emit(DataState.Finished)
         }
@@ -168,6 +165,19 @@ class AuthPsychoRepository @Inject constructor() {
             }
         } catch (e: Exception) {
             emptyList() // Retornar una lista vacía si ocurre un error
+        }
+    }
+    suspend fun getPsychoById(id: String): PsychoModel? {
+        return try {
+            val document = db.collection("psychos").document(id).get().await()
+            if (document.exists()) {
+                document.toObject(PsychoModel::class.java)
+            } else {
+                null // Retorna null si el documento no existe
+            }
+        } catch (e: Exception) {
+            Log.e("AuthPsychoRepository", "Error al obtener el psicólogo con ID: $id", e)
+            null
         }
     }
 }

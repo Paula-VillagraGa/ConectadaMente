@@ -28,7 +28,7 @@ class AuthViewModel @Inject constructor(
                 val role = authRepository.getRoleForUser(user.uid)
                 _loginState.value = DataState.Success(role)
             } catch (e: Exception) {
-                _loginState.value = DataState.Error(e)
+                _loginState.value = DataState.Error(e.toString())
             }
         }
     }

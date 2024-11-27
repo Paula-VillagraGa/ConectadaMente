@@ -14,8 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
-
 @HiltViewModel
 class PsychoAuthViewModel @Inject constructor(
     private val authPsychoRepository: AuthPsychoRepository
@@ -23,9 +21,16 @@ class PsychoAuthViewModel @Inject constructor(
 
     private val _authState = MutableStateFlow<DataState<String>>(DataState.Finished)
     val authState: StateFlow<DataState<String>> = _authState.asStateFlow()
-    private val _profileState = MutableStateFlow<PsychoModel?>(null)
-    val profileState: StateFlow<PsychoModel?> get() = _profileState
-    var psychologists = mutableStateOf<List<PsychoModel>>(emptyList())
+
+    private val _psychologistsState = MutableStateFlow<List<PsychoModel>>(emptyList())
+    val psychologistsState: StateFlow<List<PsychoModel>> = _psychologistsState.asStateFlow()
+
+    private val _selectedPsychologist = MutableStateFlow<PsychoModel?>(null)
+    val selectedPsychologist: StateFlow<PsychoModel?> = _selectedPsychologist.asStateFlow()
+
+    private val _profileState = MutableStateFlow<DataState<PsychoModel?>>(DataState.Loading)
+    val profileState: StateFlow<DataState<PsychoModel?>> = _profileState.asStateFlow()
+
     var query = mutableStateOf("")
 
     init {
@@ -34,16 +39,10 @@ class PsychoAuthViewModel @Inject constructor(
 
     fun fetchPsychologists() {
         viewModelScope.launch {
-            psychologists.value = authPsychoRepository.getPsychologists()
+            val psychologists = authPsychoRepository.getPsychologists()
+            _psychologistsState.value = psychologists
         }
     }
-
-    fun searchPsychologists() {
-        viewModelScope.launch {
-            psychologists.value = authPsychoRepository.getPsychosByName(query.value)
-        }
-    }
-
 
     fun registerPsycho(psycho: PsychoModel, password: String, documents: List<Uri>) {
         viewModelScope.launch {
@@ -53,14 +52,35 @@ class PsychoAuthViewModel @Inject constructor(
         }
     }
 
-    // Función para cargar el perfil del psicólogo
-    fun loadCurrentProfile() {
+    fun searchPsychologists() {
         viewModelScope.launch {
-            // Asumimos que ya tienes el UID del psicólogo autenticado
-            val currentUserUid = authPsychoRepository.getCurrentPsychoId() // Implementa esto si es necesario
-            val profile = authPsychoRepository.getCurrentPsychologistProfile()
-            _profileState.value = profile
+            val filtered = authPsychoRepository.getPsychosByName(query.value)
+            _psychologistsState.value = filtered
         }
     }
 
+    fun getPsychoById(id: String) {
+        viewModelScope.launch {
+            try {
+                // Llamada al repositorio para obtener los datos
+                val psycho = authPsychoRepository.getPsychoById(id)
+                _profileState.value = DataState.Success(psycho)
+            } catch (e: Exception) {
+                _profileState.value = DataState.Error("Error al cargar el perfil")
+            }
+        }
+    }
+
+    fun loadCurrentProfile() {
+        viewModelScope.launch {
+            _profileState.value = DataState.Loading // Cambia el estado a cargando
+            try {
+                val profile = authPsychoRepository.getCurrentPsychologistProfile()
+                _profileState.value = DataState.Success(profile)
+            } catch (e: Exception) {
+                _profileState.value = DataState.Error("Error al cargar el perfil")
+            }
+        }
+    }
 }
+

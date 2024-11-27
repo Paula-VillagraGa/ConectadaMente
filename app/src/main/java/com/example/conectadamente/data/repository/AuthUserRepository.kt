@@ -31,7 +31,7 @@ class AuthUserRepository @Inject constructor() {
 
             emit(DataState.Success("Paciente registrado correctamente")) // Emitir éxito
         } catch (e: Exception) {
-            emit(DataState.Error(e)) // Emitir error en caso de fallo
+            (DataState.Error(e.message ?: "Error desconocido"))
         } finally {
             emit(DataState.Finished) // Emitir estado finalizado
         }
@@ -53,7 +53,7 @@ class AuthUserRepository @Inject constructor() {
 
             emit(DataState.Success(patient)) // Emitir datos del paciente
         } catch (e: Exception) {
-            emit(DataState.Error(e)) // Emitir error en caso de fallo
+            (DataState.Error(e.message ?: "Error desconocido"))
         } finally {
             emit(DataState.Finished) // Emitir estado finalizado
         }

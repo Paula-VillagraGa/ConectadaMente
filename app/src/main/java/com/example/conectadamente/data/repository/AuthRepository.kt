@@ -44,7 +44,7 @@ class AuthRepository @Inject constructor(
             auth.signOut()
             emit(DataState.Success("Cierre de sesión exitoso"))
         } catch (e: Exception) {
-            emit(DataState.Error(e))
+            emit(DataState.Error(e.message ?: "Error desconocido"))
         } finally {
             emit(DataState.Finished)
         }

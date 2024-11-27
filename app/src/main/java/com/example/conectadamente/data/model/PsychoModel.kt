@@ -15,6 +15,7 @@ data class PsychoModel(
     val specialization : List<String> = emptyList(),
     val rating: Double = 0.0,
     val tagsSpecific: List<String> = emptyList(),
-    val descriptionPsycho: String? = null
+    val descriptionPsycho: String? = null,
+    val photoUrl: String? = null
 )
 

@@ -19,9 +19,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -38,10 +40,13 @@ import androidx.navigation.compose.rememberNavController
 import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.ui.theme.*
 import com.example.conectadamente.ui.viewModel.HomeUserViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun HomeScreen(navController: NavHostController, viewModel: HomeUserViewModel = hiltViewModel()) {
+
     Scaffold(
         topBar = { TopAppBar() },
     ) { paddingValues ->
@@ -59,7 +64,8 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeUserViewModel = 
                 SearchField( query = viewModel.query.value,
                     onQueryChanged = { newQuery -> viewModel.query.value = newQuery },
                     onSearch = { viewModel.searchPsychologists() },
-                    searchResults = viewModel.filteredPsychologists)
+                    searchResults = viewModel.filteredPsychologists,
+                    navController = navController)
                 ContentSection()
                 MentalHealthSection()
             }
@@ -95,18 +101,31 @@ fun TopAppBar() {
 fun SearchField(
     query: String,
     onQueryChanged: (String) -> Unit,
-    onSearch: () -> Unit, // Acción al buscar
-    searchResults: List<PsychoModel> // Lista de resultados de psicólogos
+    onSearch: () -> Unit,
+    searchResults: List<PsychoModel>,
+    navController: NavHostController
 ) {
     var showResults by remember { mutableStateOf(false) }
+    var filteredResults by remember { mutableStateOf(searchResults) }
+    val coroutineScope = rememberCoroutineScope()
 
+
+    // Para realizar un debounce, esperando un pequeño tiempo después de que el usuario deje de escribir
+    LaunchedEffect(query) {
+        coroutineScope.launch {
+            delay(500)
+            filteredResults = searchResults.filter {
+                it.name.contains(query, ignoreCase = true)
+            }
+        }
+    }
     OutlinedTextField(
         value = query,
-        onValueChange = {   onQueryChanged(it) // Actualiza el texto de búsqueda
+        onValueChange = {   onQueryChanged(it)
             if (it.isNotEmpty()) {
-                showResults = true // Mostrar resultados mientras haya texto
+                showResults = true
             } else {
-                showResults = false // Ocultar resultados cuando no haya texto
+                showResults = false
             }
         },
         modifier = Modifier
@@ -114,7 +133,7 @@ fun SearchField(
             .padding(16.dp)
             .background(Color(0xFFE9E7F3), RoundedCornerShape(16.dp)),
         placeholder = {
-            Text("Buscar", color = Color(0xFF3E4398))
+            Text("Buscar Psicólogo", color = Color(0xFF3E4398))
         },
         leadingIcon = {
             Icon(
@@ -127,32 +146,35 @@ fun SearchField(
         keyboardActions = KeyboardActions(
             onSearch = {
                 onSearch()
-                showResults = true // Indicar que se ha iniciado la búsqueda
             })
     )
-    // Mostrar resultados solo después de que la búsqueda haya comenzado
     if (showResults) {
-        SearchResults(psychologists = searchResults.take(3)) // Limita a los primeros 3 resultados
+        SearchResults(
+            psychologists = filteredResults,
+            navController = navController
+        )
     }
 
 }
     @Composable
-    fun SearchResults(psychologists: List<PsychoModel>) {
+    fun SearchResults(psychologists: List<PsychoModel>, navController: NavHostController) {
         LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
             items(psychologists) { psychologist ->
-                SearchResultCard(psychologist)
+                SearchResultCard(psychologist,  navController = navController)
             }
         }
     }
 // Componente para cada resultado
 @Composable
-fun SearchResultCard(psychologist: PsychoModel) {
+fun SearchResultCard(psychologist: PsychoModel, navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .background(Color(0xFFE9E7F3), RoundedCornerShape(8.dp))
-            .clickable { /* Acción al seleccionar un resultado */ }
+            .padding(vertical = 6.dp)
+            .background(Color(0xFFDCDBDB), RoundedCornerShape(8.dp))
+            .clickable {
+                navController.navigate("profile/${psychologist.id}")
+            }
             .padding(16.dp)
     ) {
         Icon(
@@ -164,9 +186,9 @@ fun SearchResultCard(psychologist: PsychoModel) {
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             text = psychologist.name,
-            fontSize = 16.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF100E1B)
+            color = Purple80
         )
     }
 }

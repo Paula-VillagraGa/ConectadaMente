@@ -190,7 +190,7 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel = hiltViewModel()) {
                         color = Color.Green
                     )
                     is DataState.Error -> Text(
-                        "Error: ${(registerState as DataState.Error).e.message}",
+                        "Error: ${(registerState as DataState.Error).e}",
                         color = Color.Red
                     )
                     DataState.Finished -> {}

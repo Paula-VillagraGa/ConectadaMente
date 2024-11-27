@@ -206,7 +206,7 @@ fun SignInScreen(
                 }
             }
             is DataState.Error -> {
-                message = state.e.message ?: "Error desconocido"
+                message = state.e?: "Error desconocido"
             }
             else -> {}
         }

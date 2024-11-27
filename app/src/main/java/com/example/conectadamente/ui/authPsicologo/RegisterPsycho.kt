@@ -355,7 +355,7 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
 
             is DataState.Error -> {
                 Text(
-                    "Error: ${(registerState as DataState.Error).e.message}",
+                    "Error: ${(registerState as DataState.Error).e}",
                     color = Color.Red,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 16.dp)
