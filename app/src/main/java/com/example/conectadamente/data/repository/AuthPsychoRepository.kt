@@ -34,6 +34,7 @@ class AuthPsychoRepository @Inject constructor() {
     val profileState: StateFlow<DataState<PsychoModel>> = _profileState
 
 
+
     fun registerPsycho(
         psycho: PsychoModel,
         password: String,
@@ -131,8 +132,24 @@ class AuthPsychoRepository @Inject constructor() {
             null
         }
     }
+
+    suspend fun getPsychologists(): List<PsychoModel> {
+        return try {
+            val documents = db.collection("psychos").get().await()
+            documents.map { document ->
+                PsychoModel(
+                    id = document.getString("id")?:"",
+                    name = document.getString("name") ?: "",
+                    /*specialty = document.getString("specialty") ?: "",*/
+                    rating = document.getDouble("rating") ?: 0.0
+                )
+            }
+        } catch (e: Exception) {
+            emptyList() // Retornar una lista vacía si ocurre un error
+        }
+    }
     //Buscar psicólogos por nombre
-    private suspend fun getPsychologistsByName(query: String): List<PsychoModel> {
+    suspend fun getPsychosByName(query: String): List<PsychoModel> {
         return try {
             val documents = db.collection("psychos")
                 .whereGreaterThanOrEqualTo("name", query)
@@ -140,10 +157,12 @@ class AuthPsychoRepository @Inject constructor() {
                 .get()
                 .await()
             documents.map { document ->
+
                 PsychoModel(
+
                     id = document.getString("id")?:"",
                     name = document.getString("name") ?: "",
-                    specialization = document.getString("specialty") ?: "",
+                    /*specialization = document.get("specialization")as? List<String> ?: emptyList(),*/
                     rating = document.getDouble("rating") ?: 0.0
                 )
             }
@@ -153,4 +172,3 @@ class AuthPsychoRepository @Inject constructor() {
     }
 }
 
-}

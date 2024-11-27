@@ -9,11 +9,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -21,16 +30,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.conectadamente.R
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.conectadamente.navegation.NavigationInferior
+import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.ui.theme.*
-
+import com.example.conectadamente.ui.viewModel.HomeUserViewModel
 
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController, viewModel: HomeUserViewModel = hiltViewModel()) {
     Scaffold(
         topBar = { TopAppBar() },
     ) { paddingValues ->
@@ -45,7 +56,10 @@ fun HomeScreen(navController: NavHostController) {
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
             ) {
-                SearchField()
+                SearchField( query = viewModel.query.value,
+                    onQueryChanged = { newQuery -> viewModel.query.value = newQuery },
+                    onSearch = { viewModel.searchPsychologists() },
+                    searchResults = viewModel.filteredPsychologists)
                 ContentSection()
                 MentalHealthSection()
             }
@@ -76,12 +90,25 @@ fun TopAppBar() {
 
 
 
-// Campo de búsqueda
+// Campo de búsqueda para psicólogos por nombre
 @Composable
-fun SearchField() {
+fun SearchField(
+    query: String,
+    onQueryChanged: (String) -> Unit,
+    onSearch: () -> Unit, // Acción al buscar
+    searchResults: List<PsychoModel> // Lista de resultados de psicólogos
+) {
+    var showResults by remember { mutableStateOf(false) }
+
     OutlinedTextField(
-        value = "",
-        onValueChange = { /* Acción para el campo de búsqueda */ },
+        value = query,
+        onValueChange = {   onQueryChanged(it) // Actualiza el texto de búsqueda
+            if (it.isNotEmpty()) {
+                showResults = true // Mostrar resultados mientras haya texto
+            } else {
+                showResults = false // Ocultar resultados cuando no haya texto
+            }
+        },
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
@@ -95,8 +122,53 @@ fun SearchField() {
                 contentDescription = "Buscar",
                 tint = Color(0xFF5A4E97)
             )
-        }
+        },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                onSearch()
+                showResults = true // Indicar que se ha iniciado la búsqueda
+            })
     )
+    // Mostrar resultados solo después de que la búsqueda haya comenzado
+    if (showResults) {
+        SearchResults(psychologists = searchResults.take(3)) // Limita a los primeros 3 resultados
+    }
+
+}
+    @Composable
+    fun SearchResults(psychologists: List<PsychoModel>) {
+        LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            items(psychologists) { psychologist ->
+                SearchResultCard(psychologist)
+            }
+        }
+    }
+// Componente para cada resultado
+@Composable
+fun SearchResultCard(psychologist: PsychoModel) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .background(Color(0xFFE9E7F3), RoundedCornerShape(8.dp))
+            .clickable { /* Acción al seleccionar un resultado */ }
+            .padding(16.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ico_perfil),
+            contentDescription = "Psicólogo",
+            tint = Color(0xFF5A4E97),
+            modifier = Modifier.size(40.dp)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            text = psychologist.name,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF100E1B)
+        )
+    }
 }
 
 // Tarjeta de recomendación utilizando aspectRatio para tamaño flexible

@@ -1,6 +1,7 @@
 package com.example.conectadamente.ui.viewModel
 
 import android.net.Uri
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.conectadamente.data.model.PsychoModel
@@ -24,7 +25,24 @@ class PsychoAuthViewModel @Inject constructor(
     val authState: StateFlow<DataState<String>> = _authState.asStateFlow()
     private val _profileState = MutableStateFlow<PsychoModel?>(null)
     val profileState: StateFlow<PsychoModel?> get() = _profileState
+    var psychologists = mutableStateOf<List<PsychoModel>>(emptyList())
+    var query = mutableStateOf("")
 
+    init {
+        fetchPsychologists()
+    }
+
+    fun fetchPsychologists() {
+        viewModelScope.launch {
+            psychologists.value = authPsychoRepository.getPsychologists()
+        }
+    }
+
+    fun searchPsychologists() {
+        viewModelScope.launch {
+            psychologists.value = authPsychoRepository.getPsychosByName(query.value)
+        }
+    }
 
 
     fun registerPsycho(psycho: PsychoModel, password: String, documents: List<Uri>) {
