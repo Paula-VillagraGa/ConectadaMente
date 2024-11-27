@@ -12,6 +12,9 @@ data class PsychoModel(
     val id: String = "",
     val rut: String = "",
     val rol: String = "psicologo",
-    val specialization : String? = null,
+    val specialization : List<String> = emptyList(),
+    val rating: Double = 0.0,
+    val tagsSpecific: List<String> = emptyList(),
+    val descriptionPsycho: String? = null
 )
 

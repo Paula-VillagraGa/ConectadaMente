@@ -131,5 +131,26 @@ class AuthPsychoRepository @Inject constructor() {
             null
         }
     }
+    //Buscar psicólogos por nombre
+    private suspend fun getPsychologistsByName(query: String): List<PsychoModel> {
+        return try {
+            val documents = db.collection("psychos")
+                .whereGreaterThanOrEqualTo("name", query)
+                .whereLessThanOrEqualTo("name", query + "\uf8ff")
+                .get()
+                .await()
+            documents.map { document ->
+                PsychoModel(
+                    id = document.getString("id")?:"",
+                    name = document.getString("name") ?: "",
+                    specialization = document.getString("specialty") ?: "",
+                    rating = document.getDouble("rating") ?: 0.0
+                )
+            }
+        } catch (e: Exception) {
+            emptyList() // Retornar una lista vacía si ocurre un error
+        }
+    }
+}
 
 }
