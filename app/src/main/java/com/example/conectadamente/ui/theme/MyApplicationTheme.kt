@@ -11,12 +11,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.conectadamente.R
 
+
 val PoppinsFontFamily = FontFamily(
     Font(R.font.poppins_regular),
     Font(R.font.poppins_bold),
     Font(R.font.poppins_light),
     Font(R.font.poppins_italic)
 )
+// Definir el Typography personalizado
+val customTypography = Typography(
+    displayLarge = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 57.sp),
+    displayMedium = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 45.sp),
+    displaySmall = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 36.sp),
+    headlineLarge = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 32.sp),
+    headlineMedium = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 28.sp),
+    headlineSmall = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 24.sp),
+    titleLarge = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 22.sp),
+    titleMedium = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 20.sp),
+    titleSmall = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 18.sp),
+    bodyLarge = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 16.sp),
+    bodyMedium = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 14.sp),
+    bodySmall = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+    labelLarge = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 14.sp),
+    labelMedium = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+    labelSmall = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 10.sp)
+)
+
 val MyTypography = Typography(
     bodyLarge = TextStyle(
         fontFamily = PoppinsFontFamily,
@@ -30,15 +50,31 @@ val MyTypography = Typography(
     )
 )
 
-private val DarkColorPalette = darkColorScheme(
-    primary = Color(0xFFBB86FC),
-    secondary = Color(0xFF03DAC6)
+private val LightColorScheme = lightColorScheme(
+    primary = Purple50,
+    secondary = Purple30,
+    tertiary = Color.White,
+    background = Color.White, //Fondo no tocar
+    surface = Color.White, //barras no tocar
+    onPrimary = Color.White,
+    onSecondary = Purple50,
+    onTertiary = Purple50,
+    onBackground = Gray50,
+    onSurface = Purple50 //Escribir
 )
 
-private val LightColorPalette = lightColorScheme(
-    primary = Purple20,
-    secondary = Purple30,
-
+// Esquema de colores oscuro
+private val DarkColorScheme = darkColorScheme(
+    primary = Color.Black,
+    secondary = Purple40,
+    tertiary = Brown40,
+    background = Gray30,
+    surface = Gray40,
+    onPrimary = Color.Black,
+    onSecondary = Color.Black,
+    onTertiary = Color.Black,
+    onBackground = Gray10,
+    onSurface = Gray20
 )
 
 @Composable
@@ -47,14 +83,14 @@ fun MyApplicationTheme(
     content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme) {
-        DarkColorPalette
+        DarkColorScheme
     } else {
-        LightColorPalette
+        LightColorScheme
     }
 
     MaterialTheme(
         colorScheme = colors,
-        typography = MyTypography,
+        typography = customTypography,
         shapes = Shapes,
         content = content
     )

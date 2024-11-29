@@ -110,6 +110,7 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.androidx.navigation.safe.args.generator)
+    implementation(libs.androidx.compose.material)
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
 

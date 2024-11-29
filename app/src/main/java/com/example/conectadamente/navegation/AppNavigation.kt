@@ -18,7 +18,7 @@ import com.example.conectadamente.ui.authPaciente.SignInScreen
 import com.example.conectadamente.ui.authPsicologo.PsychoSignInScreen
 import com.example.conectadamente.ui.authPsicologo.PsychologistLoginScreen
 import com.example.conectadamente.ui.authPsicologo.RegisterPsychoScreen
-import com.example.conectadamente.ui.homePsycho.ProfilePsyFromPatScreen
+import com.example.conectadamente.ui.homeUser.ProfilePsyFromPatScreen
 import com.example.conectadamente.ui.homePsycho.PsychoProfileScreen
 import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
 import com.example.conectadamente.ui.homeUser.FormativoUsuarioScreen
@@ -93,7 +93,7 @@ fun AppNavigation() {
             //Perfil psicólogo desde paciente
             composable("profile/{psychologistId}") { backStackEntry ->
                 val psychologistId = backStackEntry.arguments?.getString("psychologistId")
-                ProfilePsyFromPatScreen(psychologistId = psychologistId)
+                ProfilePsyFromPatScreen(psychologistId = psychologistId, navController=navController)
             }
 
             composable(NavScreen.Home.route) { HomeScreen(navController) }

@@ -22,6 +22,7 @@ firebaseStorageKtxVersion = "21.0.1"
 runtimeLivedataVersion = "1.7.5"
 foundationLayoutAndroidVersion = "1.7.2"
 navigationSafeArgsGeneratorVersion = "2.8.4"
+composeMaterialVersion = "1.4.0"
 
 
 [libraries]
@@ -53,6 +54,7 @@ firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedataVersion" }
 androidx-foundation-layout-android = { group = "androidx.compose.foundation", name = "foundation-layout-android", version.ref = "foundationLayoutAndroidVersion" }
 androidx-navigation-safe-args-generator = { group = "androidx.navigation", name = "navigation-safe-args-generator", version.ref = "navigationSafeArgsGeneratorVersion" }
+androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "composeMaterialVersion" }
 
 
 
