@@ -15,8 +15,13 @@ class ReviewViewModel @Inject constructor(
     private val reviewRepository: ReviewRepository
 ) : ViewModel() {
 
+
     private val _ratingState = MutableLiveData<DataState<String>>()
     val ratingState: LiveData<DataState<String>> get() = _ratingState
+
+    suspend fun getAverageRating(psychoId: String): Double {
+        return reviewRepository.getAverageRating(psychoId)
+    }
 
     fun submitRating(
         psychoId: String,
@@ -35,4 +40,5 @@ class ReviewViewModel @Inject constructor(
             }
         }
     }
+
 }

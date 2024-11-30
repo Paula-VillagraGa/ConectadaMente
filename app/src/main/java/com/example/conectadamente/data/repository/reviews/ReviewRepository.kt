@@ -36,5 +36,26 @@ class ReviewRepository @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    } // Calcular el promedio de las calificaciones para un psicólogo específico
+
+    suspend fun getAverageRating(psychoId: String): Double {
+        return try {
+            val reviewQuery = firestore.collection("reviews")
+                .whereEqualTo("psychoId", psychoId)
+                .get()
+                .await()
+
+            // Si no hay reseñas, el promedio es 0
+            if (reviewQuery.isEmpty) {
+                0.0
+            } else {
+                val ratings = reviewQuery.documents.map { it.getDouble("rating") ?: 0.0 }
+                ratings.average()
+            }
+        } catch (e: Exception) {
+            0.0
+        }
     }
+
 }
+
