@@ -81,7 +81,7 @@ class AuthPsychoRepository @Inject constructor() {
             emit(DataState.Success("Registro exitoso. Tu cuenta será verificada en un plazo de 24 horas hábiles."))
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "Error en registerPsycho", e)
-            emit(DataState.Error(e = "e"))
+            emit(DataState.Error(e.toString()))
         } finally {
             emit(DataState.Finished)
         }

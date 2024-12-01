@@ -73,8 +73,8 @@ fun SignInScreen(
                             color = Purple60,
                             radius = 40f,
                             center = Offset(
-                                x = (100f * i + 50f), // Posiciones en X desplazadas
-                                y = (200f * i + 30f)  // Posiciones en Y desplazadas
+                                x = (100f * i + 50f),
+                                y = (200f * i + 30f)
                             )
                         )
                     }
@@ -82,24 +82,25 @@ fun SignInScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 50.dp), // Ajuste para posicionar más abajo
+                        .padding(top = 50.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
                 ) {
-                    Spacer(modifier = Modifier.height(16.dp)) // Espaciado opcional
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     Image(
                         painter = painterResource(id = R.drawable.usuario1),
                         contentDescription = "Logo",
                         modifier = Modifier
-                            .size(200.dp) // Tamaño de la imagen
-                            .padding(bottom = 16.dp) // Espacio entre la imagen y el texto
+                            .size(200.dp)
+                            .padding(bottom = 16.dp)
                     )
                     Text(
-                        text = "Iniciar Sesión", // Reemplaza con tu texto
+                        text = "Iniciar Sesión",
                         style = TextStyle(
-                            fontFamily = PoppinsFontFamily,   // Usar la familia de fuentes definida
-                            fontStyle = FontStyle.Normal,    // Asegura que se usa el estilo itálico
-                            fontSize = 30.sp,                // Tamaño de la fuente
+                            fontFamily = PoppinsFontFamily,
+                            fontStyle = FontStyle.Normal,
+                            fontSize = 30.sp,
                             color = Color.White,
                         ),
                         textAlign = TextAlign.Left // Centrar el texto
@@ -160,7 +161,6 @@ fun SignInScreen(
 
                 // Botón de iniciar sesión
                 Button(onClick = {
-                    // Llamar al método de autenticación de Firebase
                     viewModel.handleLogin(email, password) // Llamar al método handleLogin desde el ViewModel
                 }) {
                     Text("Iniciar sesión")
