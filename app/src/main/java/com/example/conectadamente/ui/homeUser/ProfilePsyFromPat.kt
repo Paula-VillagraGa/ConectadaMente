@@ -3,20 +3,46 @@ package com.example.conectadamente.ui.homeUser
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material3.Text
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,7 +53,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-
 import coil.compose.AsyncImage
 import com.example.conectadamente.R
 import com.example.conectadamente.ui.theme.Gray50
@@ -43,6 +68,11 @@ fun ProfilePsyFromPatScreen(
     navController: NavController
 ) {
 
+// Estados para el Snackbar
+    val snackbarHostState = remember { SnackbarHostState() }
+    var isSubmitting by remember { mutableStateOf(false) }
+    var messageToShow by remember { mutableStateOf<String?>(null) }
+
     // ViewModels
     val reviewViewModel: ReviewViewModel = hiltViewModel()
     val viewModel: PsychoAuthViewModel = hiltViewModel()
@@ -51,13 +81,45 @@ fun ProfilePsyFromPatScreen(
 
     // Estados observados
     val profileState by viewModel.profileState.collectAsState()
-    val ratingState by reviewViewModel.ratingState.observeAsState()
+    val ratingState by reviewViewModel.ratingState.observeAsState() //?
 
     // Estados locales
     var rating by remember { mutableIntStateOf(0) }
     var tags by remember { mutableStateOf(listOf<String>()) }
 
+    // Manejo de mensajes del Snackbar
+    LaunchedEffect(ratingState) {
+        when (ratingState) {
+            is DataState.Success -> {
+                snackbarHostState.showSnackbar("¡Reseña enviada correctamente!")
+                isSubmitting = false
+            }
+            is DataState.Error -> {
+                snackbarHostState.showSnackbar("Error: ${(ratingState as DataState.Error).e}")
+                isSubmitting = false
+            }
+            DataState.Loading -> {
+                isSubmitting = true
+            }
+            else -> {}
+        }
+    }
+//Reseña previa
+    LaunchedEffect(psychologistId) {
+        psychologistId?.let { id ->
+            viewModel.getPsychoById(id)
+            ratingPromedio = reviewViewModel.getAverageRating(id)
 
+            val patientId = FirebaseAuth.getInstance().currentUser?.uid
+            if (patientId != null) {
+                val existingReview = reviewViewModel.getExistingReview(id, patientId)
+                existingReview?.let { review ->
+                    rating = review.rating.toInt()
+                    tags = review.tags
+                }
+            }
+        }
+    }
 
     LaunchedEffect(psychologistId) {
         psychologistId?.let { id ->
@@ -67,6 +129,7 @@ fun ProfilePsyFromPatScreen(
     }
 
         Scaffold(
+            modifier = Modifier.padding(2.dp),
             topBar = {
                 TopAppBar(
                     title = { Text("") },
@@ -79,14 +142,15 @@ fun ProfilePsyFromPatScreen(
                         }
                     }
                 )
-            }
+            },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) } // Ubicación del Snackbar
         ) { paddingValues ->
             // Contenido principal
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(top = 16.dp),
+                    .padding(top = 8.dp)
+                    .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
                 when (val state = profileState) {
@@ -200,6 +264,7 @@ fun ProfilePsyFromPatScreen(
                                 )
 
                                 //Review acá
+                                // Rating
                                 Row(
                                     modifier = Modifier.padding(vertical = 8.dp),
                                     horizontalArrangement = Arrangement.Center
@@ -211,12 +276,11 @@ fun ProfilePsyFromPatScreen(
                                             tint = if (i <= rating) Color.Yellow else Color.Gray,
                                             modifier = Modifier
                                                 .size(40.dp)
-                                                .clickable { rating = i }
+                                                .clickable { rating = i } // Permite editar la calificación
                                         )
                                     }
-
                                 }
-                                // Tags (opcional)
+
                                 Text(
                                     text = "Define al Psicólogo",
                                     style = MaterialTheme.typography.bodyLarge,
@@ -226,8 +290,7 @@ fun ProfilePsyFromPatScreen(
                                     modifier = Modifier.padding(horizontal = 16.dp),
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    val availableTags =
-                                        listOf("Empático", "Buen oyente", "Profesional", "Amable")
+                                    val availableTags = listOf("Empático", "Buen oyente", "Profesional", "Amable")
                                     items(availableTags) { tag ->
                                         AssistChip(
                                             onClick = {
@@ -236,7 +299,6 @@ fun ProfilePsyFromPatScreen(
                                                 } else if (tags.size < 3) {
                                                     tags = tags + tag
                                                 }
-
                                             },
                                             label = {
                                                 Text(
@@ -253,32 +315,33 @@ fun ProfilePsyFromPatScreen(
                                 // Botón de enviar
                                 Button(
                                     onClick = {
-                                        psychologistId?.let {
-                                            val patientId =
-                                                FirebaseAuth.getInstance().currentUser?.uid
+                                        psychologistId?.let { id ->
+                                            val patientId = FirebaseAuth.getInstance().currentUser?.uid
                                             if (patientId != null) {
+                                                isSubmitting = true // Cambia el estado a "enviando"
                                                 reviewViewModel.submitRating(
-                                                    psychoId = it,
+                                                    psychoId = id,
                                                     patientId = patientId,
                                                     tags = tags,
                                                     rating = rating.toDouble()
                                                 )
-                                            } else {
-                                                // Manejo de error: paciente no autenticado
-                                                Log.e(
-                                                    "Rating",
-                                                    "No se pudo obtener el ID del paciente"
-                                                )
+                                            }
+
+                                             else {
+                                                Log.e("Rating", "No se pudo obtener el ID del paciente")
+                                                messageToShow = "No se pudo autenticar al usuario."
                                             }
                                         }
                                     },
-                                    enabled = rating > 0, // Deshabilitar si no hay calificación
-                                    modifier = Modifier.padding(vertical = 16.dp)
+                                    enabled = rating > 0 && !isSubmitting, // Deshabilitar mientras se envía
+                                    modifier = Modifier.padding(vertical = 16.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (isSubmitting) MaterialTheme.colorScheme.secondary
+                                        else MaterialTheme.colorScheme.primary
+                                    )
                                 ) {
-                                    Text("Enviar calificación")
+                                    Text(if (isSubmitting) "Enviando..." else "Enviar calificación")
                                 }
-
-
                             }
                         } ?: run {
                             // Mostrar un mensaje si no hay datos

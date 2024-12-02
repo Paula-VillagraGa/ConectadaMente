@@ -6,5 +6,5 @@ data class ReviewModel (
     val tags: List<String>,
     val rating: Double,
     val timestamp: Long,
-
+    val id: String = ""
 )
