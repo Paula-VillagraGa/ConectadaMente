@@ -129,6 +129,7 @@ fun ProfilePsyFromPatScreen(
     }
 
         Scaffold(
+            modifier = Modifier.padding(2.dp),
             topBar = {
                 TopAppBar(
                     title = { Text("") },
@@ -148,8 +149,8 @@ fun ProfilePsyFromPatScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(top = 8.dp),
+                    .padding(top = 8.dp)
+                    .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
                 when (val state = profileState) {

@@ -27,6 +27,7 @@ class ReviewViewModel @Inject constructor(
         return reviewRepository.getAverageRating(psychoId)
     }
 
+    //Crear o editar reseñas paciente->psicólogo
     fun submitRating(
         psychoId: String,
         patientId: String,
@@ -76,60 +77,8 @@ class ReviewViewModel @Inject constructor(
             }
         }
 
-    }// update reviews
-    fun upsertRating(
-        psychoId: String,
-        patientId: String,
-        tags: List<String>,
-        rating: Double
-    ) {
-        viewModelScope.launch {
-            _ratingState.value = DataState.Loading
-
-            try {
-                // Verificar si ya existe una reseña
-                val existingReview = getExistingReview(psychoId, patientId)
-
-                if (existingReview != null) {
-                    // Si ya existe, actualizamos la reseña existente
-                    firestore.collection("reviews")
-                        .document(existingReview.id) // Necesitamos el ID del documento
-                        .set(
-                            mapOf(
-                                "psychoId" to psychoId,
-                                "patientId" to patientId,
-                                "tags" to tags,
-                                "rating" to rating,
-                                "timestamp" to System.currentTimeMillis()
-                            )
-                        )
-                        .await()
-                    _ratingState.value = DataState.Success("Reseña actualizada correctamente")
-                } else {
-                    // Si no existe, creamos una nueva
-                    firestore.collection("reviews")
-                        .add(
-                            mapOf(
-                                "psychoId" to psychoId,
-                                "patientId" to patientId,
-                                "tags" to tags,
-                                "rating" to rating,
-                                "timestamp" to System.currentTimeMillis()
-                            )
-                        )
-                        .await()
-                        .let { documentReference ->
-                            // Agregar el ID generado al documento
-                            documentReference.update("id", documentReference.id).await()
-                            _ratingState.value = DataState.Success("Reseña creada correctamente con ID: ${documentReference.id}")
-                        }
-                    _ratingState.value = DataState.Success("Reseña creada correctamente")
-                }
-            } catch (e: Exception) {
-                _ratingState.value = DataState.Error("Error: ${e.message}")
-            }
-        }
     }
+    //tomar reseña existente
     suspend fun getExistingReview(psychoId: String, patientId: String): ReviewModel? {
         return try {
             val reviewQuery = firestore.collection("reviews")
