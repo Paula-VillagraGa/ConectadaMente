@@ -54,11 +54,13 @@ fun AppNavigation() {
             }
             composable(NavScreen.SignIn.route) {
                 SignInScreen(
+                    navController = navController,
                     navigateToRegisterPacient = { navController.navigate(NavScreen.RegisterPatient.route) },
                     navigateToPsychoProfile = {navController.navigate(NavScreen.PsychoProfile.route)},
                     navigateToHomeScreen = {
                         navController.navigate(NavScreen.Home.route) {
                             popUpTo(NavScreen.Login.route) { inclusive = true }
+
                         }
                     }
                 )
@@ -95,7 +97,7 @@ fun AppNavigation() {
             }
 
             composable(NavScreen.Home.route) { HomeScreen(navController) }
-            composable(NavScreen.Perfil.route) { PerfilUsuarioScreen() }
+            composable(NavScreen.Perfil.route) {PerfilUsuarioScreen() }
             composable(NavScreen.Chat.route) { ChatUsuarioScreen(navController) }
             composable(NavScreen.Formativo.route) { FormativoUsuarioScreen(navController) }
         }

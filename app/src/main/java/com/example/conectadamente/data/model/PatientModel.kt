@@ -9,7 +9,7 @@ data class PatientModel(
     val email: String,  // Usamos el correo electrónico como identificador
     val name: String,
     val rut: String,
-    val id: String = "",
+    val userId: String = "",
     val rol: String= "paciente"
 
 )

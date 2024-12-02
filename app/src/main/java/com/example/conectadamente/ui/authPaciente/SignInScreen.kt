@@ -14,9 +14,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,17 +44,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.conectadamente.R
 import com.example.conectadamente.ui.theme.PoppinsFontFamily
 import com.example.conectadamente.ui.theme.*
 import com.example.conectadamente.ui.viewModel.AuthViewModel
 import com.example.conectadamente.utils.constants.DataState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(
     navigateToRegisterPacient: () -> Unit = {},
     navigateToHomeScreen: () -> Unit = {},
-    navigateToPsychoProfile: () -> Unit
+    navigateToPsychoProfile: () -> Unit,
+    navController: NavController
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -55,8 +66,32 @@ fun SignInScreen(
     val viewModel: AuthViewModel = hiltViewModel()
     val loginState by viewModel.loginState.collectAsState()
 
+    Scaffold(
+        modifier = Modifier.padding(0.dp),
+        topBar = {
+            TopAppBar(
+                title = { Text("") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            Icons.Filled.ArrowBackIosNew,
+                            contentDescription = "Regresar",
+                            tint = Color.White
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.smallTopAppBarColors(
+                    containerColor = Purple30,
+                    navigationIconContentColor = Color.White, // Color del ícono de navegación
+                    titleContentColor = Color.White // Color del título
+                )
+            )
+        }
+    ) { paddingValues ->
     Box(
-        modifier = Modifier.fillMaxSize() // Ocupa toda la pantalla
+        modifier = Modifier
+            .padding(paddingValues)
+            .fillMaxSize() // Ocupa toda la pantalla
     ) {
         // Fondo dividido en dos
         Column(modifier = Modifier.fillMaxSize()) {
@@ -82,7 +117,7 @@ fun SignInScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 50.dp),
+                        .padding(top = 20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
                 ) {
@@ -113,7 +148,7 @@ fun SignInScreen(
                 modifier = Modifier
                     .weight(1f) // Ocupa la mitad de la pantalla
                     .fillMaxWidth()
-                    .background(Color(0xFFD7D7D7))
+                    .background(Color.White)
             )
         }
 
@@ -123,7 +158,7 @@ fun SignInScreen(
                 .align(Alignment.Center) // Centra el formulario en toda la pantalla
                 .padding(16.dp)
                 .padding(top = 100.dp)
-                .background(color = Color.White, shape = RoundedCornerShape(16.dp)) // Fondo blanco con bordes redondeados
+                .background(color = Color(0xFFFAF3F3), shape = RoundedCornerShape(16.dp)) // Fondo blanco con bordes redondeados
                 .fillMaxWidth(0.9f) // Ocupa el 90% del ancho de la pantalla
         ) {
 
@@ -211,4 +246,4 @@ fun SignInScreen(
             else -> {}
         }
     }
-}
+}}

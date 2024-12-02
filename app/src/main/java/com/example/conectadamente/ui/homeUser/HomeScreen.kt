@@ -187,7 +187,7 @@ fun SearchResultCard(psychologist: PsychoModel, navController: NavHostController
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp)
+            .padding(vertical = 2.dp)
             .background(Color(0xFFDCDBDB), RoundedCornerShape(8.dp))
             .clickable {
                 navController.navigate("profile/${psychologist.id}")
@@ -210,37 +210,7 @@ fun SearchResultCard(psychologist: PsychoModel, navController: NavHostController
     }
 }
 
-// Tarjeta de recomendación utilizando aspectRatio para tamaño flexible
-@Composable
-fun RecommendationCardHome(title: String, imageRes: Int) {
-    Column(
-        modifier = Modifier
-            .width(200.dp)  // Controla el ancho de la tarjeta
-            .padding(8.dp)
-            .background(Color(0xFFE9E7F3), RoundedCornerShape(12.dp))
-    ) {
-        // Imagen con una relación de aspecto más alta que ancha (1:1.5)
-        Image(
-            painter = painterResource(id = imageRes),
-            contentDescription = title,
-            contentScale = ContentScale.Crop,  // Asegura que la imagen se recorte para llenar el espacio
-            modifier = Modifier
-                .fillMaxWidth()  // La imagen ocupa todo el ancho disponible
-                .aspectRatio(1f / 1.5f)  // Relación de aspecto invertida para que sea más larga que ancha
-                .clip(RoundedCornerShape(12.dp))  // Redondea las esquinas de la imagen
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = title,
-            color = Color(0xFF100E1B),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-    }
-}
-
-//prueba diseño nuevo
+//Diseño de tarjetas
 @Composable
 fun ContentSection(onCardClick: (String) -> Unit) {
     Column(
@@ -266,7 +236,7 @@ fun ContentSection(onCardClick: (String) -> Unit) {
             SupportCard(
                 title = "Título 2",
                 subtitle = "Actividades Recomendadas",
-                imageRes = R.drawable.telefono,
+                imageRes = R.drawable.ic_launcher_foreground,
                 onClick = { onCardClick("Título 2") },
                 modifier = Modifier
                     .height(200.dp)
@@ -285,7 +255,7 @@ fun ContentSection(onCardClick: (String) -> Unit) {
             SupportCard(
                 title = "Título 3",
                 subtitle = "Descripción breve",
-                imageRes = R.drawable.telefono,
+                imageRes = R.drawable.ic_launcher_foreground,
                 onClick = { onCardClick("Título 3") },
                 modifier = Modifier
                     .weight(0.6f)

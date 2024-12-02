@@ -1,7 +1,6 @@
 package com.example.conectadamente.ui.homeUser
 
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,41 +40,27 @@ import com.example.conectadamente.ui.viewModel.PatientProfileViewModel
 
 @Composable
 fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel()) {
-    // Llamar a la función para obtener los datos cuando la pantalla se carga
+    // Cargar datos del paciente actual al cargar la pantalla
     LaunchedEffect(Unit) {
-        viewModel.fetchPatientData()  // Esto obtendrá los datos del paciente actual
+        viewModel.fetchCurrentPatientData()
     }
 
-    // Obtener los datos del paciente desde el ViewModel
-    val patientData by viewModel.patientData.observeAsState()  // Observamos los datos
-    val error by viewModel.error.observeAsState(null)  // Observamos errores (usamos null como valor predeterminado)
+    val patientData by viewModel.patientData.observeAsState()
+    val error by viewModel.error.observeAsState(null)
 
-    // Contenedor principal
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .background(MaterialTheme.colorScheme.background)
     ) {
-        // Mostrar una pantalla de carga, si no hay datos
-        if (patientData == null) {
-            // Mostrar un mensaje de error si no se puede obtener los datos
-            if (error != null) {
-                ErrorMessage(error!!)
-            } else {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        } else {
-            // Si tenemos los datos, mostrar el nombre y el email
-            patientData?.let { patient ->
-                ProfileCard(patient)
-            }
+        when {
+            patientData != null -> ProfileCard(patientData!!) // Aquí se usa `!!` para asegurar que no sea nulo
+            error != null -> ErrorMessage(error!!)
+            else -> CircularProgressIndicator(Modifier.align(Alignment.Center))
         }
     }
 }
+
 
 // Componente para mostrar los datos del paciente en una tarjeta
 @Composable
@@ -117,9 +102,7 @@ fun ProfileCard(patient: PatientModel) {
                     text = "Nombre: ${patient.name}",
                     style = TextStyle(
                         color = Purple40,
-                        fontSize = 12.sp,
-                        fontFamily = PoppinsFontFamily,
-                        fontStyle = FontStyle.Normal
+                        fontSize = 12.sp
                     ),
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -140,9 +123,7 @@ fun ProfileCard(patient: PatientModel) {
                     text = "Email: ${patient.email}",
                     style = TextStyle(
                         color = Purple40,
-                        fontSize = 12.sp,
-                        fontFamily = PoppinsFontFamily,
-                        fontStyle = FontStyle.Normal
+                        fontSize = 12.sp
                     ),
                     color = MaterialTheme.colorScheme.onSurface
                 )

@@ -1,5 +1,6 @@
 package com.example.conectadamente.data.repository.PatientsRepo
 
+import android.util.Log
 import com.example.conectadamente.data.model.PatientModel
 import com.example.conectadamente.utils.constants.DataState
 import com.google.firebase.auth.FirebaseAuth
@@ -8,38 +9,51 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 
 class AuthUserRepository @Inject constructor() {
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     // Registrar un paciente con Flow
-    fun registerPatient(
-        patient: PatientModel,
-        password: String
-    ): Flow<DataState<String>> = flow {
-        emit(DataState.Loading) // Emitir estado de carga
-        try {
-            // Crear usuario en Firebase Authentication
-            val authResult = auth.createUserWithEmailAndPassword(patient.email, password).await()
-            val uid = authResult.user?.uid ?: throw IllegalStateException("UID no encontrado")
 
-            // Guardar datos del paciente en Firestore
-            db.collection("patients").document(uid).set(patient).await()
-
-            emit(DataState.Success("Paciente registrado correctamente")) // Emitir éxito
-        } catch (e: Exception) {
-            (DataState.Error(e.message ?: "Error desconocido"))
-        } finally {
-            emit(DataState.Finished) // Emitir estado finalizado
+    suspend fun registerPatientInFirebaseAuth(email: String, password: String): String {
+        return suspendCoroutine { continuation ->
+            firebaseAuth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener { authResult ->
+                    val uid = authResult.user?.uid
+                    if (uid != null) {
+                        continuation.resume(uid) // Devuelve el UID del usuario registrado
+                    } else {
+                        continuation.resumeWithException(Exception("UID no encontrado"))
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    continuation.resumeWithException(exception)
+                }
         }
+
     }
+    suspend fun savePatientData(uid: String, patient: PatientModel) {
+        db.collection("patients")
+            .document(uid)
+            .set(patient)
+            .addOnSuccessListener {
+                Log.d("PatientRepository", "Datos del paciente guardados con éxito.")
+            }
+            .addOnFailureListener { e ->
+                Log.e("PatientRepository", "Error al guardar los datos: ${e.message}")
+            }
+    }
+
 
     // Obtener el UID
     fun getCurrentUserId(): String? {
-        return auth.currentUser?.uid
+        return firebaseAuth.currentUser?.uid
     }
 
     // Obtener datos del usuario actual
