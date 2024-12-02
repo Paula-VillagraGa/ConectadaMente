@@ -1,4 +1,4 @@
-package com.example.conectadamente.data.repository
+package com.example.conectadamente.data.repository.PatientsRepo
 
 import com.example.conectadamente.data.model.PatientModel
 import com.example.conectadamente.utils.constants.DataState

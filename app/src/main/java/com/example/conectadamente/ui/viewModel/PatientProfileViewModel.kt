@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.conectadamente.data.model.PatientModel
-import com.example.conectadamente.data.repository.AuthUserRepository
+import com.example.conectadamente.data.repository.PatientsRepo.AuthUserRepository
 import com.example.conectadamente.data.repository.FirestoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
