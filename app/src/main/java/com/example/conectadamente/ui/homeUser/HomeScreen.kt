@@ -12,8 +12,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -27,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -68,8 +70,21 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeUserViewModel = 
                     onSearch = { viewModel.searchPsychologists() },
                     searchResults = viewModel.filteredPsychologists,
                     navController = navController)
-                ContentSection()
-                MentalHealthSection()
+                ContentSection(onCardClick = { cardTitle ->
+                    // Acción a realizar según la tarjeta seleccionada
+                    when (cardTitle) {
+                        "Recomendación 1" -> {
+                            // Navegar o mostrar contenido relacionado con la Recomendación 1
+                            navController.navigate("mental_health")
+                        }
+                        "Recomendación 2" -> {
+                            // Navegar o mostrar contenido relacionado con la Recomendación 2
+                        }
+                        else -> {
+                            // Otra acción
+                        }
+                    }
+                })
             }
         }
     }
@@ -81,7 +96,7 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeUserViewModel = 
 fun TopAppBar() {
     CenterAlignedTopAppBar(
         title = {
-            Text("Inicio", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text("", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         },
         actions = {
             IconButton(onClick = { /* Acción para configuración */ }) {
@@ -135,7 +150,7 @@ fun SearchField(
             .padding(16.dp)
             .background(Color(0xFFE9E7F3), RoundedCornerShape(16.dp)),
         placeholder = {
-            Text("Buscar Psicólogo", color = Color(0xFF3E4398))
+            Text("Buscar Psicólogo", color = Purple50)
         },
         leadingIcon = {
             Icon(
@@ -224,116 +239,184 @@ fun RecommendationCardHome(title: String, imageRes: Int) {
         )
     }
 }
+
+//prueba diseño nuevo
 @Composable
-fun ContentSection() {
+fun ContentSection(onCardClick: (String) -> Unit) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()  // Asegura que la columna ocupe todo el ancho
-            .padding(horizontal = 16.dp)
-            .height(300.dp)  // Define una altura específica para la sección
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
-        Text(
-            text = "Recomendaciones para ti",
-            color = Blue30,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Normal,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp)) // Espaciado entre el título y las tarjetas
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth() // Asegura que el LazyRow ocupe todo el ancho
+        // Fila superior con 2 tarjetas
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(3) { index ->
-                RecommendationCardHome("Recomendación ${index + 1}", R.drawable.ic_google)
-            }
+            SupportCard(
+                title = "",
+                subtitle = "Lecturas Recomendadas",
+                imageRes = R.drawable.leer2,
+                onClick = { onCardClick("Título 1") },
+                modifier = Modifier
+                    .weight(0.5f)
+                    .height(200.dp),
+                color = Purple20
+            )
+            SupportCard(
+                title = "Título 2",
+                subtitle = "Actividades Recomendadas",
+                imageRes = R.drawable.telefono,
+                onClick = { onCardClick("Título 2") },
+                modifier = Modifier
+                    .height(200.dp)
+                    .weight(0.8f),
+                color = Purple30
+            )
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Fila del medio con 2 tarjetas
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            SupportCard(
+                title = "Título 3",
+                subtitle = "Descripción breve",
+                imageRes = R.drawable.telefono,
+                onClick = { onCardClick("Título 3") },
+                modifier = Modifier
+                    .weight(0.6f)
+                    .height(200.dp),
+                color = Purple60
+            )
+            SupportCard(
+                title = "Título 4",
+                subtitle = "Descripción breve",
+                imageRes = R.drawable.danza2,
+                onClick = { onCardClick("Título 4") },
+                modifier = Modifier
+                    .weight(0.5f)
+                    .height(200.dp),
+                color = Purple50
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Tarjeta larga inferior
+        SupportCardB(
+            title = "Contactos de emergencia",
+            subtitle = "",
+            imageRes = R.drawable.telefono_inteligente,
+            onClick = { onCardClick("Título 5") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp),
+            color = Purple20
+        )
     }
 }
 
+@Composable
+fun SupportCard(
+    title: String,
+    subtitle: String,
+    imageRes: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    color: Color = Color(0xFFE9E7F3)
+) {
+    Column(
+        modifier = modifier
+            .background(color, RoundedCornerShape(16.dp))
+            .clickable { onClick() }
+            .padding(bottom = 10.dp)
+    ) {
+        Image(
+            painter = painterResource(id = imageRes),
+            contentDescription = title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth() // Ajusta la imagen al ancho disponible
+                .weight(1f) // Da mayor espacio a la imagen
+                .clip(RoundedCornerShape(12.dp))
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = subtitle,
+            color = Color.White,
+            fontSize = 14.sp,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+    }
+}
 
 @Composable
-fun SupportCard(title: String, subtitle: String, imageRes: Int) {
+fun SupportCardB(
+    title: String,
+    subtitle: String,
+    imageRes: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    color: Color = Color(0xFFE9E7F3)
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFFE9E7F3), RoundedCornerShape(16.dp))
-            .padding(8.dp)
+        modifier = modifier
+            .background(color, RoundedCornerShape(16.dp))
+            .clickable { onClick() }
+            .padding(10.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically // Alinea verticalmente los elementos al centro
     ) {
+        // Sección de texto a la izquierda
         Column(
             modifier = Modifier
-                .weight(1f)
-                .padding(8.dp)
+                .weight(2f) // Ajusta el espacio ocupado por el texto
+                .padding(end = 4.dp) // Espacio entre el texto y la imagen
         ) {
             Text(
                 text = title,
-                color = Color(0xFF100E1B),
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                color = Color.White,
+                fontWeight = FontWeight.Light,
+                fontSize = 18.sp
+
             )
-            Text(text = subtitle, color = Color(0xFF5A4E97), fontSize = 12.sp)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = subtitle,
+                color = Color.White,
+                fontSize = 14.sp
+            )
         }
+
+        // Imagen a la derecha
         Image(
             painter = painterResource(id = imageRes),
             contentDescription = title,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(80.dp)
-                .clip(RoundedCornerShape(12.dp))
-
-        )
-        Spacer(modifier = Modifier.width(16.dp)) // Espacio hacia abajo
-    }
-}
-
-// Sección de salud mental
-@Composable
-fun MentalHealthSection() {
-    Column(modifier = Modifier
-        .padding(horizontal = 16.dp)
-        .padding(top=8.dp)) {
-        Text(
-            text = "Cuidando tu Salud Mental",
-            color = Blue40,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Normal,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-        SupportCard("7 ways to manage anxiety", "Article · 3 min read", R.drawable.ico_perfil)
-        Spacer(modifier = Modifier.height(8.dp))
-        SupportCard("Therapist-led sessions", "Calm, Headspace, and more", R.drawable.ico_recomen)
-    }
-}
-
-// Tarjetas de recomendación
-@Composable
-fun RecommendationCard(title: String, imageRes: Int) {
-    Column(modifier = Modifier.width(150.dp)) {
-        Image(
-            painter = painterResource(id = imageRes),
-            contentDescription = title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(4 / 3f)
+                .weight(1f) // Ajusta el espacio ocupado por la imagen
+                .size(150.dp) // Tamaño fijo para la imagen
                 .clip(RoundedCornerShape(12.dp))
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = title,
-            color = Purple20,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Normal
-        )
-        Spacer(modifier = Modifier.height(10.dp))
     }
 }
 
+@Composable
+fun HomeScreenPreviewSimplified() {
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text("Pantalla Simplificada", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        ContentSection(onCardClick = {})
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewHomeScreen() {
-    val navController = rememberNavController() // Simula un NavHostController para la vista previa
-    HomeScreen(navController = navController)
+fun PreviewSimplified() {
+    HomeScreenPreviewSimplified()
 }
