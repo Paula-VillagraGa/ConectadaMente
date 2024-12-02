@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -84,7 +86,7 @@ fun TopAppBar() {
         actions = {
             IconButton(onClick = { /* Acción para configuración */ }) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ico_forma),
+                    imageVector = Icons.Filled.Settings, // Ícono predeterminado de configuración
                     contentDescription = "Settings",
                     tint = Color(0xFF100E1B)
                 )
@@ -288,13 +290,15 @@ fun SupportCard(title: String, subtitle: String, imageRes: Int) {
 // Sección de salud mental
 @Composable
 fun MentalHealthSection() {
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Column(modifier = Modifier
+        .padding(horizontal = 16.dp)
+        .padding(top=8.dp)) {
         Text(
             text = "Cuidando tu Salud Mental",
             color = Blue40,
             fontSize = 22.sp,
             fontWeight = FontWeight.Normal,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(top = 8.dp)
         )
         SupportCard("7 ways to manage anxiety", "Article · 3 min read", R.drawable.ico_perfil)
         Spacer(modifier = Modifier.height(8.dp))
