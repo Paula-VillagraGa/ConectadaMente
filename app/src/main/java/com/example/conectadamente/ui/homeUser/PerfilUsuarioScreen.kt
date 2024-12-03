@@ -1,7 +1,6 @@
 package com.example.conectadamente.ui.homeUser
 
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,11 +42,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.conectadamente.data.model.PatientModel
 import com.example.conectadamente.ui.viewModel.PatientProfileViewModel
 import java.util.Calendar
+import java.util.Locale
 
 
 @Composable
@@ -106,13 +108,19 @@ fun ProfileCard(patient: PatientModel, viewModel: PatientProfileViewModel) {
             ProfileDetailRow(
                 icon = Icons.Default.Person,
                 contentDescription = "Nombre",
-                text = "Nombre: ${patient.name}"
+                text = "Nombre: ${patient.name}",
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 20.sp // Cambia el tamaño de la fuente aquí
+            )
             )
 
             ProfileDetailRow(
                 icon = Icons.Default.Email,
                 contentDescription = "Email",
-                text = "Email: ${patient.email}"
+                text = "Email: ${patient.email}",
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 20.sp // Cambia el tamaño de la fuente aquí
+                )
             )
             // Región (Editable)
             OutlinedTextField(
@@ -183,6 +191,19 @@ fun ProfileCard(patient: PatientModel, viewModel: PatientProfileViewModel) {
                 enabled = false // Deshabilitado para evitar la edición directa
             )
 
+            // Mostrar el DatePickerDialog si isDatePickerOpen es verdadero
+            if (isDatePickerOpen) {
+                DatePickerDialog(
+                    onDismissRequest = { isDatePickerOpen = false },
+                    onDateSelected = { year, month, dayOfMonth ->
+                        // Actualizar la fecha de nacimiento
+                        birthDate = "$dayOfMonth/${month + 1}/$year"
+                        isDatePickerOpen = false
+                    }
+                )
+            }
+
+
 
             // Botón para guardar los cambios
             Button(
@@ -204,7 +225,7 @@ fun ProfileCard(patient: PatientModel, viewModel: PatientProfileViewModel) {
 
 
 @Composable
-fun ProfileDetailRow(icon: ImageVector, contentDescription: String, text: String) {
+fun ProfileDetailRow(icon: ImageVector, contentDescription: String, text: String,textStyle: TextStyle = MaterialTheme.typography.bodyMedium) {
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -241,6 +262,12 @@ fun ErrorMessage(errorMessage: String) {
 fun DatePickerDialog(onDismissRequest: () -> Unit, onDateSelected: (Int, Int, Int) -> Unit) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
+
+    // Configura el Locale en español para el DatePickerDialog
+    val spanishLocale = Locale("es", "ES")
+    val configuration = context.resources.configuration
+    configuration.setLocale(spanishLocale)
+    context.createConfigurationContext(configuration)
 
     android.app.DatePickerDialog(
         context,

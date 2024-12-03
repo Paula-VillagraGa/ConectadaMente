@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -166,29 +167,35 @@ fun ProfilePsyFromPatScreen(
                                     .fillMaxSize()
                                     .padding(16.dp)
                                     .verticalScroll(rememberScrollState()),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                horizontalAlignment = Alignment.Start
                             ) {
-                                // Mostrar la foto
-                                AsyncImage(
-                                    model = psycho.photoUrl
-                                        ?: "gs://proyectoconectadamente.firebasestorage.app/profile_pictures/hombre1.png",
-                                    contentDescription = "Foto de ${psycho.name}",
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .size(120.dp)
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.primary)
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically, // Centrar el texto y la imagen verticalmente
+                                    horizontalArrangement = Arrangement.Start // Asegura que todo esté alineado a la izquierda
+                                ) {
+                                    // Mostrar la foto
+                                    AsyncImage(
+                                        model = psycho.photoUrl
+                                            ?: "gs://proyectoconectadamente.firebasestorage.app/profile_pictures/hombre1.png",
+                                        contentDescription = "Foto de ${psycho.name}",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .size(60.dp) // Tamaño más pequeño de la imagen
+                                            .clip(CircleShape)
+                                            .background(MaterialTheme.colorScheme.primary)
+                                    )
 
-                                Spacer(modifier = Modifier.height(16.dp))
+                                    Spacer(modifier = Modifier.width(16.dp)) // Espacio entre la imagen y el nombre
 
-                                // Nombre
-                                Text(
-                                    text = psycho.name,
-                                    style = MaterialTheme.typography.headlineLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Gray50
-                                )
+                                    // Nombre
+                                    Text(
+                                        text = psycho.name,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Gray50
+                                    )
+                                }
+                            }
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -343,15 +350,7 @@ fun ProfilePsyFromPatScreen(
                                     Text(if (isSubmitting) "Enviando..." else "Enviar calificación")
                                 }
                             }
-                        } ?: run {
-                            // Mostrar un mensaje si no hay datos
-                            Text(
-                                text = "No se encontraron datos del psicólogo",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.error
-                            )
                         }
-                    }
 
                     is DataState.Error -> {
                         // Mostrar mensaje de error
