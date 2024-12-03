@@ -1,6 +1,7 @@
 package com.example.conectadamente.ui.homeUser
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,6 +22,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -30,10 +34,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -142,7 +148,7 @@ fun ProfilePsyFromPatScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 8.dp)
+                .padding(top = 2.dp)
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
@@ -212,11 +218,12 @@ fun ProfilePsyFromPatScreen(
                                 modifier = Modifier.padding(vertical = 8.dp)
                             ) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.ic_estrella),
+                                    imageVector = Icons.Default.Star,
                                     contentDescription = "Rating",
                                     tint = Color.Yellow,
                                     modifier = Modifier.size(24.dp)
                                 )
+                                Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "$formattedRating / 5.0",
                                     style = MaterialTheme.typography.bodyLarge,
@@ -237,6 +244,65 @@ fun ProfilePsyFromPatScreen(
                                 style = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier.padding(top = 8.dp)
                             )
+                            // Botones para agendar cita y chat
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                OutlinedButton(
+                                    onClick = {
+                                        // Acción para agendar cita
+                                        psychologistId?.let { id ->
+                                            navController.navigate("scheduleAppointment/$id")
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .padding(horizontal = 8.dp)
+                                        .weight(1f)
+                                        .height(48.dp),
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.primary
+                                    )
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.CalendarToday,
+                                        contentDescription = "Agendar cita",
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Agendar cita", style = MaterialTheme.typography.bodyMedium)
+                                }
+
+                                OutlinedButton(
+                                    onClick = {
+                                        // Acción para iniciar el chat
+                                        psychologistId?.let { id ->
+                                            navController.navigate("chatWithPsychologist/$id")
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .padding(horizontal = 8.dp)
+                                        .weight(1f)
+                                        .height(48.dp),
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.secondary
+                                    )
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Chat,
+                                        contentDescription = "Hablar por chat",
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Chat", style = MaterialTheme.typography.bodyMedium)
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
 
                             // Calificación del paciente
                             Text(
