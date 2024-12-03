@@ -42,4 +42,20 @@ class PatientProfileViewModel @Inject constructor(
             }
         }
     }
+    fun updatePatientData(updatedPatient: PatientModel) {
+        viewModelScope.launch {
+            try {
+                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                if (userId != null) {
+                    // Actualizar los datos del paciente en Firestore
+                    repository.updatePatientData(userId, updatedPatient)
+                    _patientData.value = updatedPatient  // Actualizamos los datos localmente
+                } else {
+                    _error.value = "Usuario no autenticado"
+                }
+            } catch (e: Exception) {
+                _error.value = e.message
+            }
+        }
+    }
 }

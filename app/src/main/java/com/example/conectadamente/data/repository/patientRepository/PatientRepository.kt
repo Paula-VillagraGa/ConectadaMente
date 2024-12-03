@@ -40,4 +40,11 @@ class PatientRepository @Inject constructor(
 
         return getPatientData(currentUserId) // Usa el UID para buscar en Firestore
     }
+
+    suspend fun updatePatientData(userId: String, updatedPatient: PatientModel) {
+        firebase.collection("patients").document(userId)
+            .set(updatedPatient)
+            .await()  // Espera a que se complete la operación
+    }
 }
+
