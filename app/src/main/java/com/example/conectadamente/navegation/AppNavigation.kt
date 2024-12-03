@@ -97,7 +97,7 @@ fun AppNavigation() {
             }
 
             composable(NavScreen.Home.route) { HomeScreen(navController) }
-            composable(NavScreen.Perfil.route) {PerfilUsuarioScreen() }
+            composable(NavScreen.Perfil.route) {PerfilUsuarioScreen(navController=navController) }
             composable(NavScreen.Chat.route) { ChatUsuarioScreen(navController) }
             composable(NavScreen.Formativo.route) { FormativoUsuarioScreen(navController) }
         }

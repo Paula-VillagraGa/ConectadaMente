@@ -1,27 +1,37 @@
 package com.example.conectadamente.ui.homeUser
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,20 +39,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import com.example.conectadamente.R
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import com.example.conectadamente.R
 import com.example.conectadamente.data.model.PsychoModel
-import com.example.conectadamente.ui.theme.*
+import com.example.conectadamente.ui.theme.Purple20
+import com.example.conectadamente.ui.theme.Purple30
+import com.example.conectadamente.ui.theme.Purple50
+import com.example.conectadamente.ui.theme.Purple60
+import com.example.conectadamente.ui.theme.Purple80
 import com.example.conectadamente.ui.viewModel.HomeUserViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -95,16 +110,32 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeUserViewModel = 
 @Composable
 fun TopAppBar() {
     CenterAlignedTopAppBar(
+        navigationIcon = {
+            Image(
+                painter = painterResource(id = R.drawable.logo2), // Reemplaza con tu recurso de imagen
+                contentDescription = "Logo",
+                modifier = Modifier
+                    .size(220.dp) // Ajusta el tamaño según necesites
+                    .padding(start = 8.dp)
+                    .padding(top = 30.dp)// Aplica un recorte circular si es necesario
+            )
+        },
         title = {
-            Text("", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = "", // Puedes añadir un título si lo necesitas
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
         },
         actions = {
-            IconButton(onClick = { /* Acción para configuración */ }) {
-                Icon(
-                    imageVector = Icons.Filled.Settings, // Ícono predeterminado de configuración
-                    contentDescription = "Settings",
-                    tint = Color(0xFF100E1B)
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = { /* Acción para configuración */ }) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings, // Ícono predeterminado de configuración
+                        contentDescription = "Settings",
+                        tint = Color(0xFF100E1B)
+                    )
+                }
             }
         },
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
@@ -114,6 +145,7 @@ fun TopAppBar() {
 
 
 // Campo de búsqueda para psicólogos por nombre
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchField(
     query: String,
@@ -159,6 +191,12 @@ fun SearchField(
                 tint = Color(0xFF5A4E97)
             )
         },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            unfocusedBorderColor = Color.Transparent,
+            focusedBorderColor = Color.Transparent
+
+        ),
+
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(
             onSearch = {

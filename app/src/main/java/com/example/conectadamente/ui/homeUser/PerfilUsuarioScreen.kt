@@ -1,7 +1,6 @@
 package com.example.conectadamente.ui.homeUser
 
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Business
-import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
@@ -25,35 +25,30 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.conectadamente.data.model.PatientModel
+import com.example.conectadamente.ui.theme.Purple80
 import com.example.conectadamente.ui.viewModel.PatientProfileViewModel
-import java.util.Calendar
-import java.util.Locale
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel()) {
+fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel(), navController: NavController) {
     // Cargar datos del paciente actual al cargar la pantalla
     LaunchedEffect(Unit) {
         viewModel.fetchCurrentPatientData()
@@ -63,27 +58,45 @@ fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel()) {
     val patientData by viewModel.patientData.observeAsState(initial = null)
     val error by viewModel.error.observeAsState(initial = null)
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        when {
-            patientData != null -> ProfileCard(patientData!!, viewModel)
-            error != null -> ErrorMessage(error!!)
-            else -> CircularProgressIndicator(Modifier.align(Alignment.Center))
+    Scaffold(
+        modifier = Modifier.padding(0.dp),
+        topBar = {
+            androidx.compose.material3.TopAppBar(
+                title = { Text("") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            Icons.Filled.ArrowBackIosNew,
+                            contentDescription = "Regresar",
+                            tint = Purple80
+                        )
+                    }
+                })
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            when {
+                error != null -> {
+                    Text(
+                        text = "Error: ${error}",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.Center),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                patientData != null -> ProfileCard(patientData!!)
+                else -> CircularProgressIndicator(Modifier.align(Alignment.Center))
+            }
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileCard(patient: PatientModel, viewModel: PatientProfileViewModel) {
-    var region by remember { mutableStateOf(patient.region ?: "") }
-    var city by remember { mutableStateOf(patient.city ?: "") }
-    var birthDate by remember { mutableStateOf(patient.birthDate ?: "") }
-    var isDatePickerOpen by remember { mutableStateOf(false) }
-
+fun ProfileCard(patient: PatientModel) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -110,7 +123,7 @@ fun ProfileCard(patient: PatientModel, viewModel: PatientProfileViewModel) {
                 contentDescription = "Nombre",
                 text = "Nombre: ${patient.name}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 20.sp // Cambia el tamaño de la fuente aquí
+                    fontSize = 20.sp
             )
             )
 
@@ -119,113 +132,52 @@ fun ProfileCard(patient: PatientModel, viewModel: PatientProfileViewModel) {
                 contentDescription = "Email",
                 text = "Email: ${patient.email}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 20.sp // Cambia el tamaño de la fuente aquí
+                    fontSize = 20.sp
                 )
             )
-            // Región (Editable)
-            OutlinedTextField(
-                value = region,
-                onValueChange = { region = it },
-                label = { Text("Región") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(4.dp, RoundedCornerShape(8.dp)),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                ),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Región",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
+            ProfileDetailRow(
+                icon = Icons.Default.LocationOn,
+                contentDescription = "Región",
+                text = "Región: ${if (patient.region.isNullOrEmpty()) "No disponible" else patient.region}",
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 20.sp
             )
-
-            // Ciudad (Editable)
-            OutlinedTextField(
-                value = city,
-                onValueChange = { city = it },
-                label = { Text("Ciudad") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(4.dp, RoundedCornerShape(8.dp)),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                ),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Business,
-                        contentDescription = "Ciudad",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
             )
-
-
-            // Fecha de Nacimiento (Editable con DatePicker)
-            OutlinedTextField(
-                value = birthDate,
-                onValueChange = {},
-                label = { Text("Fecha de Nacimiento") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { isDatePickerOpen = true } // Abre el DatePicker al hacer clic
-                    .shadow(4.dp, RoundedCornerShape(8.dp)),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                ),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.CalendarToday,
-                        contentDescription = "Fecha de Nacimiento",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                },
-                enabled = false // Deshabilitado para evitar la edición directa
+            ProfileDetailRow(
+                icon = Icons.Default.Business,
+                contentDescription = "Ciudad",
+                text = "Ciudad: ${if (patient.city.isNullOrEmpty()) "No disponible" else patient.city}",
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 20.sp
             )
-
-            // Mostrar el DatePickerDialog si isDatePickerOpen es verdadero
-            if (isDatePickerOpen) {
-                DatePickerDialog(
-                    onDismissRequest = { isDatePickerOpen = false },
-                    onDateSelected = { year, month, dayOfMonth ->
-                        // Actualizar la fecha de nacimiento
-                        birthDate = "$dayOfMonth/${month + 1}/$year"
-                        isDatePickerOpen = false
-                    }
+            )
+            ProfileDetailRow(
+                icon = Icons.Default.Cake,
+                contentDescription = "Fecha de Nacimiento",
+                text = "Fecha de Nacimiento: ${if (patient.birthDate.isNullOrEmpty()) "No disponible" else patient.birthDate}",
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 20.sp
                 )
-            }
+            )
 
-
-
-            // Botón para guardar los cambios
+            // Botón para navegar a la pantalla de edición
             Button(
-                onClick = {
-                    val updatedPatient = patient.copy(
-                        region = region,
-                        city = city,
-                        birthDate = birthDate
-                    )
-                    viewModel.updatePatientData(updatedPatient)  // Actualiza en Firestore
-                },
+                onClick = {},
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text("Guardar cambios")
+                Text("Editar Perfil")
             }
         }
     }
 }
 
-
 @Composable
-fun ProfileDetailRow(icon: ImageVector, contentDescription: String, text: String,textStyle: TextStyle = MaterialTheme.typography.bodyMedium) {
+fun ProfileDetailRow(
+    icon: ImageVector,
+    contentDescription: String,
+    text: String,
+    textStyle: TextStyle = MaterialTheme.typography.bodyMedium
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -238,47 +190,9 @@ fun ProfileDetailRow(icon: ImageVector, contentDescription: String, text: String
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyMedium.copy(
+            style = textStyle.copy(
                 color = MaterialTheme.colorScheme.onSurface
             )
         )
-    }
-}
-
-@Composable
-fun ErrorMessage(errorMessage: String) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Error: $errorMessage",
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}
-@Composable
-fun DatePickerDialog(onDismissRequest: () -> Unit, onDateSelected: (Int, Int, Int) -> Unit) {
-    val context = LocalContext.current
-    val calendar = Calendar.getInstance()
-
-    // Configura el Locale en español para el DatePickerDialog
-    val spanishLocale = Locale("es", "ES")
-    val configuration = context.resources.configuration
-    configuration.setLocale(spanishLocale)
-    context.createConfigurationContext(configuration)
-
-    android.app.DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            onDateSelected(year, month, dayOfMonth)
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
-    ).apply {
-        setOnDismissListener { onDismissRequest() }
-        show()
     }
 }
