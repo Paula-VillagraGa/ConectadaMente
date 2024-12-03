@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -104,22 +105,10 @@ fun SignInScreen(
                         .fillMaxWidth()
                         .background(Purple30)
                 ) {
-                    Canvas(modifier = Modifier.fillMaxSize()) {
-                        for (i in 0 until 5) {
-                            drawCircle(
-                                color = Purple60,
-                                radius = 40f,
-                                center = Offset(
-                                    x = (100f * i + 50f),
-                                    y = (200f * i + 30f)
-                                )
-                            )
-                        }
-                    }
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(top = 20.dp),
+                            .padding(top = 10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
                     ) {
@@ -182,7 +171,11 @@ fun SignInScreen(
                         label = { Text("Correo Electrónico") },
                         modifier = Modifier
                             .fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = Brown10,
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedBorderColor = Color.Transparent)
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -194,7 +187,11 @@ fun SignInScreen(
                         visualTransformation = PasswordVisualTransformation(), // Para ocultar la contraseña
                         modifier = Modifier
                             .fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = Brown10,
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedBorderColor = Color.Transparent)
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))

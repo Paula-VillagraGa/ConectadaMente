@@ -230,7 +230,7 @@ fun SearchResultCard(psychologist: PsychoModel, navController: NavHostController
             .clickable {
                 navController.navigate("profile/${psychologist.id}")
             }
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ico_perfil),
@@ -248,7 +248,7 @@ fun SearchResultCard(psychologist: PsychoModel, navController: NavHostController
     }
 }
 
-//Diseño de tarjetas
+
 @Composable
 fun ContentSection(onCardClick: (String) -> Unit) {
     Column(
