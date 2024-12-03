@@ -36,3 +36,30 @@ fun NavigationInferior(navController: NavController) {
         }
     }
 }
+@Composable
+fun NavigationInferiorPsycho(navController: NavController) {
+    val currentRoute = currentRoute(navController)
+
+    BottomAppBar {
+        NavigationBar {
+            bottomNavItemsPsycho.forEach { item ->
+                NavigationBarItem(
+                    icon = {
+                        Icon(imageVector = item.icon!!, contentDescription = item.title)
+                    },
+                    label = { Text(item.title) },
+                    selected = currentRoute == item.route,
+                    onClick = {
+                        navController.navigate(item.route) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
+

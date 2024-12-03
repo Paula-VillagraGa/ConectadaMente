@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -18,6 +19,8 @@ import com.example.conectadamente.ui.authPaciente.SignInScreen
 import com.example.conectadamente.ui.authPsicologo.PsychoSignInScreen
 import com.example.conectadamente.ui.authPsicologo.PsychologistLoginScreen
 import com.example.conectadamente.ui.authPsicologo.RegisterPsychoScreen
+import com.example.conectadamente.ui.homePsycho.ChatPsychoScreen
+import com.example.conectadamente.ui.homePsycho.PsychoHomeScreen
 import com.example.conectadamente.ui.homeUser.ProfilePsyFromPatScreen
 import com.example.conectadamente.ui.homePsycho.PsychoProfileScreen
 import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
@@ -37,8 +40,14 @@ fun AppNavigation() {
         NavScreen.Chat.route,
         NavScreen.Formativo.route
     )
+    val scaffoldPsycho = listOf(
+        NavScreen.PsychoHome.route,
+        NavScreen.PsychoProfile.route,
+        NavScreen.ChatPsycho.route
+    )
 
-    ScaffoldOrContent(navController = navController, scaffoldScreens = scaffoldScreens) {
+
+    ScaffoldOrContent(navController = navController, scaffoldScreens = scaffoldScreens, scaffoldPsycho = scaffoldPsycho) {
         NavHost(
             navController = navController,
             startDestination = NavScreen.Login.route
@@ -56,7 +65,7 @@ fun AppNavigation() {
                 SignInScreen(
                     navController = navController,
                     navigateToRegisterPacient = { navController.navigate(NavScreen.RegisterPatient.route) },
-                    navigateToPsychoProfile = {navController.navigate(NavScreen.PsychoProfile.route)},
+                    navigateToPsychoHomeScreen = {navController.navigate(NavScreen.PsychoHome.route)},
                     navigateToHomeScreen = {
                         navController.navigate(NavScreen.Home.route) {
                             popUpTo(NavScreen.Login.route) { inclusive = true }
@@ -86,10 +95,20 @@ fun AppNavigation() {
                 val userAuthViewModel: UserAuthViewModel = hiltViewModel()
                 RegisterPatientScreen(viewModel = userAuthViewModel)
             }
+            //Psicologo ->
+
+            //Perfil de Psicologo Current
             composable(NavScreen.PsychoProfile.route){
                 PsychoProfileScreen()
             }
-
+            //Home de psicologo
+            composable(NavScreen.PsychoHome.route){
+                PsychoHomeScreen(navController)
+            }
+            //chat de psicologo
+            composable(NavScreen.ChatPsycho.route){
+                ChatPsychoScreen(navController)
+            }
             //Perfil psicólogo desde paciente
             composable("profile/{psychologistId}") { backStackEntry ->
                 val psychologistId = backStackEntry.arguments?.getString("psychologistId")
@@ -108,6 +127,7 @@ fun AppNavigation() {
 fun ScaffoldOrContent(
     navController: NavController,
     scaffoldScreens: List<String>,
+    scaffoldPsycho: List<String>,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -115,6 +135,11 @@ fun ScaffoldOrContent(
     if (currentDestination in scaffoldScreens) {
         Scaffold(
             bottomBar = { NavigationInferior(navController) },
+            content = { paddingValues -> content(paddingValues) }
+        )
+    } else if (currentDestination in scaffoldPsycho) {
+        Scaffold(
+            bottomBar = { NavigationInferiorPsycho(navController) },
             content = { paddingValues -> content(paddingValues) }
         )
     } else {

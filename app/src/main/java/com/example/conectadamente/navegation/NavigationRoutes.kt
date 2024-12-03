@@ -2,6 +2,7 @@ package com.example.conectadamente.navegation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Assistant
+import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Home
@@ -21,7 +22,9 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
     object PsychologistLogin : NavScreen("psychologist_login", "Login", null)
     object RegisterPsycho : NavScreen("register_psycho", "Registro", null)
     object PsychoSignIn : NavScreen("psycho_sign_in", "Iniciar Sesión Psicólogo", null)
-    object PsychoProfile: NavScreen("psycho_profile", "psychoprofile", null)
+    object PsychoProfile: NavScreen("psycho_profile", "Perfil", Icons.Outlined.Person)
+    object PsychoHome: NavScreen("psycho_home", "Inicio", Icons.Outlined.Home)
+    object ChatPsycho: NavScreen("chat_psycho", "Chat", Icons.Outlined.Chat)
 
 }
 // Lista para navegación inferior
@@ -30,4 +33,10 @@ val bottomNavItems = listOf(
     NavScreen.Perfil,
     NavScreen.Chat,
     NavScreen.Formativo
+)
+// Lista para navegación inferior
+val bottomNavItemsPsycho = listOf(
+    NavScreen.PsychoHome,
+    NavScreen.PsychoProfile,
+    NavScreen.ChatPsycho
 )

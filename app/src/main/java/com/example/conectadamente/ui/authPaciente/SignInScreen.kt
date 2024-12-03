@@ -59,7 +59,7 @@ import com.example.conectadamente.utils.constants.DataState
 fun SignInScreen(
     navigateToRegisterPacient: () -> Unit = {},
     navigateToHomeScreen: () -> Unit = {},
-    navigateToPsychoProfile: () -> Unit,
+    navigateToPsychoHomeScreen: () -> Unit,
     navController: NavController
 ) {
     var email by remember { mutableStateOf("") }
@@ -244,7 +244,7 @@ fun SignInScreen(
                     isLoading = false // Detener el loading
                     // Aquí va la lógica para navegar según el rol del usuario
                     when (state.data) {
-                        "psicologo" -> navigateToPsychoProfile()
+                        "psicologo" -> navigateToPsychoHomeScreen()
                         "paciente" -> navigateToHomeScreen()
                         "unverified" -> message =
                             "Cuenta no verificada. Por favor, espera la validación."
