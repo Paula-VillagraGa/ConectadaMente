@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,7 +38,7 @@ import com.example.conectadamente.data.model.PatientModel
 import com.example.conectadamente.ui.theme.PoppinsFontFamily
 import com.example.conectadamente.ui.theme.Purple40
 import com.example.conectadamente.ui.viewModel.PatientProfileViewModel
-
+/*
 @Composable
 fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel()) {
     // Cargar datos del paciente actual al cargar la pantalla
@@ -144,5 +145,100 @@ fun ErrorMessage(errorMessage: String) {
             color = Color.Red,
         )
     }
+}*/
+
+@Composable
+fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel()) {
+    // Cargar datos del paciente actual al cargar la pantalla
+    LaunchedEffect(Unit) {
+        viewModel.fetchCurrentPatientData()
+    }
+
+    // Obteniendo estados desde el ViewModel
+    val patientData by viewModel.patientData.observeAsState(initial = null)
+    val error by viewModel.error.observeAsState(initial = null)
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        when {
+            patientData != null -> ProfileCard(patientData!!)
+            error != null -> ErrorMessage(error!!)
+            else -> CircularProgressIndicator(Modifier.align(Alignment.Center))
+        }
+    }
 }
 
+@Composable
+fun ProfileCard(patient: PatientModel) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(24.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "Perfil de Usuario",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = MaterialTheme.colorScheme.primary
+                )
+            )
+
+            ProfileDetailRow(
+                icon = Icons.Default.Person,
+                contentDescription = "Nombre",
+                text = "Nombre: ${patient.name}"
+            )
+
+            ProfileDetailRow(
+                icon = Icons.Default.Email,
+                contentDescription = "Email",
+                text = "Email: ${patient.email}"
+            )
+        }
+    }
+}
+
+@Composable
+fun ProfileDetailRow(icon: ImageVector, contentDescription: String, text: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        )
+    }
+}
+
+@Composable
+fun ErrorMessage(errorMessage: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Error: $errorMessage",
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}

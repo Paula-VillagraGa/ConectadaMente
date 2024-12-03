@@ -5,7 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.conectadamente.data.model.PatientModel
-import com.example.conectadamente.data.repository.PatientsRepo.PatientRepository
+import com.example.conectadamente.data.repository.patientRepository.PatientRepository
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,11 +22,21 @@ class PatientProfileViewModel @Inject constructor(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> get() = _error
 
+
     fun fetchCurrentPatientData() {
         viewModelScope.launch {
             try {
-                val data = repository.getCurrentPatientData()
-                _patientData.value = data
+                // Obtener el UID del paciente actual desde Firebase Authentication
+                val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+                if (userId != null) {
+                    // Usamos el UID para obtener los datos del paciente desde Firestore
+                    val data = repository.getCurrentPatientData()
+                    _patientData.value = data
+                } else {
+                    // Si no hay usuario autenticado, puedes manejar el error aquí
+                    _error.value = "Usuario no autenticado"
+                }
             } catch (e: Exception) {
                 _error.value = e.message
             }

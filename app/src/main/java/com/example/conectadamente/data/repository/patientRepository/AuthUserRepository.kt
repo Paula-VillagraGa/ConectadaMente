@@ -1,4 +1,4 @@
-package com.example.conectadamente.data.repository.PatientsRepo
+package com.example.conectadamente.data.repository.patientRepository
 
 import android.util.Log
 import com.example.conectadamente.data.model.PatientModel
@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
