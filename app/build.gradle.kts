@@ -143,6 +143,11 @@ dependencies {
     // Si usas KSP para otras tareas, manténlo configurado de esta forma:
     implementation("com.google.devtools.ksp:symbol-processing-api:2.0.21-1.0.27")
 
+    // Firebase Functions
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0") // Opcional, para logging
+
 
 }
 

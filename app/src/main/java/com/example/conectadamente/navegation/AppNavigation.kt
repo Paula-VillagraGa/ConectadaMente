@@ -24,9 +24,9 @@ import com.example.conectadamente.ui.homePsycho.PsychoHomeScreen
 import com.example.conectadamente.ui.homeUser.ProfilePsyFromPatScreen
 import com.example.conectadamente.ui.homePsycho.PsychoProfileScreen
 import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
-import com.example.conectadamente.ui.homeUser.FormativoUsuarioScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
 import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
+import com.example.conectadamente.ui.homeUser.RecomendacionScreen
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
 
@@ -118,7 +118,7 @@ fun AppNavigation() {
             composable(NavScreen.Home.route) { HomeScreen(navController) }
             composable(NavScreen.Perfil.route) {PerfilUsuarioScreen(navController=navController) }
             composable(NavScreen.Chat.route) { ChatUsuarioScreen(navController) }
-            composable(NavScreen.Formativo.route) { FormativoUsuarioScreen(navController) }
+            composable(NavScreen.Formativo.route) { RecomendacionScreen(navController) }
         }
     }
 }
