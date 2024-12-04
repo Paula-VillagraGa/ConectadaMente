@@ -19,6 +19,7 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
     object Perfil : NavScreen("perfil_usuario", "Perfil", Icons.Outlined.Person)
     object Chat : NavScreen("chat_usuario", "Chat", Icons.Outlined.Email)
     object Formativo : NavScreen("formativo_usuario", "Asistente", Icons.Outlined.Assistant)
+    object ListRecomendation : NavScreen("ListRecommendation_usuario", "ListRecomendation", null)
     object PsychologistLogin : NavScreen("psychologist_login", "Login", null)
     object RegisterPsycho : NavScreen("register_psycho", "Registro", null)
     object PsychoSignIn : NavScreen("psycho_sign_in", "Iniciar Sesión Psicólogo", null)
@@ -32,7 +33,7 @@ val bottomNavItems = listOf(
     NavScreen.Home,
     NavScreen.Perfil,
     NavScreen.Chat,
-    NavScreen.Formativo
+    NavScreen.Formativo,
 )
 // Lista para navegación inferior
 val bottomNavItemsPsycho = listOf(

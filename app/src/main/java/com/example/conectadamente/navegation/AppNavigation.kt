@@ -9,10 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.conectadamente.ui.authPaciente.LoginScreen
 import com.example.conectadamente.ui.authPaciente.RegisterPatientScreen
 import com.example.conectadamente.ui.authPaciente.SignInScreen
@@ -26,7 +28,8 @@ import com.example.conectadamente.ui.homePsycho.PsychoProfileScreen
 import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
 import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
-import com.example.conectadamente.ui.homeUser.RecomendacionScreen
+import com.example.conectadamente.ui.homeUser.Recomendacion.BuscarPorTagScreen
+import com.example.conectadamente.ui.homeUser.Recomendacion.RecomendacionScreen
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
 
@@ -38,7 +41,8 @@ fun AppNavigation() {
         NavScreen.Home.route,
         NavScreen.Perfil.route,
         NavScreen.Chat.route,
-        NavScreen.Formativo.route
+        NavScreen.Formativo.route,
+        //NavScreen.ListRecomendation.route
     )
     val scaffoldPsycho = listOf(
         NavScreen.PsychoHome.route,
@@ -119,6 +123,18 @@ fun AppNavigation() {
             composable(NavScreen.Perfil.route) {PerfilUsuarioScreen(navController=navController) }
             composable(NavScreen.Chat.route) { ChatUsuarioScreen(navController) }
             composable(NavScreen.Formativo.route) { RecomendacionScreen(navController) }
+
+            //Para la lista recomendada
+            composable(
+                route = "${NavScreen.ListRecomendation.route}/{tag}",
+                arguments = listOf(navArgument("tag") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val tag = backStackEntry.arguments?.getString("tag")
+                if (tag != null) {
+                    BuscarPorTagScreen(tag = tag, navController = navController)
+                }
+            }
+
         }
     }
 }
