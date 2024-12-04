@@ -1,5 +1,6 @@
 package com.example.conectadamente.ui.viewModel.recommendations
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.conectadamente.data.model.ArticleModel
@@ -8,6 +9,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
 import androidx.compose.runtime.State
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 
 import kotlinx.coroutines.launch
 
@@ -17,18 +20,24 @@ class ArticleViewModel @Inject constructor(
     private val articleRepository: ArticleRepository
 ) : ViewModel() {
 
-    private val _articles = mutableStateOf<List<ArticleModel>>(emptyList())
-    val articles: State<List<ArticleModel>> get() = _articles
+    private val _articles = MutableLiveData<List<ArticleModel>>()
+    val articles: LiveData<List<ArticleModel>> get() = _articles
+
+    private val _error = MutableLiveData<String>()
+    val error: LiveData<String> get() = _error
 
     init {
-        fetchArticles()
+        getArticles()
     }
 
-    private fun fetchArticles() {
-        // Llamar a la función suspendida para obtener los artículos
+    fun getArticles() {
         viewModelScope.launch {
-            val articlesList = articleRepository.getArticles()  // Obtener la lista de artículos desde Firestore
-            _articles.value = articlesList.sortedByDescending { it.date }  // Ordenar por fecha descendente
+            try {
+                val articlesList = articleRepository.getArticles()
+                _articles.value = articlesList
+            } catch (e: Exception) {
+                _error.value = "Error al obtener artículos: ${e.message}"
+            }
         }
     }
 }

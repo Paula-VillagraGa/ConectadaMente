@@ -280,7 +280,7 @@ fun ContentSection(navController: NavHostController) {
                 title = "Título 3",
                 subtitle = "Ciencia y Salud Mental",
                 imageRes = R.drawable.laboratory,
-                onClick = { },
+                onClick = {  navController.navigate(NavScreen.ArticlesRecommendations.route)},
                 modifier = Modifier
                     .weight(0.6f)
                     .height(200.dp),

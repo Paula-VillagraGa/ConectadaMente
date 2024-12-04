@@ -30,6 +30,7 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
     object EditPatientProfile: NavScreen("edit_perfil_patient", "Editar Perfil", Icons.Outlined.Info)
     //Recomendaciones ->
     object BookRecommendations: NavScreen("book_recommendations", "Recomendaciones", null)
+    object ArticlesRecommendations : NavScreen("articles_recommendations", "Recomendaciones", null)
 
 }
 // Lista para navegación inferior

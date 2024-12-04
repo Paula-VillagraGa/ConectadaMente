@@ -12,15 +12,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,17 +39,45 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.conectadamente.data.model.ArticleModel
 import com.example.conectadamente.ui.viewModel.recommendations.ArticleViewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 @Composable
-fun ArticleScreen(viewModel: ArticleViewModel = hiltViewModel()) {
-    val articles = viewModel.articles.value
-
-    ArticleList(articles = articles)
+fun ArticleScreen(navController: NavController) {
+    val viewModel : ArticleViewModel= hiltViewModel()
+    val articles by viewModel.articles.observeAsState(emptyList())
+    if (articles.isEmpty()) {
+        CircularProgressIndicator(
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentSize(Alignment.Center)
+        )
+    } else {
+        Column {
+            ArticleDetailTopBar(navController = navController)
+            ArticleList(articles = articles)
+        }
+    }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ArticleDetailTopBar(navController: NavController) {
+    TopAppBar(
+        title = { Text(text = "Artículos") },
+        navigationIcon = {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(Icons.Filled.ArrowBackIosNew, contentDescription = "Back")
+            }
+        }
+    )
+}
+
 @Composable
 fun ArticleList(articles: List<ArticleModel>) {
     LazyColumn(
@@ -48,22 +86,28 @@ fun ArticleList(articles: List<ArticleModel>) {
         contentPadding = PaddingValues(16.dp)
     ) {
         items(articles) { article ->
+            val formattedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(article.date)
             ArticleCard(
                 title = article.title,
                 summary = article.summary,
-                imageRes = article.imageUrl,  // Usamos imageUrl como String (URL de imagen)
-                onReadMoreClick = { /* Acción al presionar "Leer más" */ }
+                imageUrl = article.imageUrl,
+                date = formattedDate,
+                idArticle = article.idArticle,
+                type = article.type
             )
         }
     }
 }
 
+
 @Composable
 fun ArticleCard(
     title: String,
     summary: String,
-    imageRes: String,
-    onReadMoreClick: () -> Unit
+    imageUrl: String,
+    date: String,
+    idArticle: String,
+    type: String
 ) {
     Card(
         modifier = Modifier
@@ -76,7 +120,7 @@ fun ArticleCard(
         Row(modifier = Modifier.fillMaxSize()) {
             // Imagen del artículo
             Image(
-                painter = rememberImagePainter(imageRes),  // Usamos rememberImagePainter para cargar la imagen desde URL
+                painter = rememberImagePainter(imageUrl),  // Usamos rememberImagePainter para cargar la imagen desde URL
                 contentDescription = title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -109,7 +153,7 @@ fun ArticleCard(
                     )
                 }
                 Button(
-                    onClick = { onReadMoreClick() },
+                    onClick = {  },
                     modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(text = "Leer más")
@@ -119,14 +163,3 @@ fun ArticleCard(
     }
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewArticleCard() {
-    ArticleCard(
-        title = "Los secretos del cerebro humano",
-        summary = "Descubre cómo funciona el cerebro y su impacto en la salud mental.",
-        imageRes = "https://via.placeholder.com/150",  // URL de ejemplo
-        onReadMoreClick = { /* Acción al presionar "Leer más" */ }
-    )
-}

@@ -31,10 +31,12 @@ import com.example.conectadamente.ui.homeUser.EditProfilePatientScreen
 import com.example.conectadamente.ui.homeUser.FormativoUsuarioScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
 import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
+import com.example.conectadamente.ui.homeUser.RecommendationsPatient.ArticleScreen
 import com.example.conectadamente.ui.homeUser.RecommendationsPatient.BookRecommendations
 import com.example.conectadamente.ui.viewModel.PatientProfileViewModel
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
+import com.example.conectadamente.ui.viewModel.recommendations.ArticleViewModel
 
 
 @Composable
@@ -145,6 +147,9 @@ fun AppNavigation() {
             //Recomendaciones
             composable(NavScreen.BookRecommendations.route) {
                 BookRecommendations(navController)
+            }
+            composable(NavScreen.ArticlesRecommendations.route) {
+                ArticleScreen(navController)
             }
         }
     }
