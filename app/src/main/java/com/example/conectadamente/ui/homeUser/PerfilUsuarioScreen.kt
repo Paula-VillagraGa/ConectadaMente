@@ -48,7 +48,7 @@ import com.example.conectadamente.ui.viewModel.PatientProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel(), navController: NavController) {
+fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel(), navController: NavController, navigateToEditProfile: () -> Unit) {
     // Cargar datos del paciente actual al cargar la pantalla
     LaunchedEffect(Unit) {
         viewModel.fetchCurrentPatientData()
@@ -88,7 +88,7 @@ fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel(), na
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
-                patientData != null -> ProfileCard(patientData!!)
+                patientData != null -> ProfileCard(patient = patientData!!, navigateToEditProfile = navigateToEditProfile)  // <-- Pasa el parámetro
                 else -> CircularProgressIndicator(Modifier.align(Alignment.Center))
             }
         }
@@ -96,7 +96,7 @@ fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel(), na
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileCard(patient: PatientModel) {
+fun ProfileCard(patient: PatientModel, navigateToEditProfile: () -> Unit) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -124,7 +124,7 @@ fun ProfileCard(patient: PatientModel) {
                 text = "Nombre: ${patient.name}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
                     fontSize = 20.sp
-            )
+                )
             )
 
             ProfileDetailRow(
@@ -135,22 +135,25 @@ fun ProfileCard(patient: PatientModel) {
                     fontSize = 20.sp
                 )
             )
+
             ProfileDetailRow(
                 icon = Icons.Default.LocationOn,
                 contentDescription = "Región",
                 text = "Región: ${if (patient.region.isNullOrEmpty()) "No disponible" else patient.region}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
                     fontSize = 20.sp
+                )
             )
-            )
+
             ProfileDetailRow(
                 icon = Icons.Default.Business,
                 contentDescription = "Ciudad",
                 text = "Ciudad: ${if (patient.city.isNullOrEmpty()) "No disponible" else patient.city}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
                     fontSize = 20.sp
+                )
             )
-            )
+
             ProfileDetailRow(
                 icon = Icons.Default.Cake,
                 contentDescription = "Fecha de Nacimiento",
@@ -162,7 +165,7 @@ fun ProfileCard(patient: PatientModel) {
 
             // Botón para navegar a la pantalla de edición
             Button(
-                onClick = {},
+                onClick = { navigateToEditProfile() },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text("Editar Perfil")

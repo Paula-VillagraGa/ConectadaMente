@@ -25,6 +25,7 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
     object PsychoProfile: NavScreen("psycho_profile", "Perfil", Icons.Outlined.Person)
     object PsychoHome: NavScreen("psycho_home", "Inicio", Icons.Outlined.Home)
     object ChatPsycho: NavScreen("chat_psycho", "Chat", Icons.Outlined.Chat)
+    object EditPatientProfile: NavScreen("edit_perfil_patient", "Editar Perfil", Icons.Outlined.Info)
 
 }
 // Lista para navegación inferior

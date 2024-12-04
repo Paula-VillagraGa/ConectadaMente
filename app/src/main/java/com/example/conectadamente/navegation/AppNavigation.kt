@@ -3,10 +3,13 @@ package com.example.conectadamente.navegation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -24,9 +27,11 @@ import com.example.conectadamente.ui.homePsycho.PsychoHomeScreen
 import com.example.conectadamente.ui.homeUser.ProfilePsyFromPatScreen
 import com.example.conectadamente.ui.homePsycho.PsychoProfileScreen
 import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
+import com.example.conectadamente.ui.homeUser.EditProfilePatientScreen
 import com.example.conectadamente.ui.homeUser.FormativoUsuarioScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
 import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
+import com.example.conectadamente.ui.viewModel.PatientProfileViewModel
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
 
@@ -75,6 +80,16 @@ fun AppNavigation() {
                 )
             }
 
+            //Editar perfil paciente
+            composable(NavScreen.EditPatientProfile.route) {
+                val viewModel: PatientProfileViewModel = hiltViewModel()
+                EditProfilePatientScreen(
+                    onProfileSaved = {
+                        // Acciones después de guardar el perfil, por ejemplo, navegar atrás
+                        navController.popBackStack()
+                    }
+                )
+            }
             composable(NavScreen.PsychologistLogin.route) {
                 PsychologistLoginScreen(
                     navigateToRegisterPsycho = { navController.navigate(NavScreen.RegisterPsycho.route) },
@@ -105,7 +120,7 @@ fun AppNavigation() {
             composable(NavScreen.PsychoHome.route){
                 PsychoHomeScreen(navController)
             }
-            //chat de psicologo
+            //Chat de psicologo
             composable(NavScreen.ChatPsycho.route){
                 ChatPsychoScreen(navController)
             }
@@ -115,8 +130,15 @@ fun AppNavigation() {
                 ProfilePsyFromPatScreen(psychologistId = psychologistId, navController=navController)
             }
 
+            //Paciente Scaffold ->
             composable(NavScreen.Home.route) { HomeScreen(navController) }
-            composable(NavScreen.Perfil.route) {PerfilUsuarioScreen(navController=navController) }
+            //Perfil Paciente ->
+            composable(NavScreen.Perfil.route) {PerfilUsuarioScreen(
+                navController = navController,
+                navigateToEditProfile = {
+                    navController.navigate(NavScreen.EditPatientProfile.route)
+                }
+            )}
             composable(NavScreen.Chat.route) { ChatUsuarioScreen(navController) }
             composable(NavScreen.Formativo.route) { FormativoUsuarioScreen(navController) }
         }
