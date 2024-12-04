@@ -85,9 +85,8 @@ fun AppNavigation() {
                 val viewModel: PatientProfileViewModel = hiltViewModel()
                 EditProfilePatientScreen(
                     onProfileSaved = {
-                        // Acciones después de guardar el perfil, por ejemplo, navegar atrás
                         navController.popBackStack()
-                    }
+                    }, navController = navController
                 )
             }
             composable(NavScreen.PsychologistLogin.route) {

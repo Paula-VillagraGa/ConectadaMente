@@ -60,7 +60,7 @@ private val LightColorScheme = lightColorScheme(
     onSecondary = Purple50,
     onTertiary = Purple50,
     onBackground = Gray50,
-    onSurface = Purple50 //Escribir
+    onSurface = PurpleDark10 //Escribir
 )
 
 // Esquema de colores oscuro
@@ -68,8 +68,8 @@ private val DarkColorScheme = darkColorScheme(
     primary = Color.Black,
     secondary = Purple40,
     tertiary = Brown40,
-    background = Gray30,
-    surface = Gray40,
+    background = Color.Black,
+    surface = Color.Black,
     onPrimary = Color.Black,
     onSecondary = Color.Black,
     onTertiary = Color.Black,

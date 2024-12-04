@@ -49,12 +49,11 @@ import com.example.conectadamente.ui.viewModel.PatientProfileViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel(), navController: NavController, navigateToEditProfile: () -> Unit) {
-    // Cargar datos del paciente actual al cargar la pantalla
+
     LaunchedEffect(Unit) {
         viewModel.fetchCurrentPatientData()
     }
 
-    // Obteniendo estados desde el ViewModel
     val patientData by viewModel.patientData.observeAsState(initial = null)
     val error by viewModel.error.observeAsState(initial = null)
 
@@ -88,7 +87,7 @@ fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel(), na
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
-                patientData != null -> ProfileCard(patient = patientData!!, navigateToEditProfile = navigateToEditProfile)  // <-- Pasa el parámetro
+                patientData != null -> ProfileCard(patient = patientData!!, navigateToEditProfile = navigateToEditProfile)
                 else -> CircularProgressIndicator(Modifier.align(Alignment.Center))
             }
         }
@@ -112,8 +111,8 @@ fun ProfileCard(patient: PatientModel, navigateToEditProfile: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Perfil de Usuario",
-                style = MaterialTheme.typography.titleMedium.copy(
+                text = "Mi Perfil",
+                style = MaterialTheme.typography.titleLarge.copy(
                     color = MaterialTheme.colorScheme.primary
                 )
             )
