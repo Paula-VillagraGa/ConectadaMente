@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -256,10 +257,10 @@ fun ContentSection(navController: NavHostController) {
                     .height(200.dp),
                 color = Purple20
             )
-            SupportCard(
+            SupportCardC(
                 title = "Título 2",
-                subtitle = "Actividades Recomendadas",
-                imageRes = R.drawable.ic_launcher_foreground,
+                subtitle = "Ciencia y Salud Mental",
+                imageRes = R.drawable.cientifico,
                 onClick = {  },
                 modifier = Modifier
                     .height(200.dp)
@@ -275,10 +276,10 @@ fun ContentSection(navController: NavHostController) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SupportCard(
+            SupportCardC(
                 title = "Título 3",
-                subtitle = "Descripción breve",
-                imageRes = R.drawable.ic_launcher_foreground,
+                subtitle = "Ciencia y Salud Mental",
+                imageRes = R.drawable.laboratory,
                 onClick = { },
                 modifier = Modifier
                     .weight(0.6f)
@@ -334,7 +335,7 @@ fun SupportCard(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth() // Ajusta la imagen al ancho disponible
-                .weight(1f) // Da mayor espacio a la imagen
+                .weight(1f)
                 .clip(RoundedCornerShape(12.dp))
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -394,6 +395,43 @@ fun SupportCardB(
                 .weight(1f) // Ajusta el espacio ocupado por la imagen
                 .size(150.dp) // Tamaño fijo para la imagen
                 .clip(RoundedCornerShape(12.dp))
+        )
+    }
+}
+@Composable
+fun SupportCardC(
+    title: String,
+    subtitle: String,
+    imageRes: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    color: Color = Color(0xFFE9E7F3)
+) {
+    Column(
+        modifier = modifier
+            .background(color, RoundedCornerShape(16.dp))
+            .clickable { onClick() }
+            .padding(bottom = 10.dp)
+    ) {
+        Box( // Usamos un Box para controlar la posición de la imagen
+            modifier = Modifier
+                .fillMaxWidth() // Hace que la imagen ocupe el ancho del contenedor
+        )
+        Image(
+            painter = painterResource(id = imageRes),
+            contentDescription = title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(150.dp) // Tamaño de la imagen
+                .align(Alignment.CenterHorizontally) // Mueve la imagen hacia la derecha
+                .clip(RoundedCornerShape(12.dp))
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = subtitle,
+            color = Color.White,
+            fontSize = 16.sp,
+            modifier = Modifier.padding(horizontal = 8.dp)
         )
     }
 }
