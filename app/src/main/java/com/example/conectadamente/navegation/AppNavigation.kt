@@ -30,6 +30,7 @@ import com.example.conectadamente.ui.homeUser.HomeScreen
 import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
 import com.example.conectadamente.ui.homeUser.Recomendacion.BuscarPorTagScreen
 import com.example.conectadamente.ui.homeUser.Recomendacion.RecomendacionScreen
+import com.example.conectadamente.ui.viewModel.BuscarPorTagViewModel
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
 
@@ -124,16 +125,20 @@ fun AppNavigation() {
             composable(NavScreen.Chat.route) { ChatUsuarioScreen(navController) }
             composable(NavScreen.Formativo.route) { RecomendacionScreen(navController) }
 
-            //Para la lista recomendada
+            // Para la lista recomendada
             composable(
                 route = "${NavScreen.ListRecomendation.route}/{tag}",
                 arguments = listOf(navArgument("tag") { type = NavType.StringType })
             ) { backStackEntry ->
+                // Obtener el tag de la entrada de la pila de navegación
                 val tag = backStackEntry.arguments?.getString("tag")
                 if (tag != null) {
+                    // Pasar el tag y el navController a la pantalla
                     BuscarPorTagScreen(tag = tag, navController = navController)
                 }
             }
+
+
 
         }
     }

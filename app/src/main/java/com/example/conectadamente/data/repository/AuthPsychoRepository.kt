@@ -180,5 +180,37 @@ class AuthPsychoRepository @Inject constructor() {
             null
         }
     }
+    suspend fun getPsychosByTagsSpecific(tags: List<String>): List<PsychoModel> {
+        return try {
+            // Realizar una consulta para obtener todos los psicólogos
+            val querySnapshot = db.collection("psychos")
+                .get()
+                .await()
+
+            // Filtrar los documentos según las etiquetas específicas
+            querySnapshot.documents.mapNotNull { document ->
+                // Obtener las etiquetas específicas del psicólogo (como lista de cadenas)
+                val tagsSpecific = document.get("tagsSpecific") as? List<String> ?: emptyList()
+
+                // Verificar si alguna de las etiquetas del psicólogo coincide con las etiquetas de la búsqueda
+                if (tags.any { it in tagsSpecific }) {
+                    // Si coincide, devolver el modelo del psicólogo
+                    PsychoModel(
+                        id = document.getString("id") ?: "",
+                        name = document.getString("name") ?: "",
+                        tagsSpecific = tagsSpecific, // Usamos las etiquetas de cada psicólogo
+                        rating = document.getDouble("rating") ?: 0.0
+                    )
+                } else {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            emptyList() // Retornar una lista vacía si ocurre un error
+        }
+    }
+
 }
+
+
 
