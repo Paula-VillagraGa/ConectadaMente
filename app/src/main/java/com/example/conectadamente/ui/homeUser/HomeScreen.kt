@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -46,13 +45,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.conectadamente.R
 import com.example.conectadamente.data.model.PsychoModel
+import com.example.conectadamente.navegation.NavScreen
 import com.example.conectadamente.ui.theme.Purple20
 import com.example.conectadamente.ui.theme.Purple30
 import com.example.conectadamente.ui.theme.Purple50
@@ -85,25 +84,11 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeUserViewModel = 
                     onSearch = { viewModel.searchPsychologists() },
                     searchResults = viewModel.filteredPsychologists,
                     navController = navController)
-                ContentSection(onCardClick = { cardTitle ->
-                    // Acción a realizar según la tarjeta seleccionada
-                    when (cardTitle) {
-                        "Recomendación 1" -> {
-                            // Navegar o mostrar contenido relacionado con la Recomendación 1
-                            navController.navigate("mental_health")
-                        }
-                        "Recomendación 2" -> {
-                            // Navegar o mostrar contenido relacionado con la Recomendación 2
-                        }
-                        else -> {
-                            // Otra acción
-                        }
+                ContentSection(navController)
                     }
-                })
+                }
             }
         }
-    }
-}
 
 // Barra superior (TopAppBar)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -250,7 +235,7 @@ fun SearchResultCard(psychologist: PsychoModel, navController: NavHostController
 
 
 @Composable
-fun ContentSection(onCardClick: (String) -> Unit) {
+fun ContentSection(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -265,7 +250,7 @@ fun ContentSection(onCardClick: (String) -> Unit) {
                 title = "",
                 subtitle = "Lecturas Recomendadas",
                 imageRes = R.drawable.leer2,
-                onClick = { onCardClick("Título 1") },
+                onClick = {  navController.navigate(NavScreen.BookRecommendations.route) },
                 modifier = Modifier
                     .weight(0.5f)
                     .height(200.dp),
@@ -275,7 +260,7 @@ fun ContentSection(onCardClick: (String) -> Unit) {
                 title = "Título 2",
                 subtitle = "Actividades Recomendadas",
                 imageRes = R.drawable.ic_launcher_foreground,
-                onClick = { onCardClick("Título 2") },
+                onClick = {  },
                 modifier = Modifier
                     .height(200.dp)
                     .weight(0.8f),
@@ -294,7 +279,7 @@ fun ContentSection(onCardClick: (String) -> Unit) {
                 title = "Título 3",
                 subtitle = "Descripción breve",
                 imageRes = R.drawable.ic_launcher_foreground,
-                onClick = { onCardClick("Título 3") },
+                onClick = { },
                 modifier = Modifier
                     .weight(0.6f)
                     .height(200.dp),
@@ -304,7 +289,7 @@ fun ContentSection(onCardClick: (String) -> Unit) {
                 title = "Título 4",
                 subtitle = "Descripción breve",
                 imageRes = R.drawable.danza2,
-                onClick = { onCardClick("Título 4") },
+                onClick = { },
                 modifier = Modifier
                     .weight(0.5f)
                     .height(200.dp),
@@ -319,7 +304,7 @@ fun ContentSection(onCardClick: (String) -> Unit) {
             title = "Contactos de emergencia",
             subtitle = "",
             imageRes = R.drawable.telefono_inteligente,
-            onClick = { onCardClick("Título 5") },
+            onClick = { },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(120.dp),
@@ -411,20 +396,4 @@ fun SupportCardB(
                 .clip(RoundedCornerShape(12.dp))
         )
     }
-}
-
-@Composable
-fun HomeScreenPreviewSimplified() {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text("Pantalla Simplificada", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        ContentSection(onCardClick = {})
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSimplified() {
-    HomeScreenPreviewSimplified()
 }

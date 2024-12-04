@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.conectadamente.R
@@ -34,21 +35,9 @@ val customTypography = Typography(
     bodySmall = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 12.sp),
     labelLarge = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 14.sp),
     labelMedium = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 12.sp),
-    labelSmall = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 10.sp)
+    labelSmall = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Light, fontSize = 9.sp, fontStyle = FontStyle.Italic)
 )
 
-val MyTypography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = PoppinsFontFamily,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp
-    ),
-    titleLarge = TextStyle(
-        fontFamily = PoppinsFontFamily,
-        fontWeight = FontWeight.Medium,
-        fontSize = 20.sp
-    )
-)
 
 private val LightColorScheme = lightColorScheme(
     primary = Purple50,

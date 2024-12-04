@@ -93,27 +93,28 @@ fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel(), na
         }
     }
 }
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun ProfileCard(patient: PatientModel, navigateToEditProfile: () -> Unit) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Column(
             modifier = Modifier
-                .padding(24.dp)
+                .padding(32.dp)
                 .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
                 text = "Mi Perfil",
                 style = MaterialTheme.typography.titleLarge.copy(
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             )
 
@@ -122,7 +123,7 @@ fun ProfileCard(patient: PatientModel, navigateToEditProfile: () -> Unit) {
                 contentDescription = "Nombre",
                 text = "Nombre: ${patient.name}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 20.sp
+                    fontSize = 18.sp
                 )
             )
 
@@ -131,7 +132,7 @@ fun ProfileCard(patient: PatientModel, navigateToEditProfile: () -> Unit) {
                 contentDescription = "Email",
                 text = "Email: ${patient.email}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 20.sp
+                    fontSize = 18.sp
                 )
             )
 
@@ -140,7 +141,7 @@ fun ProfileCard(patient: PatientModel, navigateToEditProfile: () -> Unit) {
                 contentDescription = "Región",
                 text = "Región: ${if (patient.region.isNullOrEmpty()) "No disponible" else patient.region}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 20.sp
+                    fontSize = 18.sp
                 )
             )
 
@@ -149,7 +150,7 @@ fun ProfileCard(patient: PatientModel, navigateToEditProfile: () -> Unit) {
                 contentDescription = "Ciudad",
                 text = "Ciudad: ${if (patient.city.isNullOrEmpty()) "No disponible" else patient.city}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 20.sp
+                    fontSize = 18.sp
                 )
             )
 
@@ -158,10 +159,11 @@ fun ProfileCard(patient: PatientModel, navigateToEditProfile: () -> Unit) {
                 contentDescription = "Fecha de Nacimiento",
                 text = "Fecha de Nacimiento: ${if (patient.birthDate.isNullOrEmpty()) "No disponible" else patient.birthDate}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 20.sp
+                    fontSize = 18.sp
                 )
             )
 
+            Spacer(modifier = Modifier.padding(top = 20.dp))
             // Botón para navegar a la pantalla de edición
             Button(
                 onClick = { navigateToEditProfile() },
@@ -178,10 +180,11 @@ fun ProfileDetailRow(
     icon: ImageVector,
     contentDescription: String,
     text: String,
-    textStyle: TextStyle = MaterialTheme.typography.bodyMedium
+    textStyle: TextStyle
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Icon(
             imageVector = icon,
@@ -194,7 +197,8 @@ fun ProfileDetailRow(
             text = text,
             style = textStyle.copy(
                 color = MaterialTheme.colorScheme.onSurface
-            )
+            ),
+            modifier = Modifier.weight(1f)
         )
     }
 }

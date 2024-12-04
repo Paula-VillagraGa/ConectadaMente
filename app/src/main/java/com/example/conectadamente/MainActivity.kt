@@ -14,10 +14,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Establecemos el contenido con el wrapper de navegación
         setContent {
             MyApplicationTheme {
-                //Navegación acá
+
                 AppNavigation()
             }
         }
