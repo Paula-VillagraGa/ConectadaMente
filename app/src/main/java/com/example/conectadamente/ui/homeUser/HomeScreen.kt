@@ -276,10 +276,10 @@ fun ContentSection(navController: NavHostController) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SupportCard(
+            SupportCardC(
                 title = "Título 3",
                 subtitle = "Ciencia y Salud Mental",
-                imageRes = R.drawable.laboratory,
+                imageRes = R.drawable.salud_mental5,
                 onClick = { navController.navigate(NavScreen.ArticlesRecommendations.route) },
                 modifier = Modifier
                     .weight(0.6f)
@@ -288,7 +288,7 @@ fun ContentSection(navController: NavHostController) {
             )
             SupportCard(
                 title = "Título 4",
-                subtitle = "Descripción breve",
+                subtitle = "Actividades",
                 imageRes = R.drawable.danza2,
                 onClick = { },
                 modifier = Modifier
@@ -336,56 +336,6 @@ fun SupportCard(
 }
 
 @Composable
-fun SupportCardB(
-    title: String,
-    subtitle: String,
-    imageRes: Int,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    color: Color = Color(0xFFE9E7F3)
-) {
-    Row(
-        modifier = modifier
-            .background(color, RoundedCornerShape(16.dp))
-            .clickable { onClick() }
-            .padding(10.dp)
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically // Alinea verticalmente los elementos al centro
-    ) {
-        // Sección de texto a la izquierda
-        Column(
-            modifier = Modifier
-                .weight(2f) // Ajusta el espacio ocupado por el texto
-                .padding(end = 4.dp) // Espacio entre el texto y la imagen
-        ) {
-            Text(
-                text = title,
-                color = Color.White,
-                fontWeight = FontWeight.Light,
-                fontSize = 18.sp
-
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = subtitle,
-                color = Color.White,
-                fontSize = 14.sp
-            )
-        }
-
-        // Imagen a la derecha
-        Image(
-            painter = painterResource(id = imageRes),
-            contentDescription = title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .weight(1f) // Ajusta el espacio ocupado por la imagen
-                .size(150.dp) // Tamaño fijo para la imagen
-                .clip(RoundedCornerShape(12.dp))
-        )
-    }
-}
-@Composable
 fun SupportCardC(
     title: String,
     subtitle: String,
@@ -409,11 +359,12 @@ fun SupportCardC(
             contentDescription = title,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(150.dp) // Tamaño de la imagen
+                .padding(top = 20.dp)
+                .size(160.dp) // Tamaño de la imagen
                 .align(Alignment.CenterHorizontally) // Mueve la imagen hacia la derecha
                 .clip(RoundedCornerShape(12.dp))
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Text(
             text = subtitle,
             color = Color.White,
