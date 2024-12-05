@@ -27,8 +27,8 @@ import com.example.conectadamente.ui.theme.*
 fun LoginScreen(
     navController: NavController,
     navigateToSignIn: () -> Unit,
-    navigateToRegisterPatient: () -> Unit,
-    navigateToPsychologistLogin: () -> Unit
+    navigateToRegisterPatient: () -> Unit
+
 ) {
     Column(
         modifier = Modifier
@@ -93,23 +93,8 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
     }
-    // Texto cliqueable en la esquina superior derecha
-    Text(
-        text = "Ingresar como Psicólogo",
-        modifier = Modifier
-            .padding(8.dp)
-            .clickable { navigateToPsychologistLogin() },
-        style = TextStyle(
-            color = Purple20,
-            fontSize = 14.sp,
-            textDecoration = TextDecoration.Underline
-        )
-    )
 }
-
-
-@Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(navController = NavController(LocalContext.current), navigateToSignIn = {}, navigateToRegisterPatient = {}, navigateToPsychologistLogin = {})
+    LoginScreen(navController = NavController(LocalContext.current), navigateToSignIn = {}, navigateToRegisterPatient = {})
 }

@@ -62,8 +62,7 @@ fun AppNavigation() {
                 LoginScreen(
                     navController = navController,
                     navigateToSignIn = { navController.navigate(NavScreen.SignIn.route) },
-                    navigateToRegisterPatient = { navController.navigate(NavScreen.RegisterPatient.route) },
-                    navigateToPsychologistLogin = { navController.navigate(NavScreen.PsychologistLogin.route) }
+                    navigateToRegisterPatient = { navController.navigate(NavScreen.RegisterPatient.route) }
                 )
             }
             composable(NavScreen.SignIn.route) {
@@ -107,7 +106,7 @@ fun AppNavigation() {
 
             composable(NavScreen.RegisterPatient.route) {
                 val userAuthViewModel: UserAuthViewModel = hiltViewModel()
-                RegisterPatientScreen(viewModel = userAuthViewModel)
+                RegisterPatientScreen(viewModel = userAuthViewModel, navigateToRegisterPsycho = {navController.navigate(NavScreen.RegisterPsycho.route)})
             }
             //Psicologo ->
 
