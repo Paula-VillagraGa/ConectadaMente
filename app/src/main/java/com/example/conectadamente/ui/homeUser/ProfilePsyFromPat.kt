@@ -30,6 +30,7 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -62,6 +63,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.conectadamente.R
+import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.ui.theme.Gray50
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.ui.viewModel.reviews.ReviewViewModel
@@ -74,26 +76,21 @@ fun ProfilePsyFromPatScreen(
     psychologistId: String?,
     navController: NavController
 ) {
-    // Estados para el Snackbar
+    // Estados y ViewModels
     val snackbarHostState = remember { SnackbarHostState() }
-    var isSubmitting by remember { mutableStateOf(false) }
-    var messageToShow by remember { mutableStateOf<String?>(null) }
-
-    // ViewModels
     val reviewViewModel: ReviewViewModel = hiltViewModel()
     val viewModel: PsychoAuthViewModel = hiltViewModel()
 
+    var isSubmitting by remember { mutableStateOf(false) }
+    var messageToShow by remember { mutableStateOf<String?>(null) }
     var ratingPromedio by remember { mutableStateOf(0.0) }
-
-    // Estados observados
-    val profileState by viewModel.profileState.collectAsState()
-    val ratingState by reviewViewModel.ratingState.observeAsState()
-
-    // Estados locales
     var rating by remember { mutableIntStateOf(0) }
     var tags by remember { mutableStateOf(listOf<String>()) }
 
-    // Manejo de mensajes del Snackbar
+    val profileState by viewModel.profileState.collectAsState()
+    val ratingState by reviewViewModel.ratingState.observeAsState()
+
+    // Snackbar para notificaciones
     LaunchedEffect(ratingState) {
         when (ratingState) {
             is DataState.Success -> {
@@ -104,23 +101,19 @@ fun ProfilePsyFromPatScreen(
                 snackbarHostState.showSnackbar("Error: ${(ratingState as DataState.Error).e}")
                 isSubmitting = false
             }
-            DataState.Loading -> {
-                isSubmitting = true
-            }
+            DataState.Loading -> isSubmitting = true
             else -> {}
         }
     }
 
-    // Reseña previa
+    // Cargar datos iniciales
     LaunchedEffect(psychologistId) {
         psychologistId?.let { id ->
             viewModel.getPsychoById(id)
             ratingPromedio = reviewViewModel.getAverageRating(id)
-
             val patientId = FirebaseAuth.getInstance().currentUser?.uid
             if (patientId != null) {
-                val existingReview = reviewViewModel.getExistingReview(id, patientId)
-                existingReview?.let { review ->
+                reviewViewModel.getExistingReview(id, patientId)?.let { review ->
                     rating = review.rating.toInt()
                     tags = review.tags
                 }
@@ -129,278 +122,167 @@ fun ProfilePsyFromPatScreen(
     }
 
     Scaffold(
-        modifier = Modifier.padding(2.dp),
         topBar = {
             TopAppBar(
                 title = { Text("") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            Icons.Filled.ArrowBackIosNew,
-                            contentDescription = "Regresar"
-                        )
+                        Icon(Icons.Filled.ArrowBackIosNew, contentDescription = "Regresar")
                     }
                 }
             )
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 2.dp)
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             when (val state = profileState) {
-                is DataState.Loading -> {
-                    CircularProgressIndicator()
-                }
-                is DataState.Success -> {
-                    state.data?.let { psycho ->
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp)
-                                .verticalScroll(rememberScrollState()),
-                            horizontalAlignment = Alignment.Start
-                        ) {
-                            // Foto y nombre
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Start
-                            ) {
-                                AsyncImage(
-                                    model = psycho.photoUrl
-                                        ?: "gs://proyectoconectadamente.firebasestorage.app/profile_pictures/hombre1.png",
-                                    contentDescription = "Foto de ${psycho.name}",
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .size(120.dp)
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.primary)
-                                )
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Text(
-                                    text = psycho.name,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(8.dp))
+                is DataState.Loading -> CircularProgressIndicator()
+                is DataState.Success -> state.data?.let { psycho ->
+                    // Información del perfil
+                    ProfileSection(psycho, ratingPromedio, navController, psychologistId)
 
-                            // Especialización
-                            Text(
-                                text = "Especialización:",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            if (psycho.specialization.isNullOrEmpty()) {
-                                Text(
-                                    text = "Sin especialización disponible",
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Sección para realizar una nueva reseña
+                    Divider(modifier = Modifier.padding(horizontal = 16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    NewReviewSection(
+                        rating = rating,
+                        tags = tags,
+                        onRatingChange = { rating = it },
+                        onTagToggle = { tag ->
+                            tags = if (tags.contains(tag)) tags - tag else if (tags.size < 3) tags + tag else tags
+                        },
+                        onSubmit = {
+                            val patientId = FirebaseAuth.getInstance().currentUser?.uid
+                            if (psychologistId != null && patientId != null) {
+                                isSubmitting = true
+                                reviewViewModel.submitRating(psychologistId, patientId, tags, rating.toDouble())
                             } else {
-                                psycho.specialization.forEach { specialization ->
-                                    Text(
-                                        text = specialization,
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                }
+                                messageToShow = "No se pudo autenticar al usuario."
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            // Rating promedio
-                            val formattedRating = "%.1f".format(ratingPromedio)
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Star,
-                                    contentDescription = "Rating",
-                                    tint = Color.Yellow,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "$formattedRating / 5.0",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            // Descripción
-                            Text(
-                                text = "Descripción:",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Text(
-                                text = psycho.descriptionPsycho ?: "Descripción no disponible",
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.padding(top = 8.dp)
-                            )
-                            // Botones para agendar cita y chat
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                .padding(horizontal = 8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                OutlinedButton(
-                                    onClick = {
-                                        // Acción para agendar cita
-                                        psychologistId?.let { id ->
-                                            navController.navigate("scheduleAppointment/$id")
-                                        }
-                                    },
-                                    modifier = Modifier
-                                        .padding(horizontal = 8.dp)
-                                        .weight(1f)
-                                        .height(48.dp),
-                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-                                    colors = ButtonDefaults.outlinedButtonColors(
-                                        contentColor = MaterialTheme.colorScheme.primary
-                                    )
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.CalendarToday,
-                                        contentDescription = "Agendar cita",
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Agendar cita", style = MaterialTheme.typography.bodyMedium)
-                                }
-
-                                OutlinedButton(
-                                    onClick = {
-                                        // Acción para iniciar el chat
-                                        psychologistId?.let { id ->
-                                            navController.navigate("chatWithPsychologist/$id")
-                                        }
-                                    },
-                                    modifier = Modifier
-                                        .padding(horizontal = 8.dp)
-                                        .weight(1f)
-                                        .height(48.dp),
-                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
-                                    colors = ButtonDefaults.outlinedButtonColors(
-                                        contentColor = MaterialTheme.colorScheme.secondary
-                                    )
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Chat,
-                                        contentDescription = "Hablar por chat",
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Chat", style = MaterialTheme.typography.bodyMedium)
-                                }
-                            }
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            // Calificación del paciente
-                            Text(
-                                text = "Califica al psicólogo",
-                                style = MaterialTheme.typography.titleSmall,
-                                modifier = Modifier.padding(top = 16.dp)
-                            )
-                            Row(
-                                modifier = Modifier.padding(vertical = 8.dp),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                for (i in 1..5) {
-                                    Icon(
-                                        imageVector = Icons.Default.Star,
-                                        contentDescription = null,
-                                        tint = if (i <= rating) Color.Yellow else Color.Gray,
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                            .clickable { rating = i }
-                                    )
-                                }
-                            }
-
-                            // Etiquetas
-                            Text(
-                                text = "Define al Psicólogo",
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.padding(top = 8.dp)
-                            )
-                            LazyRow(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                val availableTags = listOf("Empático", "Buen oyente", "Profesional", "Amable")
-                                items(availableTags) { tag ->
-                                    AssistChip(
-                                        onClick = {
-                                            if (tags.contains(tag)) {
-                                                tags = tags - tag
-                                            } else if (tags.size < 3) {
-                                                tags = tags + tag
-                                            }
-                                        },
-                                        label = { Text(text = tag) },
-                                        colors = AssistChipDefaults.assistChipColors(
-                                            containerColor = if (tags.contains(tag)) MaterialTheme.colorScheme.primary
-                                            else MaterialTheme.colorScheme.secondary,
-                                            labelColor = Color.White
-                                        )
-                                    )
-                                }
-                            }
-
-                            // Botón de enviar
-                            Button(
-                                onClick = {
-                                    psychologistId?.let { id ->
-                                        val patientId = FirebaseAuth.getInstance().currentUser?.uid
-                                        if (patientId != null) {
-                                            isSubmitting = true
-                                            reviewViewModel.submitRating(
-                                                psychoId = id,
-                                                patientId = patientId,
-                                                tags = tags,
-                                                rating = rating.toDouble()
-                                            )
-                                        } else {
-                                            messageToShow = "No se pudo autenticar al usuario."
-                                        }
-                                    }
-                                },
-                                enabled = rating > 0 && !isSubmitting,
-                                modifier = Modifier.padding(vertical = 16.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (isSubmitting) MaterialTheme.colorScheme.secondary
-                                    else MaterialTheme.colorScheme.primary
-                                )
-                            ) {
-                                Text(if (isSubmitting) "Enviando..." else "Enviar calificación")
-                            }
-                        }
-                    }
-                }
-                is DataState.Error -> {
-                    Text(
-                        text = state.e,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.error
+                        },
+                        isSubmitting = isSubmitting
                     )
                 }
-                else -> {
-                    Text(
-                        text = "Cargando...",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
+                is DataState.Error -> Text("Error: ${state.e}", color = MaterialTheme.colorScheme.error)
+                else -> Text("Cargando...")
             }
         }
     }
 }
 
+@Composable
+fun ProfileSection(
+    psycho: PsychoModel,
+    ratingPromedio: Double,
+    navController: NavController,
+    psychologistId: String?
+) {
+    // Mostrar foto, nombre, especialización y descripción
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AsyncImage(
+                model = psycho.photoUrl
+                    ?: "gs://proyectoconectadamente.firebasestorage.app/profile_pictures/hombre1.png",
+                contentDescription = "Foto de ${psycho.name}",
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(psycho.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Especialización: ${psycho.specialization?.joinToString() ?: "No disponible"}")
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow)
+            Spacer(modifier = Modifier.width(4.dp))
+            Text("%.1f / 5.0".format(ratingPromedio))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Descripción: ${psycho.descriptionPsycho ?: "No disponible"}")
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            OutlinedButton(onClick = { psychologistId?.let { navController.navigate("scheduleAppointment/$it") } }) {
+                Icon(Icons.Default.CalendarToday, contentDescription = null)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Agendar cita")
+            }
+            OutlinedButton(onClick = { psychologistId?.let { navController.navigate("chatWithPsychologist/$it") } }) {
+                Icon(Icons.Default.Chat, contentDescription = null)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Chat")
+            }
+        }
+    }
+}
+
+@Composable
+fun NewReviewSection(
+    rating: Int,
+    tags: List<String>,
+    onRatingChange: (Int) -> Unit,
+    onTagToggle: (String) -> Unit,
+    onSubmit: () -> Unit,
+    isSubmitting: Boolean
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+    ) {
+        Text("Califica al psicólogo", style = MaterialTheme.typography.titleMedium)
+
+        Row(horizontalArrangement = Arrangement.Center) {
+            (1..5).forEach { i ->
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = if (i <= rating) Color.Yellow else Color.Gray,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable { onRatingChange(i) }
+                )
+            }
+        }
+
+        Text("Define al psicólogo", style = MaterialTheme.typography.bodyLarge)
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            val availableTags = listOf("Empático", "Buen oyente", "Profesional", "Amable")
+            items(availableTags) { tag ->
+                AssistChip(
+                    onClick = { onTagToggle(tag) },
+                    label = { Text(tag) },
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = if (tags.contains(tag)) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.secondary
+                    )
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onSubmit, enabled = !isSubmitting) {
+            Text(if (isSubmitting) "Enviando..." else "Enviar calificación")
+        }
+    }
+}
