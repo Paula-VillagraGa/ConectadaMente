@@ -1,4 +1,4 @@
-package com.example.conectadamente.ui.homeUser.RecommendationsPatient
+package com.example.conectadamente.ui.homeUser.recommendationsPatient
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

@@ -5,7 +5,13 @@
     <!-- Permiso para acceso a Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
+    <queries>
+        <!-- Declarar que tu app interactúa con aplicaciones que manejan acciones de llamada -->
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <data android:scheme="tel" />
+        </intent>
+    </queries>
 
 
 

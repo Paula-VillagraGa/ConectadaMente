@@ -305,7 +305,7 @@ fun ContentSection(navController: NavHostController) {
             title = "Contactos de emergencia",
             subtitle = "",
             imageRes = R.drawable.telefono_inteligente,
-            onClick = { },
+            onClick = { navController.navigate(NavScreen.CallSosRecommendations.route) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(120.dp),

@@ -3,15 +3,11 @@ package com.example.conectadamente.navegation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -31,12 +27,12 @@ import com.example.conectadamente.ui.homeUser.EditProfilePatientScreen
 import com.example.conectadamente.ui.homeUser.FormativoUsuarioScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
 import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
-import com.example.conectadamente.ui.homeUser.RecommendationsPatient.ArticleScreen
-import com.example.conectadamente.ui.homeUser.RecommendationsPatient.BookRecommendations
+import com.example.conectadamente.ui.homeUser.recommendationsPatient.ArticleScreen
+import com.example.conectadamente.ui.homeUser.recommendationsPatient.BookRecommendations
+import com.example.conectadamente.ui.homeUser.recommendationsPatient.SosDialCardScreen
 import com.example.conectadamente.ui.viewModel.PatientProfileViewModel
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
-import com.example.conectadamente.ui.viewModel.recommendations.ArticleViewModel
 
 
 @Composable
@@ -150,6 +146,9 @@ fun AppNavigation() {
             }
             composable(NavScreen.ArticlesRecommendations.route) {
                 ArticleScreen(navController)
+            }
+            composable(NavScreen.CallSosRecommendations.route) {
+                SosDialCardScreen(navController)
             }
         }
     }
