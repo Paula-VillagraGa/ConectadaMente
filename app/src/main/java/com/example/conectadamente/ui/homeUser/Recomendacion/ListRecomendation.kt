@@ -15,19 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -61,70 +56,110 @@ import com.example.conectadamente.ui.viewModel.BuscarPorTagViewModel
 fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
     // Usamos hiltViewModel para obtener el ViewModel
     val viewModel: BuscarPorTagViewModel = hiltViewModel()
+
+    // Estado para la etiqueta seleccionada (inicialmente es la que llega como argumento)
+    val selectedTag = remember { mutableStateOf(tag) }
     // Llamamos a la función del ViewModel para filtrar los psicólogos por la etiqueta (tag)
-    LaunchedEffect(tag) {
-        viewModel.tagsQuery.value = listOf(tag)  // Establecemos la etiqueta para la búsqueda
+    LaunchedEffect(selectedTag.value) {
+        viewModel.tagsQuery.value = listOf(selectedTag.value)  // Establecemos la etiqueta para la búsqueda
         viewModel.searchPsychologists()  // Realizamos la búsqueda por etiquetas
     }
 
     // Obtenemos la lista de psicólogos filtrados
     val filteredPsychologists = viewModel.filteredPsychologists
+    Scaffold(
+        topBar = { com.example.conectadamente.ui.homeUser.Recomendacion.TopAppBar() },
+    ) { paddingValues ->
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFFEFEFEF))
+            ) {
+                // Fila horizontal con las etiquetas disponibles para selección
+                // Fila de etiquetas para seleccionar
+                val tags = listOf(
+                    "necesito psicólogo", "falta de sueño", "falta de apetito", "problemas con amigos",
+                    "ansiedad", "estrés laboral", "problemas de pareja", "soledad",
+                    "baja autoestima", "miedo", "ira", "agotamiento emocional",
+                    "dificultad de concentración", "inseguridad", "desmotivación",
+                    "preocupación constante", "culpa", "falta de sentido", "crisis de identidad"
+                )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFEFEFEF))
-    ) {
-        // Puedes agregar un campo de búsqueda adicional aquí si lo deseas
-        // Como la búsqueda es por tags, este campo puede estar vacío por ahora.
-        SearchField(
-            query = "", // No estamos buscando por nombre aquí
-            onQueryChanged = { },
-            onSearch = { },
-            searchResults = filteredPsychologists,
-            navController = navController
-        )
-
-        // Mostrar los psicólogos filtrados
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(filteredPsychologists) { psicologo ->
-                Column(
+                LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .clickable {
-                            // Navegar al detalle del psicólogo
-                            navController.navigate("detallePsicologo/${psicologo.id}")
-                        }
-                        .background(
-                            color = Color.White,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .shadow(4.dp, RoundedCornerShape(12.dp))
+                        .padding(8.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    items(tags) { tag ->
+                        val isSelected = tag == selectedTag.value
                         Box(
                             modifier = Modifier
-                                .size(56.dp)
-                                .clip(CircleShape)
-                                .background(Color.Gray) // Aquí puedes reemplazar con una imagen de perfil
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
+                                .padding(4.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(
+                                    if (isSelected) Color(0xFF1980E6) else Color(0xFFF0F2F4)
+                                )
+                                .clickable { selectedTag.value = tag }
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                        ) {
                             Text(
-                                text = psicologo.name,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp,
-                                color = Color.Black
-                            )
-                            Text(
-                                text = psicologo.tagsSpecific?.joinToString(", ") ?: "",
+                                text = tag,
+                                color = if (isSelected) Color.White else Color.Black,
                                 fontSize = 14.sp,
-                                color = Color.Gray
+                                fontWeight = FontWeight.Bold
                             )
+                        }
+                    }
+                }
+
+                // Mostrar los psicólogos filtrados
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(filteredPsychologists) { psicologo ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .clickable {
+                                    // Navegar al detalle del psicólogo
+                                    navController.navigate("detallePsicologo/${psicologo.id}")
+                                }
+                                .background(
+                                    color = Color.White,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .shadow(4.dp, RoundedCornerShape(12.dp))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(56.dp)
+                                        .clip(CircleShape)
+                                        .background(Color.Gray) // Aquí puedes reemplazar con una imagen de perfil
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Column {
+                                    Text(
+                                        text = psicologo.name,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp,
+                                        color = Color.Black
+                                    )
+                                    Text(
+                                        text = psicologo.tagsSpecific?.joinToString(", ") ?: "",
+                                        fontSize = 14.sp,
+                                        color = Color.Gray
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -133,5 +168,22 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
     }
 }
 
-
+// Composable para los filtros de etiquetas
+@Composable
+fun FilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(if (isSelected) Color(0xFF1980E6) else Color(0xFFF0F2F4))
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            color = if (isSelected) Color.White else Color.Black,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}
 
