@@ -170,6 +170,7 @@ fun PsychoProfileScreen(
                                 // Botón Editar
                                 Button(
                                     onClick = {
+                                        viewModel.loadCurrentProfile()
                                         navController.navigate(NavScreen.PsychoEdit.route)
                                     },
                                     modifier = Modifier

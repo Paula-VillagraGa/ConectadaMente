@@ -40,6 +40,7 @@ import androidx.navigation.NavController
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.utils.constants.DataState
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditPsychoProfileScreen(
@@ -48,21 +49,30 @@ fun EditPsychoProfileScreen(
 ) {
     val profileState by viewModel.profileState.collectAsState()
     val context = LocalContext.current
+
+    // Estados locales para los campos del perfil
     var phone by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var experience by remember { mutableStateOf("") }
     var selectedSpecializations by remember { mutableStateOf(listOf<String>()) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val specializations = listOf("Psicología Clínica", "Psicología Educacional", "Psicología Organizacional") // Lista de ejemplo
+    val specializations = listOf(
+        "Psicología Clínica",
+        "Psicología Educacional",
+        "Psicología Organizacional"
+    ) // Ejemplo de especializaciones
 
+    // Usar un LaunchedEffect para cargar los datos cuando la pantalla se muestre
     LaunchedEffect(profileState) {
         if (profileState is DataState.Success) {
             val psycho = (profileState as DataState.Success).data
-            phone = psycho?.phone.orEmpty()
-            description = psycho?.descriptionPsycho.orEmpty()
-            experience = psycho?.experience.orEmpty()
-            selectedSpecializations = psycho?.specialization ?: listOf()
+            if (psycho != null) {
+                phone = psycho.phone ?: ""
+                description = psycho.descriptionPsycho ?: ""
+                experience = psycho.experience ?: ""
+                selectedSpecializations = psycho.specialization ?: listOf()
+            }
         }
     }
 
@@ -85,24 +95,31 @@ fun EditPsychoProfileScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Campo Teléfono
             TextField(
                 value = phone,
                 onValueChange = { phone = it },
                 label = { Text("Teléfono") },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            // Campo Descripción
             TextField(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Descripción") },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            // Campo Experiencia
             TextField(
                 value = experience,
                 onValueChange = { experience = it },
                 label = { Text("Experiencia") },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            // Especializaciones
             Text("Especializaciones:")
             LazyColumn {
                 items(specializations) { spec ->
@@ -124,9 +141,10 @@ fun EditPsychoProfileScreen(
                     }
                 }
             }
+
+            // Botón para subir foto
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                // Selección de imagen
                 val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                     type = "image/*"
                 }
@@ -134,16 +152,26 @@ fun EditPsychoProfileScreen(
             }) {
                 Text("Subir Foto")
             }
+
+            // Botón para guardar cambios
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
+                val currentState = (profileState as? DataState.Success)?.data
                 viewModel.updateProfile(
-                    phone = phone,
-                    description = description,
-                    experience = experience,
-                    specializations = selectedSpecializations,
+                    phone = phone.takeIf { it.isNotBlank() } ?: currentState?.phone.orEmpty(),
+                    description = description.takeIf { it.isNotBlank() }
+                        ?: currentState?.descriptionPsycho.orEmpty(),
+                    experience = experience.takeIf { it.isNotBlank() }
+                        ?: currentState?.experience.orEmpty(),
+                    specializations = if (selectedSpecializations.isNotEmpty()) selectedSpecializations else currentState?.specialization
+                        ?: listOf(),
                     imageUri = imageUri
                 )
-                navController.popBackStack()
+
+                // Solo navega después de que la actualización se haya realizado correctamente
+                if (profileState is DataState.Success) {
+                    navController.popBackStack()
+                }
             }) {
                 Text("Guardar Cambios")
             }
