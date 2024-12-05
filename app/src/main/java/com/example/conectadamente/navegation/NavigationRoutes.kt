@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 sealed class NavScreen(val route: String, val title: String, val icon: ImageVector?) {
     object Login : NavScreen("login", "Login", null)
     object SignIn : NavScreen("sign_in", "Iniciar Sesión", null)
+    //Paciente ->
     object RegisterPatient : NavScreen("register_patient", "Registro", null)
     object Home : NavScreen("home_screen", "Inicio", Icons.Outlined.Home)
     object Perfil : NavScreen("perfil_usuario", "Perfil", Icons.Outlined.Person)
@@ -21,11 +22,19 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
     object Formativo : NavScreen("formativo_usuario", "Asistente", Icons.Outlined.Assistant)
     object ListRecomendation : NavScreen("ListRecommendation_usuario", "ListRecomendation", null)
     object PsychologistLogin : NavScreen("psychologist_login", "Login", null)
-    object RegisterPsycho : NavScreen("register_psycho", "Registro", null)
+    object EditPatientProfile: NavScreen("edit_perfil_patient", "Editar Perfil", Icons.Outlined.Info)
+    //Psicologo ->
     object PsychoSignIn : NavScreen("psycho_sign_in", "Iniciar Sesión Psicólogo", null)
     object PsychoProfile: NavScreen("psycho_profile", "Perfil", Icons.Outlined.Person)
     object PsychoHome: NavScreen("psycho_home", "Inicio", Icons.Outlined.Home)
     object ChatPsycho: NavScreen("chat_psycho", "Chat", Icons.Outlined.Chat)
+    object RegisterPsycho : NavScreen("register_psycho", "Registro", null)
+    object PsychoEdit : NavScreen("psycho_edit", "Editar Perfil", Icons.Outlined.Info)
+
+    //Recomendaciones ->
+    object BookRecommendations: NavScreen("book_recommendations", "Recomendaciones", null)
+    object ArticlesRecommendations : NavScreen("articles_recommendations", "Recomendaciones", null)
+    object CallSosRecommendations : NavScreen("call_sos_recommendations", "Recomendaciones", null)
 
 }
 // Lista para navegación inferior

@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
@@ -37,11 +39,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -65,6 +70,8 @@ fun SignInScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
+    val emailFocusRequester = FocusRequester()
+    val passwordFocusRequester = FocusRequester()
 
     val viewModel: AuthViewModel = hiltViewModel()
     val loginState by viewModel.loginState.collectAsState()
@@ -167,11 +174,18 @@ fun SignInScreen(
                     // Campo para ingresar el correo electrónico
                     TextField(
                         value = email,
-                        onValueChange = { email = it },
+                        onValueChange = { email = it.trim() }, // Elimina los espacios en blanco
                         label = { Text("Correo Electrónico") },
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .focusRequester(emailFocusRequester),
                         shape = RoundedCornerShape(8.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Next // Cambia de campo cuando se presiona "Enter"
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { passwordFocusRequester.requestFocus() } // Cambiar al campo de contraseña
+                        ),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = Brown10,
                             unfocusedBorderColor = Color.Transparent,
@@ -179,15 +193,25 @@ fun SignInScreen(
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
+
                     // Campo para ingresar la contraseña
                     TextField(
                         value = password,
-                        onValueChange = { password = it },
+                        onValueChange = { password = it.trim() }, // Elimina los espacios en blanco
                         label = { Text("Contraseña") },
                         visualTransformation = PasswordVisualTransformation(), // Para ocultar la contraseña
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .focusRequester(passwordFocusRequester),
                         shape = RoundedCornerShape(8.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done // Acción para finalizar
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                viewModel.handleLogin(email, password) // Iniciar sesión cuando se presiona "Done"
+                            }
+                        ),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = Brown10,
                             unfocusedBorderColor = Color.Transparent,
@@ -198,10 +222,7 @@ fun SignInScreen(
 
                     // Botón de iniciar sesión
                     Button(onClick = {
-                        viewModel.handleLogin(
-                            email,
-                            password
-                        ) // Llamar al método handleLogin desde el ViewModel
+                        viewModel.handleLogin(email, password)
                     }) {
                         Text("Iniciar sesión")
                     }
@@ -231,6 +252,7 @@ fun SignInScreen(
                 }
             }
         }
+
         var isLoading by remember { mutableStateOf(true) }
 
         // Comprobación del estado de login

@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -28,11 +30,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -41,11 +48,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.conectadamente.R
 import com.example.conectadamente.data.model.PsychoModel
-import com.example.conectadamente.ui.theme.Blue20
-import com.example.conectadamente.ui.theme.Blue30
 import com.example.conectadamente.ui.theme.PoppinsFontFamily
-import com.example.conectadamente.ui.theme.Purple50
-import com.example.conectadamente.ui.theme.Purple80
+import com.example.conectadamente.ui.theme.*
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.utils.constants.DataState
 import com.example.conectadamente.utils.getImageSize
@@ -65,6 +69,15 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
 
     val registerState by viewModel.authState.collectAsState()
 
+    //request
+    val focusRequesterRut = FocusRequester()
+    val focusRequesterEmail = FocusRequester()
+    val focusRequesterNVerificador = FocusRequester()
+    val focusRequesterPassword = FocusRequester()
+    val focusRequesterPasswordB = FocusRequester()
+    val focusRequesterButton = FocusRequester()
+
+    val rutFocused = remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -132,7 +145,7 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
                 modifier = Modifier
                     .weight(1f) // Ocupa la mitad de la pantalla
                     .fillMaxWidth()
-                    .background(Blue30)
+                    .background(Purple30)
             ) {
                 Column(
                     modifier = Modifier
@@ -179,12 +192,12 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
                         .padding(bottom = 6.dp) // Espacio entre la imagen y el texto
                 )
                 Text(
-                    text = "Regístrate",
+                    text = "Únete al Equipo",
                     style = TextStyle(
                         fontFamily = PoppinsFontFamily,
                         fontStyle = FontStyle.Italic,
-                        fontSize = 30.sp,
-                        color = Blue20,
+                        fontSize = 20.sp,
+                        color = Purple50,
                     ),
                     textAlign = TextAlign.Center
                 )
@@ -196,6 +209,9 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
                     label = { Text("Nombre Completo") },
                     modifier = Modifier
                         .fillMaxWidth()
+                        .focusRequester(FocusRequester.Default),
+                    keyboardOptions = KeyboardOptions.Default.copy(capitalization = KeyboardCapitalization.Words,imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { focusRequesterRut.requestFocus() })
                 )
 
                 // Campo para el RUT
@@ -203,27 +219,45 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
                     value = rut,
                     onValueChange = { rut = it },
                     label = { Text("RUT") },
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
+                    .focusRequester(focusRequesterRut)
+                    .onFocusChanged { rutFocused.value = it.isFocused },
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { focusRequesterEmail.requestFocus() })
                 )
-                // Campo para el N°verificador
-                OutlinedTextField(
-                    value = numero,
-                    onValueChange = { numero = it },
-                    label = { Text("N° Registro Prestador de Salud") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
+                // Mostrar mensaje si el campo de RUT está enfocado
+                if (rutFocused.value) {
+                    Text(
+                        text = "Ingrese el RUT sin puntos y con guión",
+                        style = TextStyle(color = Color.Gray, fontSize = 12.sp), // Estilo del texto
+                        modifier = Modifier.padding(top = 4.dp) // Espaciado entre el campo y el mensaje
+                    )
+                }
 
                 // Campo para el correo electrónico
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Correo Electrónico") },
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
+                        .focusRequester(focusRequesterEmail),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { focusRequesterNVerificador.requestFocus()})
 
                 )
+
+                // Campo para el N°verificador
+                OutlinedTextField(
+                    value = numero,
+                    onValueChange = { numero = it },
+                    label = { Text("N° Registro Prestador de Salud") },
+                    modifier = Modifier.fillMaxWidth()
+                        .focusRequester(focusRequesterNVerificador),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = {  focusRequesterPassword.requestFocus() })
+                )
+
+
 
                 // Campo para la contraseña
                 OutlinedTextField(
@@ -231,8 +265,10 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
                     onValueChange = { password = it },
                     label = { Text("Contraseña") },
                     visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
+                        .focusRequester((focusRequesterPassword)),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { focusRequesterPasswordB.requestFocus() })
                 )
 
                 // Campo para confirmar la contraseña
@@ -241,15 +277,17 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
                     onValueChange = { confirmPassword = it },
                     label = { Text("Confirmar Contraseña") },
                     visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
+                        .focusRequester((focusRequesterPasswordB)),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = {focusRequesterButton.requestFocus() })
 
 
                 )
                 // Botón para seleccionar imágenes
                 Button(
                     onClick = { imagePickerLauncher.launch("image/*") },
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp) .focusRequester(focusRequesterButton)
                 ) {
                     Text("Seleccionar Imágenes")
                 }
@@ -336,41 +374,6 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
                 }
 
             }
-        }
-
-        // Mostrar mensajes según el estado
-        when (registerState) {
-            is DataState.Loading -> {
-                Text("Registrando...", color = Purple50)
-            }
-
-            is DataState.Success -> {
-                Text(
-                    "Registro exitoso. Tu cuenta será verificada en un plazo de 24 horas hábiles.",
-                    color = Purple80,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-            }
-
-            is DataState.Error -> {
-                Text(
-                    "Error: ${(registerState as DataState.Error).e}",
-                    color = Color.Red,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-            }
-
-            DataState.Finished -> {
-                Text(
-                    "Proceso finalizado",
-                    color = Purple80,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-            }
-            DataState.Idle -> {} // Agregar esta rama
         }
     }
 }

@@ -48,13 +48,12 @@ import com.example.conectadamente.ui.viewModel.PatientProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel(), navController: NavController) {
-    // Cargar datos del paciente actual al cargar la pantalla
+fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel(), navController: NavController, navigateToEditProfile: () -> Unit) {
+
     LaunchedEffect(Unit) {
         viewModel.fetchCurrentPatientData()
     }
 
-    // Obteniendo estados desde el ViewModel
     val patientData by viewModel.patientData.observeAsState(initial = null)
     val error by viewModel.error.observeAsState(initial = null)
 
@@ -88,33 +87,34 @@ fun PerfilUsuarioScreen(viewModel: PatientProfileViewModel = hiltViewModel(), na
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
-                patientData != null -> ProfileCard(patientData!!)
+                patientData != null -> ProfileCard(patient = patientData!!, navigateToEditProfile = navigateToEditProfile)
                 else -> CircularProgressIndicator(Modifier.align(Alignment.Center))
             }
         }
     }
 }
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun ProfileCard(patient: PatientModel) {
+fun ProfileCard(patient: PatientModel, navigateToEditProfile: () -> Unit) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Column(
             modifier = Modifier
-                .padding(24.dp)
+                .padding(32.dp)
                 .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = "Perfil de Usuario",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    color = MaterialTheme.colorScheme.primary
+                text = "Mi Perfil",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             )
 
@@ -123,8 +123,8 @@ fun ProfileCard(patient: PatientModel) {
                 contentDescription = "Nombre",
                 text = "Nombre: ${patient.name}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 20.sp
-            )
+                    fontSize = 18.sp
+                )
             )
 
             ProfileDetailRow(
@@ -132,37 +132,41 @@ fun ProfileCard(patient: PatientModel) {
                 contentDescription = "Email",
                 text = "Email: ${patient.email}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 20.sp
+                    fontSize = 18.sp
                 )
             )
+
             ProfileDetailRow(
                 icon = Icons.Default.LocationOn,
                 contentDescription = "Región",
                 text = "Región: ${if (patient.region.isNullOrEmpty()) "No disponible" else patient.region}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 20.sp
+                    fontSize = 18.sp
+                )
             )
-            )
+
             ProfileDetailRow(
                 icon = Icons.Default.Business,
                 contentDescription = "Ciudad",
                 text = "Ciudad: ${if (patient.city.isNullOrEmpty()) "No disponible" else patient.city}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 20.sp
+                    fontSize = 18.sp
+                )
             )
-            )
+
             ProfileDetailRow(
                 icon = Icons.Default.Cake,
                 contentDescription = "Fecha de Nacimiento",
                 text = "Fecha de Nacimiento: ${if (patient.birthDate.isNullOrEmpty()) "No disponible" else patient.birthDate}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 20.sp
+                    fontSize = 18.sp
                 )
             )
 
+            Spacer(modifier = Modifier.padding(top = 20.dp))
             // Botón para navegar a la pantalla de edición
             Button(
-                onClick = {},
+                onClick = { navigateToEditProfile() },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text("Editar Perfil")
@@ -176,10 +180,11 @@ fun ProfileDetailRow(
     icon: ImageVector,
     contentDescription: String,
     text: String,
-    textStyle: TextStyle = MaterialTheme.typography.bodyMedium
+    textStyle: TextStyle
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Icon(
             imageVector = icon,
@@ -192,7 +197,8 @@ fun ProfileDetailRow(
             text = text,
             style = textStyle.copy(
                 color = MaterialTheme.colorScheme.onSurface
-            )
+            ),
+            modifier = Modifier.weight(1f)
         )
     }
 }

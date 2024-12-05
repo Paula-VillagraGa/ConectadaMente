@@ -11,7 +11,7 @@ val Purple60 = Color(0xFF8F7FB9)
 val Purple70 = Color(0xFFD896FF)
 val Purple80 = Color(0xFFB57EDC)
 
-
+val PurpleDark10= Color(0xFF2F014B)
 
 val Blue10 = Color(0xFF6E91C0)
 val Blue20= Color(0xFF6E7CB2)
