@@ -10,17 +10,22 @@ import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.data.repository.AuthPsychoRepository
 import com.example.conectadamente.data.repository.reviews.ReviewRepository
 import com.example.conectadamente.utils.constants.DataState
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
 class PsychoAuthViewModel @Inject constructor(
     private val authPsychoRepository: AuthPsychoRepository,
     private val reviewRepository: ReviewRepository,
+    val firestore: FirebaseFirestore
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<DataState<String>>(DataState.Finished)
@@ -102,5 +107,33 @@ class PsychoAuthViewModel @Inject constructor(
                 }
             }
         }
+    //Update
+    fun updateProfile(
+        phone: String,
+        description: String,
+        experience: String,
+        specializations: List<String>,
+        imageUri: Uri?
+    ) {
+        viewModelScope.launch {
+            val psychoId = FirebaseAuth.getInstance().currentUser?.uid
+            psychoId?.let {
+                val profileData = mapOf(
+                    "phone" to phone,
+                    "descriptionPsycho" to description,
+                    "experience" to experience,
+                    "specialization" to specializations
+                )
+                firestore.collection("psychos").document(it).update(profileData)
+                imageUri?.let { uri ->
+                    val storageRef = FirebaseStorage.getInstance().reference.child("profile_pictures/$it.jpg")
+                    storageRef.putFile(uri).await()
+                    val downloadUrl = storageRef.downloadUrl.await().toString()
+                    firestore.collection("psychos").document(it).update("photoUrl", downloadUrl)
+                }
+            }
+        }
     }
+
+}
 

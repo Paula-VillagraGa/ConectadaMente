@@ -19,6 +19,7 @@ import com.example.conectadamente.ui.authPsicologo.PsychoSignInScreen
 import com.example.conectadamente.ui.authPsicologo.PsychologistLoginScreen
 import com.example.conectadamente.ui.authPsicologo.RegisterPsychoScreen
 import com.example.conectadamente.ui.homePsycho.ChatPsychoScreen
+import com.example.conectadamente.ui.homePsycho.EditPsychoProfileScreen
 import com.example.conectadamente.ui.homePsycho.PsychoHomeScreen
 import com.example.conectadamente.ui.homeUser.ProfilePsyFromPatScreen
 import com.example.conectadamente.ui.homePsycho.PsychoProfileScreen
@@ -112,7 +113,11 @@ fun AppNavigation() {
 
             //Perfil de Psicologo Current
             composable(NavScreen.PsychoProfile.route){
-                PsychoProfileScreen()
+                PsychoProfileScreen(navController)
+            }
+
+            composable(NavScreen.PsychoEdit.route){
+                EditPsychoProfileScreen(navController = navController)
             }
             //Home de psicologo
             composable(NavScreen.PsychoHome.route){
