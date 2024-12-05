@@ -64,6 +64,7 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel = hiltViewModel(),  navig
     val focusRequesterEmail = FocusRequester()
     val focusRequesterPassword = FocusRequester()
     val focusRequesterPasswordB = FocusRequester()
+    val focusRequesterButton = FocusRequester()
 
     val rutFocused = remember { mutableStateOf(false) }
 
@@ -221,7 +222,7 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel = hiltViewModel(),  navig
                     modifier = Modifier.fillMaxWidth()
                         .focusRequester((focusRequesterPasswordB)),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                    keyboardActions = KeyboardActions(onNext = { })
+                    keyboardActions = KeyboardActions(onNext = { focusRequesterButton.requestFocus()})
                 )
 
                 // Botón de registro
@@ -244,7 +245,8 @@ fun RegisterPatientScreen(viewModel: UserAuthViewModel = hiltViewModel(),  navig
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp),
+                        .padding(top = 16.dp)
+                        .focusRequester(focusRequesterButton),
                     colors = ButtonDefaults.buttonColors(containerColor = Purple50)
                 ) {
                     Text("Registrar")

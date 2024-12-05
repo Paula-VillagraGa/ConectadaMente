@@ -75,6 +75,7 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
     val focusRequesterNVerificador = FocusRequester()
     val focusRequesterPassword = FocusRequester()
     val focusRequesterPasswordB = FocusRequester()
+    val focusRequesterButton = FocusRequester()
 
     val rutFocused = remember { mutableStateOf(false) }
 
@@ -279,14 +280,14 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
                     modifier = Modifier.fillMaxWidth()
                         .focusRequester((focusRequesterPasswordB)),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                    keyboardActions = KeyboardActions(onNext = { })
+                    keyboardActions = KeyboardActions(onNext = {focusRequesterButton.requestFocus() })
 
 
                 )
                 // Botón para seleccionar imágenes
                 Button(
                     onClick = { imagePickerLauncher.launch("image/*") },
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp) .focusRequester(focusRequesterButton)
                 ) {
                     Text("Seleccionar Imágenes")
                 }
