@@ -251,20 +251,20 @@ fun ContentSection(navController: NavHostController) {
                 title = "",
                 subtitle = "Lecturas Recomendadas",
                 imageRes = R.drawable.leer2,
-                onClick = {  navController.navigate(NavScreen.BookRecommendations.route) },
+                onClick = { navController.navigate(NavScreen.BookRecommendations.route) },
                 modifier = Modifier
-                    .weight(0.5f)
-                    .height(200.dp),
+                    .weight(0.6f)
+                    .height(250.dp),
                 color = Purple20
             )
-            SupportCardC(
+            SupportCard(
                 title = "Título 2",
-                subtitle = "Ciencia y Salud Mental",
-                imageRes = R.drawable.cientifico,
-                onClick = {  },
+                subtitle = "Números de emergencia",
+                imageRes = R.drawable.telefono_inteligente,
+                onClick = { navController.navigate(NavScreen.CallSosRecommendations.route) },
                 modifier = Modifier
-                    .height(200.dp)
-                    .weight(0.8f),
+                    .height(250.dp)
+                    .weight(0.7f),
                 color = Purple30
             )
         }
@@ -276,14 +276,14 @@ fun ContentSection(navController: NavHostController) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SupportCardC(
+            SupportCard(
                 title = "Título 3",
                 subtitle = "Ciencia y Salud Mental",
                 imageRes = R.drawable.laboratory,
-                onClick = {  navController.navigate(NavScreen.ArticlesRecommendations.route)},
+                onClick = { navController.navigate(NavScreen.ArticlesRecommendations.route) },
                 modifier = Modifier
                     .weight(0.6f)
-                    .height(200.dp),
+                    .height(250.dp),
                 color = Purple60
             )
             SupportCard(
@@ -293,26 +293,13 @@ fun ContentSection(navController: NavHostController) {
                 onClick = { },
                 modifier = Modifier
                     .weight(0.5f)
-                    .height(200.dp),
+                    .height(250.dp),
                 color = Purple50
             )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Tarjeta larga inferior
-        SupportCardB(
-            title = "Contactos de emergencia",
-            subtitle = "",
-            imageRes = R.drawable.telefono_inteligente,
-            onClick = { navController.navigate(NavScreen.CallSosRecommendations.route) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp),
-            color = Purple20
-        )
     }
 }
+
 
 @Composable
 fun SupportCard(

@@ -196,7 +196,7 @@ fun ProfilePsyFromPatScreen(
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold
                             )
-                            if (psycho.specialization.isEmpty()) {
+                            if (psycho.specialization.isNullOrEmpty()) {
                                 Text(
                                     text = "Sin especialización disponible",
                                     style = MaterialTheme.typography.bodyLarge

@@ -141,12 +141,15 @@ fun AppNavigation() {
             composable(NavScreen.Formativo.route) { FormativoUsuarioScreen(navController) }
 
             //Recomendaciones
+            //pa que lean un poquito ;)
             composable(NavScreen.BookRecommendations.route) {
                 BookRecommendations(navController)
             }
+            //articulos cientificos :B
             composable(NavScreen.ArticlesRecommendations.route) {
                 ArticleScreen(navController)
             }
+            //números sos
             composable(NavScreen.CallSosRecommendations.route) {
                 SosDialCardScreen(navController)
             }
