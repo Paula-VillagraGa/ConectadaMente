@@ -198,8 +198,10 @@ class AuthPsychoRepository @Inject constructor() {
                     PsychoModel(
                         id = document.getString("id") ?: "",
                         name = document.getString("name") ?: "",
+                        descriptionPsycho = document.getString("descriptionPsycho") ?: "",
                         tagsSpecific = tagsSpecific, // Usamos las etiquetas de cada psicólogo
-                        rating = document.getDouble("rating") ?: 0.0
+                        rating = document.getDouble("rating") ?: 0.0,
+                        photoUrl = document.getString("photoUrl")
                     )
                 } else {
                     null

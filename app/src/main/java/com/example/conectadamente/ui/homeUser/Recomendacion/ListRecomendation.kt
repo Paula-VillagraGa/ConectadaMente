@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.conectadamente.R
 import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.ui.homeUser.SearchField
@@ -57,16 +60,22 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
     // Usamos hiltViewModel para obtener el ViewModel
     val viewModel: BuscarPorTagViewModel = hiltViewModel()
 
-    // Estado para la etiqueta seleccionada (inicialmente es la que llega como argumento)
-    val selectedTag = remember { mutableStateOf(tag) }
-    // Llamamos a la función del ViewModel para filtrar los psicólogos por la etiqueta (tag)
-    LaunchedEffect(selectedTag.value) {
-        viewModel.tagsQuery.value = listOf(selectedTag.value)  // Establecemos la etiqueta para la búsqueda
-        viewModel.searchPsychologists()  // Realizamos la búsqueda por etiquetas
+    // Estado para la especialización seleccionada
+    val selectedSpecialization = remember { mutableStateOf<String?>(null) }
+
+    // Llamamos a la función del ViewModel para filtrar los psicólogos por la etiqueta (tag) y especialización
+    LaunchedEffect(tag, selectedSpecialization.value) {
+        // Establecemos la etiqueta para la búsqueda
+        viewModel.tagsQuery.value = listOf(tag)
+        // Establecemos la especialización si está seleccionada
+        viewModel.specializationQuery.value = selectedSpecialization.value?.let { listOf(it) } ?: emptyList()
+        // Realizamos la búsqueda
+        viewModel.searchPsychologists()
     }
 
     // Obtenemos la lista de psicólogos filtrados
     val filteredPsychologists = viewModel.filteredPsychologists
+
     Scaffold(
         topBar = { com.example.conectadamente.ui.homeUser.Recomendacion.TopAppBar() },
     ) { paddingValues ->
@@ -81,14 +90,11 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
                     .fillMaxSize()
                     .background(Color(0xFFEFEFEF))
             ) {
-                // Fila horizontal con las etiquetas disponibles para selección
-                // Fila de etiquetas para seleccionar
-                val tags = listOf(
-                    "necesito psicólogo", "falta de sueño", "falta de apetito", "problemas con amigos",
-                    "ansiedad", "estrés laboral", "problemas de pareja", "soledad",
-                    "baja autoestima", "miedo", "ira", "agotamiento emocional",
-                    "dificultad de concentración", "inseguridad", "desmotivación",
-                    "preocupación constante", "culpa", "falta de sentido", "crisis de identidad"
+                // Fila horizontal con las especializaciones disponibles para selección
+                val specializations = listOf(
+                    "Clinica", "Infantil", "Forense", "Organizacional", "Educacional", "Salud", "Deportiva",
+                    "Social", "Comunicatorio", "Neuropsicológica", "Terapéutica", "Psicoterapia", "Sexualidad",
+                    "Envejecimiento", "Duelo", "Humanista", "Integrativa"
                 )
 
                 LazyRow(
@@ -96,25 +102,15 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
                         .fillMaxWidth()
                         .padding(8.dp)
                 ) {
-                    items(tags) { tag ->
-                        val isSelected = tag == selectedTag.value
-                        Box(
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(
-                                    if (isSelected) Color(0xFF1980E6) else Color(0xFFF0F2F4)
-                                )
-                                .clickable { selectedTag.value = tag }
-                                .padding(horizontal = 12.dp, vertical = 8.dp)
-                        ) {
-                            Text(
-                                text = tag,
-                                color = if (isSelected) Color.White else Color.Black,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
+                    items(specializations) { specialization ->
+                        val isSelected = specialization == selectedSpecialization.value
+                        FilterChip(
+                            text = specialization,
+                            isSelected = isSelected,
+                            onClick = {
+                                selectedSpecialization.value = if (isSelected) null else specialization
+                            }
+                        )
                     }
                 }
 
@@ -144,7 +140,17 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
                                         .size(56.dp)
                                         .clip(CircleShape)
                                         .background(Color.Gray) // Aquí puedes reemplazar con una imagen de perfil
-                                )
+                                ) {
+                                    AsyncImage(
+                                        model = ImageRequest.Builder(LocalContext.current)
+                                            .data(psicologo.photoUrl)
+                                            .crossfade(true)
+                                            .build(),
+                                        contentDescription = "Imagen de Psicólogo",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Column {
                                     Text(
@@ -154,7 +160,7 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
                                         color = Color.Black
                                     )
                                     Text(
-                                        text = psicologo.tagsSpecific?.joinToString(", ") ?: "",
+                                        text = psicologo.specialization?.joinToString(", ") ?: "",
                                         fontSize = 14.sp,
                                         color = Color.Gray
                                     )
@@ -168,7 +174,7 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
     }
 }
 
-// Composable para los filtros de etiquetas
+// Composable para los filtros de especialización
 @Composable
 fun FilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
     Box(
@@ -186,4 +192,5 @@ fun FilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
         )
     }
 }
+
 

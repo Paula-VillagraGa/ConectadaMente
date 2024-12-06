@@ -28,7 +28,6 @@ import com.example.conectadamente.ui.homeUser.ProfilePsyFromPatScreen
 import com.example.conectadamente.ui.homePsycho.PsychoProfileScreen
 import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
 import com.example.conectadamente.ui.homeUser.EditProfilePatientScreen
-import com.example.conectadamente.ui.homeUser.FormativoUsuarioScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
 import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
 import com.example.conectadamente.ui.homeUser.Recomendacion.BuscarPorTagScreen
@@ -165,7 +164,7 @@ fun AppNavigation() {
 
 
 
-            composable(NavScreen.Formativo.route) { FormativoUsuarioScreen(navController) }
+
 
             //Recomendaciones
             //pa que lean un poquito ;)

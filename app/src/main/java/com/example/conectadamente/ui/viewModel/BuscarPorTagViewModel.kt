@@ -16,6 +16,7 @@ class BuscarPorTagViewModel @Inject constructor(
 ) : ViewModel() {
     var psychologists = mutableStateOf<List<PsychoModel>>(emptyList())
     var tagsQuery = mutableStateOf<List<String>>(emptyList())
+    var specializationQuery = mutableStateOf<List<String>>(emptyList())
 
     init {
         // Si se desea obtener todos los psicólogos inicialmente sin filtro, se puede usar esto
@@ -28,12 +29,27 @@ class BuscarPorTagViewModel @Inject constructor(
         }
     }
 
-    // Esta función permite obtener los psicólogos filtrados por las etiquetas específicas
+
+    // Esta función permite obtener los psicólogos filtrados por tags y especializaciones
     fun searchPsychologists() {
         viewModelScope.launch {
-            if (tagsQuery.value.isNotEmpty()) {
-                psychologists.value = authPsychoRepository.getPsychosByTagsSpecific(tagsQuery.value)
+            // Filtra primero por tags
+            var filteredList = if (tagsQuery.value.isNotEmpty()) {
+                authPsychoRepository.getPsychosByTagsSpecific(tagsQuery.value)
+            } else {
+                authPsychoRepository.getPsychologists() // Obtiene todos los psicólogos si no hay filtro
             }
+
+            // Ahora, filtra por especializaciones
+            if (specializationQuery.value.isNotEmpty()) {
+                filteredList = filteredList.filter { psycho ->
+                    psycho.specialization?.any { specialization ->
+                        specializationQuery.value.contains(specialization)
+                    } == true
+                }
+            }
+
+            psychologists.value = filteredList
         }
     }
 

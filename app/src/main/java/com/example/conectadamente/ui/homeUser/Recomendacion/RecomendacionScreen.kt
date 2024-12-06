@@ -161,6 +161,12 @@ fun RecomendacionScreen(navController: NavHostController) {
                                     delay(4000) // Simular tiempo de espera de 4 segundos
                                     makePrediction(inputText.value, apiService, resultText, context)
                                     isLoading.value = false // Desactivar indicador de carga
+                                    // Realizar la navegación automáticamente después de 4 segundos
+                                    if (resultText.value.isNotEmpty()) {
+                                        navController.navigate("${NavScreen.ListRecomendation.route}/${resultText.value}")
+                                    } else {
+                                        Toast.makeText(context, "No hay predicción para buscar", Toast.LENGTH_SHORT).show()
+                                    }
                                 }
                             } else {
                                 Toast.makeText(
@@ -187,27 +193,6 @@ fun RecomendacionScreen(navController: NavHostController) {
                             color = Purple30
                         )
                     }
-
-                    Button(
-                        onClick = {
-                            if (resultText.value.isNotEmpty()) {
-                                navController.navigate("${NavScreen.ListRecomendation.route}/${resultText.value}")
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "No hay predicción para buscar",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(24.dp)),
-                        colors = ButtonDefaults.buttonColors(containerColor = Purple30),
-                        enabled = !isLoading.value // Deshabilitar mientras se carga
-                    ) {
-                        Text("Buscar Psicólogos")
-                    }
                 }
 
                 // Resultado y advertencia
@@ -215,13 +200,6 @@ fun RecomendacionScreen(navController: NavHostController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "Resultado: ${resultText.value}",
-                        fontSize = 16.sp,
-                        color = Color(0xFF1C160C),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 30.dp, bottom = 80.dp)
-                    )
                     Text(
                         text = "Warning: Esto es una aplicación de prueba y la predicción puede tener errores",
                         fontSize = 14.sp,
@@ -234,6 +212,7 @@ fun RecomendacionScreen(navController: NavHostController) {
         }
     }
 }
+
 // Datos de entrada para la petición
 data class InputData(val text: String)
 
