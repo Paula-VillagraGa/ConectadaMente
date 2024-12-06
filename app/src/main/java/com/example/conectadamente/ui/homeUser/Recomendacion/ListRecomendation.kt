@@ -19,6 +19,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -68,7 +70,8 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
         // Establecemos la etiqueta para la búsqueda
         viewModel.tagsQuery.value = listOf(tag)
         // Establecemos la especialización si está seleccionada
-        viewModel.specializationQuery.value = selectedSpecialization.value?.let { listOf(it) } ?: emptyList()
+        viewModel.specializationQuery.value =
+            selectedSpecialization.value?.let { listOf(it) } ?: emptyList()
         // Realizamos la búsqueda
         viewModel.searchPsychologists()
     }
@@ -92,9 +95,23 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
             ) {
                 // Fila horizontal con las especializaciones disponibles para selección
                 val specializations = listOf(
-                    "Clinica", "Infantil", "Forense", "Organizacional", "Educacional", "Salud", "Deportiva",
-                    "Social", "Comunicatorio", "Neuropsicológica", "Terapéutica", "Psicoterapia", "Sexualidad",
-                    "Envejecimiento", "Duelo", "Humanista", "Integrativa"
+                    "Clinica",
+                    "Infantil",
+                    "Forense",
+                    "Organizacional",
+                    "Educacional",
+                    "Salud",
+                    "Deportiva",
+                    "Social",
+                    "Comunicatorio",
+                    "Neuropsicológica",
+                    "Terapéutica",
+                    "Psicoterapia",
+                    "Sexualidad",
+                    "Envejecimiento",
+                    "Duelo",
+                    "Humanista",
+                    "Integrativa"
                 )
 
                 LazyRow(
@@ -108,62 +125,77 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
                             text = specialization,
                             isSelected = isSelected,
                             onClick = {
-                                selectedSpecialization.value = if (isSelected) null else specialization
+                                selectedSpecialization.value =
+                                    if (isSelected) null else specialization
                             }
                         )
                     }
                 }
 
                 // Mostrar los psicólogos filtrados
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(filteredPsychologists) { psicologo ->
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                                .clickable {
-                                    // Navegar al detalle del psicólogo
-                                    navController.navigate("detallePsicologo/${psicologo.id}")
-                                }
-                                .background(
-                                    color = Color.White,
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .shadow(4.dp, RoundedCornerShape(12.dp))
-                        ) {
-                            Row(
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
+                    if (filteredPsychologists.isEmpty()) {
+                        item {
+                            Text(
+                                text = "No hay psicólogos disponibles.",
                                 modifier = Modifier.padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.Gray
+                            )
+                        }
+                    } else {
+                        items(filteredPsychologists) { psicologo ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    .clickable {
+                                        // Navegar al detalle del psicólogo
+                                        navController.navigate("profile/${psicologo.id}")
+                                    },
+                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color.White)
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(56.dp)
-                                        .clip(CircleShape)
-                                        .background(Color.Gray) // Aquí puedes reemplazar con una imagen de perfil
+                                Row(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    AsyncImage(
-                                        model = ImageRequest.Builder(LocalContext.current)
-                                            .data(psicologo.photoUrl)
-                                            .crossfade(true)
-                                            .build(),
-                                        contentDescription = "Imagen de Psicólogo",
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Column {
-                                    Text(
-                                        text = psicologo.name,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 16.sp,
-                                        color = Color.Black
-                                    )
-                                    Text(
-                                        text = psicologo.specialization?.joinToString(", ") ?: "",
-                                        fontSize = 14.sp,
-                                        color = Color.Gray
-                                    )
+                                    // Imagen del psicólogo
+                                    Box(
+                                        modifier = Modifier
+                                            .size(56.dp)
+                                            .clip(CircleShape)
+                                            .background(Color.Gray)
+                                    ) {
+                                        AsyncImage(
+                                            model = ImageRequest.Builder(LocalContext.current)
+                                                .data(psicologo.photoUrl)
+                                                .crossfade(true)
+                                                .build(),
+                                            contentDescription = "Imagen de Psicólogo",
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Column {
+                                        Text(
+                                            text = psicologo.name,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 16.sp,
+                                            color = Color.Black
+                                        )
+                                        Text(
+                                            text = psicologo.specialization?.joinToString(", ")
+                                                ?: "",
+                                            fontSize = 14.sp,
+                                            color = Color.Gray
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -173,7 +205,6 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
         }
     }
 }
-
 // Composable para los filtros de especialización
 @Composable
 fun FilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
@@ -192,5 +223,6 @@ fun FilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
         )
     }
 }
+
 
 
