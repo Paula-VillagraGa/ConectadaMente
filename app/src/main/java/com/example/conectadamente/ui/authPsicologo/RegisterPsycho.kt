@@ -49,9 +49,9 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.conectadamente.R
 import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.ui.theme.PoppinsFontFamily
-import com.example.conectadamente.ui.theme.*
+import com.example.conectadamente.ui.theme.Purple30
+import com.example.conectadamente.ui.theme.Purple50
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
-import com.example.conectadamente.utils.constants.DataState
 import com.example.conectadamente.utils.getImageSize
 import com.example.conectadamente.utils.validateRegistrationData
 
