@@ -127,7 +127,7 @@ fun RecomendacionScreen(navController: NavHostController) {
                                 "Para ello, utilizamos un avanzado algoritmo basado en procesamiento de lenguaje natural (NLTK), " +
                                 "que analiza cuidadosamente el texto que compartes. Este algoritmo identifica patrones en tus palabras y," +
                                 " con base en ellos, predice una etiqueta que refleja tus principales preocupaciones o necesidades emocionales",
-                        fontSize = 10.sp,
+                        fontSize = 14.sp,
                         color = Color(0xFF1C160C),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(bottom = 16.dp)

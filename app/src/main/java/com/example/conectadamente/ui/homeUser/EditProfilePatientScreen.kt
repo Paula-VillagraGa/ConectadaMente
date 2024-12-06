@@ -127,36 +127,6 @@ fun EditProfilePatientScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Componente de selección de región
-            RegionDropdown(
-                region = region,
-                onRegionSelected = { selectedRegion ->
-                    region = selectedRegion
-                },
-                regions = regions
-            )
-
-            // Ciudad (Editable)
-            OutlinedTextField(
-                value = city ?: "",
-                onValueChange = { city = it },
-                label = { Text("Ciudad") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(4.dp, RoundedCornerShape(8.dp)),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                ),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Business,
-                        contentDescription = "Ciudad",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            )
 
             // Fecha de Nacimiento (Editable con DatePicker)
             OutlinedTextField(
@@ -192,6 +162,38 @@ fun EditProfilePatientScreen(
                     }
                 )
             }
+            // Componente de selección de región
+            RegionDropdown(
+                region = region,
+                onRegionSelected = { selectedRegion ->
+                    region = selectedRegion
+                },
+                regions = regions
+            )
+
+            // Ciudad (Editable)
+            OutlinedTextField(
+                value = city ?: "",
+                onValueChange = { city = it },
+                label = { Text("Ciudad") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(4.dp, RoundedCornerShape(8.dp)),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                ),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Business,
+                        contentDescription = "Ciudad",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            )
+
+
 
             Button(
                 onClick = {

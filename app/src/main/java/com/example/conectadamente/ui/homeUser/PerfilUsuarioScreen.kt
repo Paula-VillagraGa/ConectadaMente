@@ -135,6 +135,14 @@ fun ProfileCard(patient: PatientModel, navigateToEditProfile: () -> Unit) {
                     fontSize = 18.sp
                 )
             )
+            ProfileDetailRow(
+                icon = Icons.Default.Cake,
+                contentDescription = "Fecha de Nacimiento",
+                text = "Fecha de Nacimiento: ${if (patient.birthDate.isNullOrEmpty()) "No disponible" else patient.birthDate}",
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 18.sp
+                )
+            )
 
             ProfileDetailRow(
                 icon = Icons.Default.LocationOn,
@@ -149,15 +157,6 @@ fun ProfileCard(patient: PatientModel, navigateToEditProfile: () -> Unit) {
                 icon = Icons.Default.Business,
                 contentDescription = "Ciudad",
                 text = "Ciudad: ${if (patient.city.isNullOrEmpty()) "No disponible" else patient.city}",
-                textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 18.sp
-                )
-            )
-
-            ProfileDetailRow(
-                icon = Icons.Default.Cake,
-                contentDescription = "Fecha de Nacimiento",
-                text = "Fecha de Nacimiento: ${if (patient.birthDate.isNullOrEmpty()) "No disponible" else patient.birthDate}",
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
                     fontSize = 18.sp
                 )

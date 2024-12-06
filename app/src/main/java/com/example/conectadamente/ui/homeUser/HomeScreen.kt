@@ -191,7 +191,7 @@ fun SearchField(
     )
     if (showResults) {
         SearchResults(
-            psychologists = filteredResults,
+            psychologists = filteredResults.take(3),
             navController = navController
         )
     }
@@ -229,7 +229,7 @@ fun SearchResultCard(psychologist: PsychoModel, navController: NavHostController
             text = psychologist.name,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            color = Purple80
+            color = Purple50
         )
     }
 }

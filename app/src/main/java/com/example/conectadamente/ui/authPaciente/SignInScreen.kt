@@ -43,6 +43,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -75,6 +76,8 @@ fun SignInScreen(
 
     val viewModel: AuthViewModel = hiltViewModel()
     val loginState by viewModel.loginState.collectAsState()
+
+    val keyboardController = LocalSoftwareKeyboardController.current // Controlador del teclado
 
     Scaffold(
         modifier = Modifier.padding(0.dp),
@@ -209,6 +212,7 @@ fun SignInScreen(
                         ),
                         keyboardActions = KeyboardActions(
                             onDone = {
+                                keyboardController?.hide() // Ocultar teclado
                                 viewModel.handleLogin(email, password) // Iniciar sesión cuando se presiona "Done"
                             }
                         ),

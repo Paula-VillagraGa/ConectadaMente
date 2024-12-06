@@ -350,6 +350,17 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
                             viewModel.registerPsycho(psycho, password, selectedImages)
 
                             message = "Registro en proceso. Por favor, espera..."
+
+                            // Limpiar los campos
+                            name = ""
+                            rut = ""
+                            email = ""
+                            numero= ""
+                            password = ""
+                            confirmPassword = ""
+                            selectedImages = listOf()
+
+
                         } catch (e: IllegalArgumentException) {
                             message = e.message ?: "Error desconocido"
                         } catch (e: Exception) {
@@ -367,7 +378,7 @@ fun RegisterPsychoScreen(viewModel: PsychoAuthViewModel = hiltViewModel()) {
                 if (message.isNotBlank()) {
                     Text(
                         text = message,
-                        color = if (message.startsWith("Error")) Color.Red else Color.Green,
+                        color = if (message.startsWith("Error")) Color.Red else Color.Black,
                         modifier = Modifier.padding(top = 8.dp),
                         textAlign = TextAlign.Center
                     )
