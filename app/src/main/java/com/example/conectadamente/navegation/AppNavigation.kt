@@ -22,6 +22,7 @@ import com.example.conectadamente.ui.authPsicologo.PsychoSignInScreen
 import com.example.conectadamente.ui.authPsicologo.PsychologistLoginScreen
 import com.example.conectadamente.ui.authPsicologo.RegisterPsychoScreen
 import com.example.conectadamente.ui.homePsycho.ChatPsychoScreen
+import com.example.conectadamente.ui.homePsycho.DisponibilidadScreen
 import com.example.conectadamente.ui.homePsycho.EditPsychoProfileScreen
 import com.example.conectadamente.ui.homePsycho.PsychoHomeScreen
 import com.example.conectadamente.ui.homeUser.ProfilePsyFromPatScreen
@@ -115,7 +116,7 @@ fun AppNavigation() {
             }
             //Psicologo ->
 
-            //Perfil de Psicologo Current
+
             composable(NavScreen.PsychoProfile.route){
                 PsychoProfileScreen(navController)
             }
@@ -123,23 +124,23 @@ fun AppNavigation() {
             composable(NavScreen.PsychoEdit.route){
                 EditPsychoProfileScreen(navController = navController)
             }
-            //Home de psicologo
+
             composable(NavScreen.PsychoHome.route){
                 PsychoHomeScreen(navController)
             }
-            //Chat de psicologo
+
             composable(NavScreen.ChatPsycho.route){
                 ChatPsychoScreen(navController)
             }
-            //Perfil psicólogo desde paciente
+
             composable("profile/{psychologistId}") { backStackEntry ->
                 val psychologistId = backStackEntry.arguments?.getString("psychologistId")
                 ProfilePsyFromPatScreen(psychologistId = psychologistId, navController=navController)
             }
 
-            //Paciente Scaffold ->
+            //Paciente
             composable(NavScreen.Home.route) { HomeScreen(navController) }
-            //Perfil Paciente ->
+
             composable(NavScreen.Perfil.route) {PerfilUsuarioScreen(
                 navController = navController,
                 navigateToEditProfile = {
@@ -149,7 +150,7 @@ fun AppNavigation() {
             composable(NavScreen.Chat.route) { ChatUsuarioScreen(navController) }
             composable(NavScreen.Formativo.route) { RecomendacionScreen(navController) }
 
-            // Para la lista recomendada
+            // Recomendaciones
             composable(
                 route = "${NavScreen.ListRecomendation.route}/{tag}",
                 arguments = listOf(navArgument("tag") { type = NavType.StringType })
@@ -165,17 +166,21 @@ fun AppNavigation() {
 
 
 
+            //Agendar Citas
+            composable(NavScreen.DisponibilidadCalendario.route) {
+                DisponibilidadScreen(viewModel = hiltViewModel())
+            }
 
-            //Recomendaciones
-            //pa que lean un poquito ;)
+            //Recomendaciones para Paciente
+
             composable(NavScreen.BookRecommendations.route) {
                 BookRecommendations(navController)
             }
-            //articulos cientificos :B
+
             composable(NavScreen.ArticlesRecommendations.route) {
                 ArticleScreen(navController)
             }
-            //números sos
+
             composable(NavScreen.CallSosRecommendations.route) {
                 SosDialCardScreen(navController)
             }

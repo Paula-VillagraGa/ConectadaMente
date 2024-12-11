@@ -1,79 +1,171 @@
 package com.example.conectadamente.ui.homePsycho
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
+import androidx.compose.material.icons.*
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material3.*
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.unit.*
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.conectadamente.R
-import com.example.conectadamente.data.model.PsychoModel
-import com.example.conectadamente.ui.theme.Purple20
-import com.example.conectadamente.ui.theme.Purple30
-import com.example.conectadamente.ui.theme.Purple50
-import com.example.conectadamente.ui.theme.Purple60
-import com.example.conectadamente.ui.theme.Purple80
-import com.example.conectadamente.ui.viewModel.HomeUserViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.example.conectadamente.navegation.NavScreen
+import com.example.conectadamente.ui.theme.*
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PsychoHomeScreen(navController: NavHostController) {
+    // Habilitar la navegación hacia atrás
+    BackHandler {
+        navController.popBackStack() // Navega hacia atrás en el stack de navegación
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("Inicio Psicólogo", fontSize = 20.sp)
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Filled.ArrowBackIosNew, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            PsychologistHomeContent(navController)
+        }
+    }
+}
+@Composable
+fun PsychologistHomeContent(navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        // Fila superior con 2 tarjetas
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            SupportCard(
+                title = "Psicología Clínica",
+                subtitle = "Modificar Calendario",
+                imageRes = R.drawable.ico_recomen, // Cambia la imagen
+                onClick = { navController.navigate(NavScreen.DisponibilidadCalendario.route) },
+                modifier = Modifier
+                    .weight(0.6f)
+                    .height(250.dp),
+                color = Purple60
+            )
+            SupportCard(
+                title = "Terapias Online",
+                subtitle = "Sesiones Virtuales",
+                imageRes = R.drawable.ico_perfil, // Cambia la imagen
+                onClick = { /* Acción para terapias online */ },
+                modifier = Modifier
+                    .height(250.dp)
+                    .weight(0.7f),
+                color = Color(0xFFF1F8E9)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Fila del medio con 2 tarjetas
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            SupportCard(
+                title = "Terapia Infantil",
+                subtitle = "Para niños y adolescentes",
+                imageRes = R.drawable.ico_chat, // Cambia la imagen
+                onClick = { /* Acción para terapia infantil */ },
+                modifier = Modifier
+                    .weight(0.6f)
+                    .height(250.dp),
+                color = Color(0xFFFFF59D)
+            )
+            SupportCard(
+                title = "Mindfulness",
+                subtitle = "Enfoque en la meditación",
+                imageRes = R.drawable.ico_chat, // Cambia la imagen
+                onClick = { /* Acción para mindfulness */ },
+                modifier = Modifier
+                    .weight(0.5f)
+                    .height(250.dp),
+                    color = Purple30
+            )
+        }
+    }
+}
 
 @Composable
-fun PsychoHomeScreen(navController: NavHostController){
-    Column (
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ){
+fun SupportCard(
+    title: String,
+    subtitle: String,
+    imageRes: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    color: Color = Color(0xFFE9E7F3)
+) {
+    Column(
+        modifier = modifier
+            .background(color, RoundedCornerShape(16.dp))
+            .clickable { onClick() }
+            .padding(bottom = 10.dp)
+    ) {
         Image(
-            painter = painterResource(
-                id = R.drawable.ico_chat),
-            contentDescription = null)
-        Text(text = "Home")
+            painter = painterResource(id = imageRes),
+            contentDescription = title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth() // Ajusta la imagen al ancho disponible
+                .weight(1f)
+                .clip(RoundedCornerShape(12.dp))
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = subtitle,
+            color = Color.White,
+            fontSize = 14.sp,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PsychologistHomeContentPreview() {
+    // Usamos rememberNavController para emular la navegación, aunque no se está utilizando en el preview
+    val navController = rememberNavController()
+
+    // El colorScheme se puede definir para que tenga un tema claro en el preview
+    MaterialTheme(
+        colorScheme = lightColorScheme()
+    ) {
+        // Llamamos a PsychologistHomeContent, que es el composable que deseas previsualizar
+        PsychoHomeScreen(navController)
     }
 }

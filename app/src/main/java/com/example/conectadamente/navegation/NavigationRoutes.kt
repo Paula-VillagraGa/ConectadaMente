@@ -36,6 +36,9 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
     object ArticlesRecommendations : NavScreen("articles_recommendations", "Recomendaciones", null)
     object CallSosRecommendations : NavScreen("call_sos_recommendations", "Recomendaciones", null)
 
+    //Agendar citas
+    object DisponibilidadCalendario: NavScreen("disponibilidad_calendario", "Disponibilidad", null)
+
 }
 // Lista para navegación inferior
 val bottomNavItems = listOf(
