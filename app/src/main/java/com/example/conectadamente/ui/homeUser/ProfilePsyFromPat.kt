@@ -64,6 +64,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.conectadamente.R
 import com.example.conectadamente.data.model.PsychoModel
+import com.example.conectadamente.navegation.NavScreen
 import com.example.conectadamente.ui.theme.Gray50
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.ui.viewModel.reviews.ReviewViewModel
@@ -76,6 +77,9 @@ fun ProfilePsyFromPatScreen(
     psychologistId: String?,
     navController: NavController
 ) {
+
+    val patientId = FirebaseAuth.getInstance().currentUser?.uid
+
     // Estados y ViewModels
     val snackbarHostState = remember { SnackbarHostState() }
     val reviewViewModel: ReviewViewModel = hiltViewModel()
@@ -224,11 +228,19 @@ fun ProfileSection(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            OutlinedButton(onClick = { psychologistId?.let { navController.navigate("scheduleAppointment/$it") } }) {
+            OutlinedButton(onClick = {
+                val patientId = FirebaseAuth.getInstance().currentUser?.uid // Obtener el ID del paciente
+                if (psychologistId != null && patientId != null) {
+                    navController.navigate("agendarCita/${psychologistId}/${patientId}") // Navegar a la pantalla de agendar con los dos IDs
+                } else {
+                    // Si no se puede obtener el patientId o el psychologistId, mostrar un mensaje o manejar el error
+                }
+            }) {
                 Icon(Icons.Default.CalendarToday, contentDescription = null)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text("Agendar cita")
             }
+
             OutlinedButton(onClick = { psychologistId?.let { navController.navigate("chatWithPsychologist/$it") } }) {
                 Icon(Icons.Default.Chat, contentDescription = null)
                 Spacer(modifier = Modifier.width(4.dp))

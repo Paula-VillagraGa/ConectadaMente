@@ -75,6 +75,10 @@ dependencies {
     //Coil para imagenes
     implementation("io.coil-kt:coil-compose:2.4.0")
 
+    //Calendar
+    implementation ("com.himanshoe:kalendar:1.1.0")
+
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -112,6 +116,7 @@ dependencies {
     implementation(libs.androidx.navigation.safe.args.generator)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.storage)
+    implementation(libs.androidx.foundation.android)
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
 

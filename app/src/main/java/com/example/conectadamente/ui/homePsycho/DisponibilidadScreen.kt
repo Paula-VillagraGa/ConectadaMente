@@ -24,7 +24,7 @@ fun DisponibilidadScreen(viewModel: DisponibilidadViewModel) {
     val horaFin = remember { mutableStateOf("") }
     val estado = viewModel.estado.collectAsState()
 
-    val userId = viewModel.obtenerIdUsuarioActual()
+    val psychoId = viewModel.obtenerIdUsuarioActual()
 
     // Fondo y espaciado general
     Column(
@@ -73,7 +73,7 @@ fun DisponibilidadScreen(viewModel: DisponibilidadViewModel) {
                     fechaSeleccionada.value,
                     horaInicio.value,
                     horaFin.value,
-                    userId
+                    psychoId
 
                 )
             },

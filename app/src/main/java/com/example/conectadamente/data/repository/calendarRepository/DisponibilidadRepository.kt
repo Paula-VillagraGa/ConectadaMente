@@ -16,17 +16,24 @@ class DisponibilidadRepositorio @Inject constructor() {
     }
 
     // Función para guardar la disponibilidad del usuario
-    suspend fun guardarDisponibilidad(fecha: String, horaInicio: String, horaFin: String, userId: String): String {
+    suspend fun guardarDisponibilidad(
+        fecha: String,
+        horaInicio: String,
+        horaFin: String,
+        psychoId: String,
+        s: String
+    ): String {
         return try {
             val availability = hashMapOf(
                 "fecha" to fecha,
                 "horaInicio" to horaInicio,
                 "horaFin" to horaFin,
-                "userId" to userId
+                "psychoId" to psychoId,
+                "estado" to "disponible" //predeterminado
             )
 
             // Guardar la disponibilidad en Firestore
-            val result = db.collection("availability")
+            db.collection("availability")
                 .add(availability)
                 .await() // Utilizamos await() para hacer esta operación de forma asincrónica
 

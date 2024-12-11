@@ -38,6 +38,7 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
 
     //Agendar citas
     object DisponibilidadCalendario: NavScreen("disponibilidad_calendario", "Disponibilidad", null)
+    object AgendarCita: NavScreen("agendar_cita", "Agendar Cita", null)
 
 }
 // Lista para navegación inferior

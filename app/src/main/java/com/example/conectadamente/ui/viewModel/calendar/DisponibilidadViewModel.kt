@@ -27,10 +27,16 @@ class DisponibilidadViewModel @Inject constructor(
         // Pasa la fecha seleccionada al callback `onFechaSeleccionada`
     }
 
-    fun guardarDisponibilidad(fecha: String, inicioHora: String, finHora: String, userId: String) {
+    fun guardarDisponibilidad(
+        fecha: String,
+        inicioHora: String,
+        finHora: String,
+        psychoId: String
+    ) {
         viewModelScope.launch {
             try {
-                repository.guardarDisponibilidad(fecha, inicioHora, finHora, userId)
+                // Agregar campo de estado inicial "disponible"
+                repository.guardarDisponibilidad(fecha, inicioHora, finHora, psychoId, "disponible")
                 _estado.value = "Disponibilidad guardada exitosamente"
             } catch (e: Exception) {
                 _estado.value = "Error al guardar disponibilidad: ${e.message}"

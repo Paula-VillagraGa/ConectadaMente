@@ -33,6 +33,7 @@ import com.example.conectadamente.ui.homeUser.HomeScreen
 import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
 import com.example.conectadamente.ui.homeUser.Recomendacion.BuscarPorTagScreen
 import com.example.conectadamente.ui.homeUser.Recomendacion.RecomendacionScreen
+import com.example.conectadamente.ui.homeUser.calendar.AgendarScreen
 import com.example.conectadamente.ui.viewModel.BuscarPorTagViewModel
 import com.example.conectadamente.ui.homeUser.recommendationsPatient.ArticleScreen
 import com.example.conectadamente.ui.homeUser.recommendationsPatient.BookRecommendations
@@ -170,6 +171,12 @@ fun AppNavigation() {
             composable(NavScreen.DisponibilidadCalendario.route) {
                 DisponibilidadScreen(viewModel = hiltViewModel())
             }
+            composable("agendarCita/{psychoId}/{patientId}") { backStackEntry ->
+                val psychoId = backStackEntry.arguments?.getString("psychoId") ?: ""
+                val patientId = backStackEntry.arguments?.getString("patientId") ?: ""
+                AgendarScreen(viewModel = hiltViewModel(), psychoId = psychoId, patientId = patientId)
+            }
+
 
             //Recomendaciones para Paciente
 
