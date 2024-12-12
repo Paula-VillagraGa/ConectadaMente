@@ -200,6 +200,7 @@ class AuthPsychoRepository @Inject constructor() {
                         name = document.getString("name") ?: "",
                         descriptionPsycho = document.getString("descriptionPsycho") ?: "",
                         tagsSpecific = tagsSpecific, // Usamos las etiquetas de cada psicólogo
+                        specialization = document.get("specialization") as? List<String> ?: emptyList(),
                         rating = document.getDouble("rating") ?: 0.0,
                         photoUrl = document.getString("photoUrl")
                     )
