@@ -1,11 +1,15 @@
 package com.example.conectadamente.ui.authPaciente
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +34,7 @@ fun LoginScreen(
     navigateToRegisterPatient: () -> Unit
 
 ) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,7 +96,62 @@ fun LoginScreen(
             Text(text = "Registrarse", style = TextStyle(color = Color.White, fontSize = 16.sp))
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // Icono de Instagram (PNG)
+        Row(
+            modifier = Modifier
+                .clickable {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("instagram.com/conectadamente.cl/"))
+                    context.startActivity(intent)
+                }
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_instagram), // Asegúrate de que ic_instagram.png esté en res/drawable
+                contentDescription = "Instagram",
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "conectadamente.cl",
+                style = TextStyle(color = Purple20, fontSize = 16.sp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Icono de Correo
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = {
+                    val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = Uri.parse("mailto:conectadamente.app@gmail.com")
+                        putExtra(Intent.EXTRA_SUBJECT, "Consulta sobre la aplicación ConectadaMente")
+                    }
+                    context.startActivity(emailIntent)
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_email), // Reemplaza con tu recurso de ícono
+                    contentDescription = "Correo",
+                    tint = Color(0xFF0072C6),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = "conectadamente.app@gmail.com",
+                style = TextStyle(color = Purple20, fontSize = 16.sp)
+            )
+        }
     }
 }
 @Composable
