@@ -3,6 +3,7 @@ package com.example.conectadamente.ui.homePsycho
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,12 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -37,9 +40,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.utils.constants.DataState
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,20 +61,40 @@ fun EditPsychoProfileScreen(
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     val specializations = listOf(
-        "Psicología Clínica",
-        "Psicología Educacional",
-        "Psicología Organizacional"
-    ) // Ejemplo de especializaciones
+        "Clinica",
+        "Infantil",
+        "Forense",
+        "Organizacional",
+        "Educacional",
+        "Salud",
+        "Deportiva",
+        "Social",
+        "Comunicatorio",
+        "Neuropsicológica",
+        "Terapéutica",
+        "Psicoterapia",
+        "Sexualidad",
+        "Envejecimiento",
+        "Duelo",
+        "Humanista",
+        "Integrativa"
+    )
+    val maxSelection = 3
 
-    // Usar un LaunchedEffect para cargar los datos cuando la pantalla se muestre
+    // Cargar automáticamente los datos del perfil al abrir la pantalla
+    LaunchedEffect(Unit) {
+        viewModel.loadProfile() // Llama al ViewModel para cargar el perfil
+    }
+
+    // Sincronizar los datos del perfil al estado del formulario
     LaunchedEffect(profileState) {
         if (profileState is DataState.Success) {
             val psycho = (profileState as DataState.Success).data
-            if (psycho != null) {
-                phone = psycho.phone ?: ""
-                description = psycho.descriptionPsycho ?: ""
-                experience = psycho.experience ?: ""
-                selectedSpecializations = psycho.specialization ?: listOf()
+            psycho?.let {
+                phone = it.phone.orEmpty()
+                description = it.descriptionPsycho.orEmpty()
+                experience = it.experience.orEmpty()
+                selectedSpecializations = it.specialization.orEmpty()
             }
         }
     }
@@ -119,59 +142,39 @@ fun EditPsychoProfileScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Especializaciones
-            Text("Especializaciones:")
-            LazyColumn {
+            // Especializaciones (Chips con límite de selección)
+            Text("Especializaciones (máximo 3):")
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 items(specializations) { spec ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Checkbox(
-                            checked = spec in selectedSpecializations,
-                            onCheckedChange = {
-                                selectedSpecializations = if (it) {
-                                    selectedSpecializations + spec
-                                } else {
-                                    selectedSpecializations - spec
-                                }
+                    val isSelected = spec in selectedSpecializations
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = {
+                            if (isSelected) {
+                                selectedSpecializations = selectedSpecializations - spec
+                            } else if (selectedSpecializations.size < maxSelection) {
+                                selectedSpecializations = selectedSpecializations + spec
                             }
-                        )
-                        Text(text = spec)
-                    }
+                        },
+                        label = { Text(text = spec) },
+                        modifier = Modifier.padding(4.dp)
+                    )
                 }
             }
 
-            // Botón para subir foto
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                    type = "image/*"
-                }
-                (context as Activity).startActivityForResult(intent, 1000)
-            }) {
-                Text("Subir Foto")
-            }
-
-            // Botón para guardar cambios
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-                val currentState = (profileState as? DataState.Success)?.data
                 viewModel.updateProfile(
-                    phone = phone.takeIf { it.isNotBlank() } ?: currentState?.phone.orEmpty(),
-                    description = description.takeIf { it.isNotBlank() }
-                        ?: currentState?.descriptionPsycho.orEmpty(),
-                    experience = experience.takeIf { it.isNotBlank() }
-                        ?: currentState?.experience.orEmpty(),
-                    specializations = if (selectedSpecializations.isNotEmpty()) selectedSpecializations else currentState?.specialization
-                        ?: listOf(),
+                    phone = phone,
+                    description = description,
+                    experience = experience,
+                    specializations = selectedSpecializations,
                     imageUri = imageUri
                 )
-
-                // Solo navega después de que la actualización se haya realizado correctamente
-                if (profileState is DataState.Success) {
-                    navController.popBackStack()
-                }
+                navController.popBackStack()
             }) {
                 Text("Guardar Cambios")
             }

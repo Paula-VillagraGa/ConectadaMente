@@ -19,3 +19,4 @@ data class PsychoModel(
     val photoUrl: String? = null
 )
 
+
