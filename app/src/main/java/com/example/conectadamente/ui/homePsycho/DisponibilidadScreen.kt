@@ -1,30 +1,48 @@
 package com.example.conectadamente.ui.homePsycho
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.conectadamente.ui.viewModel.calendar.DisponibilidadViewModel
+import kotlinx.coroutines.delay
 import java.util.Calendar
 
 @Composable
 fun DisponibilidadScreen(viewModel: DisponibilidadViewModel) {
     val fechaSeleccionada = remember { mutableStateOf("") }
-    val horaInicio = remember { mutableStateOf("") }
-    val horaFin = remember { mutableStateOf("") }
-    val estado = viewModel.estado.collectAsState()
-
+    val horasDisponibles = viewModel.horasDisponibles.collectAsState().value // Observando las horas disponibles
+    val estado = viewModel.estado.collectAsState().value // Observando el estado global de la operación
     val psychoId = viewModel.obtenerIdUsuarioActual()
+    val guardando = remember { mutableStateOf(false) } // Para mostrar el mensaje "Guardando..."
+    val guardadoCorrectamente = remember { mutableStateOf(false) } // Para mostrar "Guardado correctamente"
+    val mostrarMensajeFecha = remember { mutableStateOf(false) } // Para mostrar el mensaje de fecha obligatoria
+    val mensajeEstado = remember { mutableStateOf("") } // Para mostrar el mensaje dinámico según el estado de la hora
+
+    // Lista de horas posibles (de 8:00 a 19:00)
+    val horasPosibles = (8..19).map { "${it}:00" }
 
     // Fondo y espaciado general
     Column(
@@ -42,62 +60,134 @@ fun DisponibilidadScreen(viewModel: DisponibilidadViewModel) {
         )
 
         // Selección de fecha
-        SeleccionFecha(fechaSeleccionada) {
-            viewModel.mostrarDatePicker { fecha -> fechaSeleccionada.value = fecha }
+        SeleccionFecha(fechaSeleccionada) { fecha ->
+            fechaSeleccionada.value = fecha
+            viewModel.cargarHorasDisponibles(fecha, psychoId)
+            mostrarMensajeFecha.value = false
+        }
+
+        // Mostrar mensaje si no se ha seleccionado la fecha
+        if (mostrarMensajeFecha.value) {
+            Text(
+                text = "Debe seleccionar una fecha primero",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 16.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Entrada para hora de inicio
-        EntradaHora(
-            label = "Hora de inicio:",
-            horaValue = horaInicio,
-            onValueChange = { horaInicio.value = it }
-        )
+        // Mostrar botones para cada hora en filas de tres
+        Column {
+            horasPosibles.chunked(3).forEachIndexed { index, horaChunk ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    horaChunk.forEach { hora ->
+                        // Buscar el estado de la hora en horasDisponibles
+                        val horaEstado = horasDisponibles.find { it.hora == hora }?.estado ?: "no disponible"
 
-        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = {
+                                if (fechaSeleccionada.value.isEmpty()) {
+                                    mostrarMensajeFecha.value = true
+                                    return@Button
+                                }
 
-        // Entrada para hora de fin
-        EntradaHora(
-            label = "Hora de fin:",
-            horaValue = horaFin,
-            onValueChange = { horaFin.value = it }
-        )
+                                // Si la hora no está en la lista, significa que es nueva
+                                val esHoraNueva = horasDisponibles.none { it.hora == hora }
 
-        Spacer(modifier = Modifier.height(32.dp))
+                                // Determinar el nuevo estado y el mensaje
+                                val nuevoEstado = if (horaEstado == "no disponible" || esHoraNueva) {
+                                    mensajeEstado.value = "Hora disponible añadida"
+                                    "disponible"
+                                } else {
+                                    mensajeEstado.value = "Hora descartada"
+                                    "no disponible"
+                                }
 
-        // Botón para guardar la disponibilidad
-        Button(
-            onClick = {
-                viewModel.guardarDisponibilidad(
-                    fechaSeleccionada.value,
-                    horaInicio.value,
-                    horaFin.value,
-                    psychoId
+                                // Cambiar el estado de la hora
+                                viewModel.cambiarEstadoHora(fechaSeleccionada.value, hora, psychoId, nuevoEstado)
 
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            )
-        ) {
-            Text("Guardar disponibilidad", color = Color.White)
+                                // Mostrar "Guardando..." al presionar un botón
+                                guardando.value = true
+                                guardadoCorrectamente.value = false
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(40.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = when (horaEstado) {
+                                    "disponible" -> MaterialTheme.colorScheme.primary
+                                    "no disponible" -> Color.Transparent
+                                    else -> Color.Transparent
+                                },
+                                contentColor = if (horaEstado == "disponible") Color.White else MaterialTheme.colorScheme.primary
+                            ),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                        ) {
+                            Text(text = hora, color = if (horaEstado == "disponible") Color.White else MaterialTheme.colorScheme.primary)
+                        }
+                    }
+                }
+
+                // Espacio entre las filas
+                if (index < horasPosibles.chunked(3).size - 1) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
         }
 
-        // Estado del proceso de guardado
-        if (estado.value.isNotEmpty()) {
+        // Mostrar el estado del proceso de guardado
+        if (guardando.value) {
             Text(
-                text = estado.value,
+                text = "",
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
+
+        if (guardadoCorrectamente.value) {
+            Text(
+                text = "",
                 color = Color.Green,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 16.dp)
             )
         }
+
+        // Mostrar el mensaje dinámico de acuerdo al estado
+        if (mensajeEstado.value.isNotEmpty()) {
+            Text(
+                text = mensajeEstado.value,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
+    }
+
+    // Ejecutar el delay y ocultar el mensaje "Guardado correctamente" después de un tiempo
+    if (guardadoCorrectamente.value) {
+        LaunchedEffect(Unit) {
+            delay(2000) // 2 segundos
+            guardadoCorrectamente.value = false
+        }
+    }
+
+    // Mostrar mensaje de estado de la operación
+    LaunchedEffect(estado) {
+        if (estado == "Estado de la hora actualizado con éxito") {
+            guardando.value = false
+            guardadoCorrectamente.value = true
+        }
     }
 }
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun SeleccionFecha(fechaSeleccionada: MutableState<String>, onDateSelected: (String) -> Unit) {
     val context = LocalContext.current
@@ -142,31 +232,5 @@ fun SeleccionFecha(fechaSeleccionada: MutableState<String>, onDateSelected: (Str
                 color = Color.White
             )
         }
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EntradaHora(label: String, horaValue: MutableState<String>, onValueChange: (String) -> Unit) {
-    Column {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        OutlinedTextField(
-            value = horaValue.value,
-            onValueChange = onValueChange,
-            placeholder = { Text("Ej: 09:00") },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
-                focusedLabelColor = MaterialTheme.colorScheme.primary
-            ),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-        )
     }
 }
