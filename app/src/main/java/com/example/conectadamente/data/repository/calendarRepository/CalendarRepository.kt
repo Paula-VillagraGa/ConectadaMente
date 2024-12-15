@@ -33,19 +33,23 @@ class AgendarRepository @Inject constructor(
         }
     }
 
-    // Agendar un horario, actualizando su estado y creando un documento en "appointments"
-    suspend fun agendarHorario(availabilityId: String, patientId: String, psychoId: String): Boolean {
+    suspend fun agendarHorario(
+        availabilityId: String,
+        patientId: String,
+        psychoId: String,
+        modalidad: String // Modalidad es el nuevo parámetro que hemos agregado
+    ): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 val availabilityRef = firestore.collection("availability").document(availabilityId)
                 val appointmentsRef = firestore.collection("appointments").document()
 
                 firestore.runTransaction { transaction ->
-                    // Verificar que el horario existe y está disponible
                     val snapshot = transaction.get(availabilityRef)
                     if (!snapshot.exists()) {
                         throw Exception("El horario no existe.")
                     }
+
                     val estado = snapshot.getString("estado")
                     if (estado != "disponible") {
                         throw Exception("El horario ya no está disponible.")
@@ -54,18 +58,20 @@ class AgendarRepository @Inject constructor(
                     // Actualizar el estado del horario a "reservado"
                     transaction.update(availabilityRef, "estado", "reservado")
 
+                    // Ahora solo tenemos una "hora" en lugar de "horaInicio" y "horaFin"
+                    val hora = snapshot.getString("hora") ?: throw Exception("Hora no válida.")
+
                     // Crear un nuevo documento en la colección "appointments"
                     val appointment = mapOf(
                         "availabilityId" to availabilityId,
                         "patientId" to patientId,
                         "psychoId" to psychoId,
-                        "fecha" to snapshot.getString("fecha"),
-                        "horaInicio" to snapshot.getString("horaInicio"),
-                        "horaFin" to snapshot.getString("horaFin"),
-                        "estado" to "pendiente" // Estado inicial de la cita
+                        "hora" to hora, // Usamos la hora directamente
+                        "estado" to "pendiente",
+                        "modalidad" to modalidad // Aquí agregamos la modalidad
                     )
                     transaction.set(appointmentsRef, appointment)
-                }.await()
+                }.await() // Espera a que la transacción termine
                 true
             } catch (e: FirebaseFirestoreException) {
                 Log.e("AgendarRepository", "Firestore error: ${e.message}")

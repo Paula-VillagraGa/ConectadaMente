@@ -7,12 +7,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -22,16 +27,22 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,6 +65,7 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType")
 @Composable
 fun AgendarScreen(
@@ -65,11 +77,22 @@ fun AgendarScreen(
     val horariosDisponibles = viewModel.horariosDisponibles.observeAsState(emptyList())
     val estadoAgendar = viewModel.estadoAgendar.observeAsState("")
 
-    // Cargar horarios disponibles para el psicólogo
-    remember { viewModel.cargarHorariosDisponibles(psychoId) }
-
     // Estado de la fecha seleccionada
     var fechaSeleccionada by remember { mutableStateOf<String?>(null) }
+
+    // Estado para mostrar el cuadro emergente
+    var mostrarDialogo by remember { mutableStateOf(false) }
+
+    // Estado para la modalidad seleccionada
+    var modalidadSeleccionada by remember { mutableStateOf("En línea") }
+
+    // Estado para la hora y fecha seleccionada
+    var horaSeleccionada by remember { mutableStateOf<String?>(null) }
+
+    var availabilityIdSeleccionado by remember { mutableStateOf<String?>(null) }
+
+    // Cargar horarios disponibles para el psicólogo
+    remember { viewModel.cargarHorariosDisponibles(psychoId) }
 
     Column(
         modifier = Modifier
@@ -85,23 +108,19 @@ fun AgendarScreen(
 
         CustomCalendar(
             availableDates = horariosDisponibles.value.map { it["fecha"] as String },
-            onDateSelected = { date ->
-                fechaSeleccionada = date
-            }
+            onDateSelected = { date -> fechaSeleccionada = date }
         )
+
         fechaSeleccionada?.let { selectedDate ->
             LazyColumn(modifier = Modifier.weight(1f)) {
                 items(
                     horariosDisponibles.value
                         .filter { it["fecha"] == selectedDate && it["estado"] == "disponible" }
                         .sortedBy {
-                            // Intentamos convertir la hora a LocalTime
                             val horaString = it["hora"] as? String ?: ""
                             try {
-                                // Convertir la hora al formato LocalTime (formato "HH:mm")
                                 LocalTime.parse(horaString, DateTimeFormatter.ofPattern("HH:mm"))
                             } catch (e: Exception) {
-                                // En caso de error (formato incorrecto o nulo), asignamos la hora más tarde (23:59)
                                 LocalTime.MAX
                             }
                         }
@@ -109,19 +128,24 @@ fun AgendarScreen(
                     HorarioItem(
                         horario = horario,
                         onAgendarClick = { availabilityId ->
-                            viewModel.agendarHorario(availabilityId, patientId, psychoId)
+                            horaSeleccionada = horario["hora"] as? String
+                            availabilityIdSeleccionado = availabilityId
+                            mostrarDialogo = true
                         }
                     )
                 }
             }
         }
 
-        // Mostrar el estado de la acción de agendar
         if (estadoAgendar.value.isNotEmpty()) {
             Text(
                 text = estadoAgendar.value,
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (estadoAgendar.value.contains("éxito", ignoreCase = true)) Color.Green else Color.Red,
+                color = if (estadoAgendar.value.contains(
+                        "éxito",
+                        ignoreCase = true
+                    )
+                ) Color.Green else Color.Red,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
@@ -129,41 +153,156 @@ fun AgendarScreen(
             )
         }
     }
-}
 
-    @Composable
-    fun HorarioItem(horario: Map<String, Any>, onAgendarClick: (String) -> Unit) {
-        val fecha = horario["fecha"] as? String ?: ""
-        val horaInicio = horario["hora"] as? String ?: ""
-        val availabilityId = horario["id"] as? String ?: ""
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            shape = MaterialTheme.shapes.medium,
-            elevation = CardDefaults.cardElevation(4.dp)
+    if (mostrarDialogo) {
+        ModalBottomSheet(
+            onDismissRequest = { mostrarDialogo = false }
         ) {
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxHeight(0.4f)
+                    .padding(top = 16.dp)
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(text = "Fecha: $fecha", style = MaterialTheme.typography.bodyMedium)
-                    Text(text = "Hora: $horaInicio", style = MaterialTheme.typography.bodyMedium)
-                }
-                Button(
-                    onClick = { onAgendarClick(availabilityId) },
-                    shape = MaterialTheme.shapes.small,
-                    colors = ButtonDefaults.buttonColors(containerColor = Purple10)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.TopStart)
+                        .padding(horizontal = 16.dp)
                 ) {
-                    Text("Agendar", color = Color.White)
+                    Text(
+                        text = "Confirmar cita",
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    Text(
+                        text = "Fecha: $fechaSeleccionada",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "Hora: $horaSeleccionada",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    // Selector de modalidad con botones
+                    Text(text = "Selecciona modalidad:")
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center // Centra los botones
+                    ) {
+                        Button(
+                            onClick = { modalidadSeleccionada = "En línea" },
+                            modifier = Modifier
+                                .padding(8.dp) // Ajusta el espacio alrededor del botón
+                                .weight(1f), // Asegura que ambos botones tengan el mismo tamaño
+                            shape = MaterialTheme.shapes.medium, // Forma más estilizada
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (modalidadSeleccionada == "En línea") Purple10 else Color.Gray
+                            ),
+                            contentPadding = PaddingValues(vertical = 12.dp, horizontal = 32.dp) // Ajusta el padding para hacerlo más grande
+                        ) {
+                            Text(
+                                text = "En línea",
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), // Texto más grande y visible
+                                modifier = Modifier.align(Alignment.CenterVertically) // Alinea el texto verticalmente
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp)) // Añade un espacio entre los botones
+
+                        Button(
+                            onClick = { modalidadSeleccionada = "Presencial" },
+                            modifier = Modifier
+                                .padding(8.dp) // Ajusta el espacio alrededor del botón
+                                .weight(1f), // Asegura que ambos botones tengan el mismo tamaño
+                            shape = MaterialTheme.shapes.medium, // Forma más estilizada
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (modalidadSeleccionada == "Presencial") Purple10 else Color.Gray
+                            ),
+                            contentPadding = PaddingValues(vertical = 12.dp, horizontal = 32.dp) // Ajusta el padding para hacerlo más grande
+                        ) {
+                            Text(
+                                text = "Presencial",
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), // Texto más grande y visible
+                                modifier = Modifier.align(Alignment.CenterVertically) // Alinea el texto verticalmente
+                            )
+                        }
+                    }
+
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 10.dp, bottom = 16.dp), // Márgenes arriba y abajo
+                        contentAlignment = Alignment.Center // Centra el contenido dentro del Box
+                    ) {
+                        Button(
+                            onClick = {
+                                viewModel.agendarHorario(
+                                    availabilityId = availabilityIdSeleccionado ?: "", // El ID de disponibilidad correcto
+                                    patientId = patientId,
+                                    psychoId = psychoId,
+                                    modalidad = modalidadSeleccionada
+                                )
+                                mostrarDialogo = false
+                            },
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .padding(horizontal = 16.dp),
+                            shape = MaterialTheme.shapes.medium,
+                            colors = ButtonDefaults.buttonColors(containerColor = Purple10),
+                            contentPadding = PaddingValues(vertical = 14.dp, horizontal = 36.dp)
+                        ) {
+                            Text(
+                                text = "Confirmar",
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                            )
+                        }
+                    }
                 }
             }
         }
     }
+}
+
+
+@Composable
+fun HorarioItem(horario: Map<String, Any>, onAgendarClick: (String) -> Unit) {
+    val fecha = horario["fecha"] as? String ?: ""
+    val hora = horario["hora"] as? String ?: ""
+    val availabilityId = horario["id"] as? String ?: ""
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = "Fecha: $fecha", style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Hora: $hora", style = MaterialTheme.typography.bodyMedium)  // Solo mostrar la hora
+            }
+            Button(
+                onClick = { onAgendarClick(availabilityId) },
+                shape = MaterialTheme.shapes.small,
+                colors = ButtonDefaults.buttonColors(containerColor = Purple10)
+            ) {
+                Text("Agendar", color = Color.White)
+            }
+        }
+    }
+}
+
+
 @Composable
 fun CustomCalendar(
     availableDates: List<String>, // Lista de fechas en formato "dd/MM/yyyy"

@@ -32,11 +32,16 @@ class AgendarViewModel @Inject constructor(
         }
     }
 
-    // Agendar un horario, incluyendo la actualización del estado y la creación de la cita en la colección de appointments
-    fun agendarHorario(availabilityId: String, patientId: String, psychoId: String) {
+    fun agendarHorario(
+        availabilityId: String,
+        patientId: String,
+        psychoId: String,
+        modalidad: String
+    ) {
         viewModelScope.launch {
             try {
-                val exito = repository.agendarHorario(availabilityId, patientId, psychoId)
+                val exito =
+                    repository.agendarHorario(availabilityId, patientId, psychoId, modalidad)
                 if (exito) {
                     _estadoAgendar.postValue("Horario reservado con éxito.")
                 } else {
