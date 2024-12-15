@@ -1,5 +1,6 @@
 package com.example.conectadamente.ui.homePsycho
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +31,7 @@ import com.example.conectadamente.ui.viewModel.calendar.DisponibilidadViewModel
 import kotlinx.coroutines.delay
 import java.util.Calendar
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun DisponibilidadScreen(viewModel: DisponibilidadViewModel) {
     val fechaSeleccionada = remember { mutableStateOf("") }
@@ -42,7 +44,7 @@ fun DisponibilidadScreen(viewModel: DisponibilidadViewModel) {
     val mensajeEstado = remember { mutableStateOf("") } // Para mostrar el mensaje dinámico según el estado de la hora
 
     // Lista de horas posibles (de 8:00 a 19:00)
-    val horasPosibles = (8..19).map { "${it}:00" }
+    val horasPosibles = (8..19).map { String.format("%02d:00", it) }
 
     // Fondo y espaciado general
     Column(

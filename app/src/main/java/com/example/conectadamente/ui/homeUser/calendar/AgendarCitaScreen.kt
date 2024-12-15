@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.conectadamente.ui.theme.Purple10
 import com.example.conectadamente.ui.viewModel.calendar.AgendarViewModel
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 
 @SuppressLint("RememberReturnType")
@@ -71,14 +73,22 @@ fun AgendarScreen(
                 fechaSeleccionada = date
             }
         )
-
-        // Mostrar los horarios disponibles de la fecha seleccionada
         fechaSeleccionada?.let { selectedDate ->
             LazyColumn(modifier = Modifier.weight(1f)) {
                 items(
-                    horariosDisponibles.value.filter {
-                        it["fecha"] == selectedDate && it["estado"] == "disponible"
-                    }
+                    horariosDisponibles.value
+                        .filter { it["fecha"] == selectedDate && it["estado"] == "disponible" }
+                        .sortedBy {
+                            // Intentamos convertir la hora a LocalTime
+                            val horaString = it["hora"] as? String ?: ""
+                            try {
+                                // Convertir la hora al formato LocalTime (formato "HH:mm")
+                                LocalTime.parse(horaString, DateTimeFormatter.ofPattern("HH:mm"))
+                            } catch (e: Exception) {
+                                // En caso de error (formato incorrecto o nulo), asignamos la hora más tarde (23:59)
+                                LocalTime.MAX
+                            }
+                        }
                 ) { horario ->
                     HorarioItem(
                         horario = horario,
@@ -143,37 +153,36 @@ fun CalendarView(horariosDisponibles: List<Map<String, Any>>, onDateSelected: (S
     }
 }
 
-@Composable
-fun HorarioItem(horario: Map<String, Any>, onAgendarClick: (String) -> Unit) {
-    val fecha = horario["fecha"] as? String ?: ""
-    val horaInicio = horario["horaInicio"] as? String ?: ""
-    val horaFin = horario["horaFin"] as? String ?: ""
-    val availabilityId = horario["id"] as? String ?: ""
+    @Composable
+    fun HorarioItem(horario: Map<String, Any>, onAgendarClick: (String) -> Unit) {
+        val fecha = horario["fecha"] as? String ?: ""
+        val horaInicio = horario["hora"] as? String ?: ""
+        val availabilityId = horario["id"] as? String ?: ""
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Row(
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(vertical = 8.dp),
+            shape = MaterialTheme.shapes.medium,
+            elevation = CardDefaults.cardElevation(4.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = "Fecha: $fecha", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Hora: $horaInicio - $horaFin", style = MaterialTheme.typography.bodyMedium)
-            }
-            Button(
-                onClick = { onAgendarClick(availabilityId) },
-                shape = MaterialTheme.shapes.small,
-                colors = ButtonDefaults.buttonColors(containerColor = Purple10)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Agendar", color = Color.White)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = "Fecha: $fecha", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = "Hora: $horaInicio", style = MaterialTheme.typography.bodyMedium)
+                }
+                Button(
+                    onClick = { onAgendarClick(availabilityId) },
+                    shape = MaterialTheme.shapes.small,
+                    colors = ButtonDefaults.buttonColors(containerColor = Purple10)
+                ) {
+                    Text("Agendar", color = Color.White)
+                }
             }
         }
     }
-}
