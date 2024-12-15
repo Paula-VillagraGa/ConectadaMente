@@ -30,6 +30,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -130,44 +131,6 @@ fun AgendarScreen(
     }
 }
 
-@Composable
-fun CalendarView(horariosDisponibles: List<Map<String, Any>>, onDateSelected: (String) -> Unit) {
-    // Extraer las fechas disponibles
-    val uniqueDates = horariosDisponibles
-        .map { it["fecha"] as? String ?: "" }
-        .distinct()
-        .sorted()
-
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp)
-    ) {
-        items(uniqueDates) { date ->
-            Card(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable { onDateSelected(date) },
-                shape = MaterialTheme.shapes.small,
-                elevation = CardDefaults.cardElevation(4.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = date,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
-    }
-}
-
     @Composable
     fun HorarioItem(horario: Map<String, Any>, onAgendarClick: (String) -> Unit) {
         val fecha = horario["fecha"] as? String ?: ""
@@ -210,8 +173,15 @@ fun CustomCalendar(
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
     val daysInMonth = currentMonth.lengthOfMonth()
 
-    // Obtener el primer día del mes
-    val firstDayOfMonth = currentMonth.atDay(1).dayOfWeek.value % 7 // 0: Domingo, 6: Sábado
+    // Obtener el primer día del mes (0 = Lunes, 6 = Domingo)
+    val firstDayOfMonth = (currentMonth.atDay(1).dayOfWeek.value + 6) % 7
+
+    // Días de la semana (Lun, Mar, Mié, Jue, Vie, Sáb, Dom)
+    val daysOfWeek = listOf("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom")
+
+    // Calculamos el total de celdas necesarias (esto es como un offset para la primera fila)
+    val totalCells = firstDayOfMonth + daysInMonth
+    val rows = (totalCells / 7) + if (totalCells % 7 > 0) 1 else 0
 
     Column(modifier = Modifier.padding(16.dp)) {
         // Cabecera del calendario
@@ -220,88 +190,95 @@ fun CustomCalendar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { currentMonth = currentMonth.minusMonths(1) }) {
+            IconButton(
+                onClick = { currentMonth = currentMonth.minusMonths(1) },
+                colors = IconButtonDefaults.iconButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary // Establece el color del icono
+                )
+            ) {
                 Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Mes anterior")
             }
+
             Text(
                 text = currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
                     .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }, // Primera letra en mayúscula
-                style = MaterialTheme.typography.bodyLarge.copy(
+                style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary // Color primario
                 )
             )
-            IconButton(onClick = { currentMonth = currentMonth.plusMonths(1) }) {
+            IconButton(
+                onClick = { currentMonth = currentMonth.plusMonths(1) },
+                colors = IconButtonDefaults.iconButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary // Establece el color del icono
+                )
+            ) {
                 Icon(Icons.Default.ArrowForwardIos, contentDescription = "Mes siguiente")
             }
         }
-    }
 
-
-    // Días de la semana
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        listOf("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom").forEach { day ->
-            Text(
-                text = day,
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f)
-            )
+        // Mostrar los días de la semana
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            daysOfWeek.forEach { day ->
+                Text(
+                    text = day,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
-    }
 
-    // Días del mes
-    val totalCells = firstDayOfMonth + daysInMonth
-    val rows = (totalCells / 7) + if (totalCells % 7 > 0) 1 else 0
+        // Días del mes
+        Column {
+            for (row in 0 until rows) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    for (col in 0..6) {
+                        val dayIndex = row * 7 + col
+                        val dayNumber = dayIndex - firstDayOfMonth + 1
 
-    Column {
-        for (row in 0 until rows) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                for (col in 0..6) {
-                    val dayIndex = row * 7 + col
-                    val dayNumber = dayIndex - firstDayOfMonth + 1
+                        if (dayIndex < firstDayOfMonth || dayNumber > daysInMonth) {
+                            Spacer(modifier = Modifier.weight(1f)) // Espacio vacío
+                        } else {
+                            val date = currentMonth.atDay(dayNumber)
+                            val formattedDate = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                            val isAvailable = formattedDate in availableDates
 
-                    if (dayIndex < firstDayOfMonth || dayNumber > daysInMonth) {
-                        Spacer(modifier = Modifier.weight(1f)) // Espacio vacío
-                    } else {
-                        val date = currentMonth.atDay(dayNumber)
-                        val formattedDate = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                        val isAvailable = formattedDate in availableDates
-
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(4.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    when {
-                                        isAvailable -> Color(0xFFB39DDB) // Morado claro para fechas disponibles
-                                        else -> Color(0xFFEDE7F6) // Morado muy claro para días normales
-                                    }
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(4.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        when {
+                                            isAvailable -> Color(0xFFB39DDB) // Morado claro para fechas disponibles
+                                            else -> Color(0xFFEDE7F6) // Morado muy claro para días normales
+                                        }
+                                    )
+                                    .clickable(enabled = isAvailable) { onDateSelected(formattedDate) }
+                                    .border(
+                                        width = if (isAvailable) 2.dp else 1.dp,
+                                        color = if (isAvailable) Color(0xFF7E57C2) else Color(0xFFD1C4E9),
+                                        shape = CircleShape
+                                    )
+                                    .size(48.dp), // Tamaño de los días
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = dayNumber.toString(),
+                                    color = when {
+                                        isAvailable -> Color.White // Texto blanco para fechas disponibles
+                                        else -> Color(0xFF7E57C2) // Texto morado oscuro para días normales
+                                    },
+                                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                                 )
-                                .clickable(enabled = isAvailable) { onDateSelected(formattedDate) }
-                                .border(
-                                    width = if (isAvailable) 2.dp else 1.dp,
-                                    color = if (isAvailable) Color(0xFF7E57C2) else Color(0xFFD1C4E9),
-                                    shape = CircleShape
-                                )
-                                .size(48.dp), // Tamaño de los días
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = dayNumber.toString(),
-                                color = when {
-                                    isAvailable -> Color.White // Texto blanco para fechas disponibles
-                                    else -> Color(0xFF7E57C2) // Texto morado oscuro para días normales
-                                },
-                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                            )
+                            }
                         }
                     }
                 }
