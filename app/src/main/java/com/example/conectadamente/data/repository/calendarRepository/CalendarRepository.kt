@@ -7,12 +7,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.google.firebase.Timestamp
 
 
 class AgendarRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
 
+    // Obtener horarios disponibles de un psicólogo por ID, solo los que están en estado "disponible"
     suspend fun obtenerDisponibilidadPorPsychoId(psychoId: String): List<Map<String, Any>> {
         return withContext(Dispatchers.IO) {
             try {
@@ -32,7 +34,6 @@ class AgendarRepository @Inject constructor(
         }
     }
 
-
     suspend fun agendarHorario(
         availabilityId: String,
         patientId: String,
@@ -46,52 +47,43 @@ class AgendarRepository @Inject constructor(
 
         return withContext(Dispatchers.IO) {
             try {
-                val availabilityQuery = firestore.collection("availability")
-                    .whereEqualTo("availabilityId", availabilityId)
-                    .get()
-                    .await()
+                val availabilityRef = firestore.collection("availability").document(availabilityId)
+                val appointmentsRef = firestore.collection("appointments").document()
 
-                if (availabilityQuery.isEmpty) {
-                    Log.e("AgendarRepository", "El horario no fue encontrado.")
-                    return@withContext false
-                }
-
-                val availabilityDoc = availabilityQuery.documents.first()
-
-                // Verificar el estado
-                val estado = availabilityDoc.getString("estado")
-                if (estado != "disponible") {
-                    Log.e("AgendarRepository", "El horario ya no está disponible.")
-                    return@withContext false
-                }
-
-                // Comenzar la transacción para agendar
                 firestore.runTransaction { transaction ->
-                    val snapshot = transaction.get(availabilityDoc.reference)
+                    // Obtener la disponibilidad
+                    val snapshot = transaction.get(availabilityRef)
                     if (!snapshot.exists()) {
                         throw Exception("El horario no existe.")
                     }
 
+                    // Verificar que el estado del horario sea "disponible"
                     val estado = snapshot.getString("estado")
                     if (estado != "disponible") {
                         throw Exception("El horario ya no está disponible.")
                     }
 
-                    transaction.update(snapshot.reference, "estado", "reservado")
-
+                    // Obtener la fecha y hora de availability
+                    val fechaAvailability =
+                        snapshot.getString("fecha") ?: throw Exception("Fecha no válida.")
                     val hora = snapshot.getString("hora") ?: throw Exception("Hora no válida.")
 
-                    // Crear el documento de cita en appointments
+                    // Actualizar el estado del horario a "reservado"
+                    transaction.update(availabilityRef, "estado", "reservado")
+
+                    // Crear un nuevo documento en la colección "appointments"
                     val appointment = mapOf(
                         "availabilityId" to availabilityId,
                         "patientId" to patientId,
                         "psychoId" to psychoId,
-                        "hora" to hora,
-                        "estado" to "pendiente",
-                        "modalidad" to modalidad
+                        "fecha" to fechaAvailability,  // Fecha del horario (availability)
+                        "hora" to hora,  // Hora del horario
+                        "modalidad" to modalidad,
+                        "estado" to "pendiente",  // Estado inicial de la cita
+                        "agendadoEn" to Timestamp.now() // Fecha y hora de la reserva (timestamp)
                     )
 
-                    transaction.set(firestore.collection("appointments").document(), appointment)
+                    transaction.set(appointmentsRef, appointment)
                 }.await()
 
                 Log.d("AgendarRepository", "Cita agendada exitosamente")

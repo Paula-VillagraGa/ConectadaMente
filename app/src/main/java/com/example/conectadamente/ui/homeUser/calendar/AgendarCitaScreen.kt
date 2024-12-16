@@ -141,11 +141,7 @@ fun AgendarScreen(
             Text(
                 text = estadoAgendar.value,
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (estadoAgendar.value.contains(
-                        "éxito",
-                        ignoreCase = true
-                    )
-                ) Color.Green else Color.Red,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
@@ -261,8 +257,6 @@ fun AgendarScreen(
                                 viewModel.actualizarDisponibilidad(
                                     availabilityId = availabilityIdSeleccionado ?: ""  // ID del horario seleccionado
                                 )
-
-
                                 mostrarDialogo = false
                             },
                             modifier = Modifier
