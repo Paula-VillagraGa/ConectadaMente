@@ -1,6 +1,7 @@
 package com.example.conectadamente.ui.homeUser.calendar
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,36 +14,28 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -92,7 +85,10 @@ fun AgendarScreen(
     var availabilityIdSeleccionado by remember { mutableStateOf<String?>(null) }
 
     // Cargar horarios disponibles para el psicólogo
-    remember { viewModel.cargarHorariosDisponibles(psychoId) }
+    remember {
+        Log.d("AgendarScreen", "Cargando horarios disponibles para el psicólogo: $psychoId")
+        viewModel.cargarHorariosDisponibles(psychoId)
+    }
 
     Column(
         modifier = Modifier
@@ -108,9 +104,11 @@ fun AgendarScreen(
 
         CustomCalendar(
             availableDates = horariosDisponibles.value.map { it["fecha"] as String },
-            onDateSelected = { date -> fechaSeleccionada = date }
+            onDateSelected = { date ->
+                Log.d("AgendarScreen", "Fecha seleccionada: $date")
+                fechaSeleccionada = date
+            }
         )
-
         fechaSeleccionada?.let { selectedDate ->
             LazyColumn(modifier = Modifier.weight(1f)) {
                 items(
@@ -128,6 +126,7 @@ fun AgendarScreen(
                     HorarioItem(
                         horario = horario,
                         onAgendarClick = { availabilityId ->
+                            Log.d("AgendarScreen", "Horario seleccionado: ${horario["hora"]}, AvailabilityId: $availabilityId")
                             horaSeleccionada = horario["hora"] as? String
                             availabilityIdSeleccionado = availabilityId
                             mostrarDialogo = true
@@ -138,6 +137,7 @@ fun AgendarScreen(
         }
 
         if (estadoAgendar.value.isNotEmpty()) {
+            Log.d("AgendarScreen", "Estado de la acción de agendar: ${estadoAgendar.value}")
             Text(
                 text = estadoAgendar.value,
                 style = MaterialTheme.typography.bodyMedium,
@@ -155,6 +155,7 @@ fun AgendarScreen(
     }
 
     if (mostrarDialogo) {
+        Log.d("AgendarScreen", "Mostrando el cuadro de diálogo para confirmar cita.")
         ModalBottomSheet(
             onDismissRequest = { mostrarDialogo = false }
         ) {
@@ -193,7 +194,10 @@ fun AgendarScreen(
                         horizontalArrangement = Arrangement.Center // Centra los botones
                     ) {
                         Button(
-                            onClick = { modalidadSeleccionada = "En línea" },
+                            onClick = {
+                                Log.d("AgendarScreen", "Modalidad seleccionada: En línea")
+                                modalidadSeleccionada = "En línea"
+                            },
                             modifier = Modifier
                                 .padding(8.dp) // Ajusta el espacio alrededor del botón
                                 .weight(1f), // Asegura que ambos botones tengan el mismo tamaño
@@ -213,7 +217,10 @@ fun AgendarScreen(
                         Spacer(modifier = Modifier.width(12.dp)) // Añade un espacio entre los botones
 
                         Button(
-                            onClick = { modalidadSeleccionada = "Presencial" },
+                            onClick = {
+                                Log.d("AgendarScreen", "Modalidad seleccionada: Presencial")
+                                modalidadSeleccionada = "Presencial"
+                            },
                             modifier = Modifier
                                 .padding(8.dp) // Ajusta el espacio alrededor del botón
                                 .weight(1f), // Asegura que ambos botones tengan el mismo tamaño
@@ -240,12 +247,22 @@ fun AgendarScreen(
                     ) {
                         Button(
                             onClick = {
+                                Log.d("AgendarScreen", "Confirmando cita con los siguientes datos: availabilityId=$availabilityIdSeleccionado, patientId=$patientId, psychoId=$psychoId, modalidad=$modalidadSeleccionada")
+
+                                // Crear un documento en "appointments" con la información de la cita
                                 viewModel.agendarHorario(
-                                    availabilityId = availabilityIdSeleccionado ?: "", // El ID de disponibilidad correcto
-                                    patientId = patientId,
-                                    psychoId = psychoId,
-                                    modalidad = modalidadSeleccionada
+                                    availabilityId = availabilityIdSeleccionado ?: "",  // El ID del horario disponible
+                                    patientId = patientId,  // El ID del paciente
+                                    psychoId = psychoId,  // El ID del psicólogo
+                                    modalidad = modalidadSeleccionada  // La modalidad seleccionada
                                 )
+
+                                // Actualizar el estado de la disponibilidad a "reservado"
+                                viewModel.actualizarDisponibilidad(
+                                    availabilityId = availabilityIdSeleccionado ?: ""  // ID del horario seleccionado
+                                )
+
+
                                 mostrarDialogo = false
                             },
                             modifier = Modifier
@@ -268,11 +285,12 @@ fun AgendarScreen(
 }
 
 
+
 @Composable
 fun HorarioItem(horario: Map<String, Any>, onAgendarClick: (String) -> Unit) {
     val fecha = horario["fecha"] as? String ?: ""
     val hora = horario["hora"] as? String ?: ""
-    val availabilityId = horario["id"] as? String ?: ""
+    val availabilityId = horario["availabilityId"] as? String ?: ""  // Asegúrate de que es availabilityId y no "id" o algo diferente
 
     Card(
         modifier = Modifier
@@ -289,7 +307,7 @@ fun HorarioItem(horario: Map<String, Any>, onAgendarClick: (String) -> Unit) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = "Fecha: $fecha", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Hora: $hora", style = MaterialTheme.typography.bodyMedium)  // Solo mostrar la hora
+                Text(text = "Hora: $hora", style = MaterialTheme.typography.bodyMedium)
             }
             Button(
                 onClick = { onAgendarClick(availabilityId) },
@@ -301,7 +319,6 @@ fun HorarioItem(horario: Map<String, Any>, onAgendarClick: (String) -> Unit) {
         }
     }
 }
-
 
 @Composable
 fun CustomCalendar(

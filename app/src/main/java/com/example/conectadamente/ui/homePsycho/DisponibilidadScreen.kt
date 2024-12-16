@@ -98,22 +98,19 @@ fun DisponibilidadScreen(viewModel: DisponibilidadViewModel) {
                                     return@Button
                                 }
 
-                                // Si la hora no está en la lista, significa que es nueva
-                                val esHoraNueva = horasDisponibles.none { it.hora == hora }
+                                // Verifica si la hora está documentada
+                                val horaExistente = horasDisponibles.find { it.hora == hora }
 
-                                // Determinar el nuevo estado y el mensaje
-                                val nuevoEstado = if (horaEstado == "no disponible" || esHoraNueva) {
-                                    mensajeEstado.value = "Hora disponible añadida"
-                                    "disponible"
+                                if (horaExistente == null) {
+                                    // Caso: La hora no está documentada (nueva)
+                                    viewModel.guardarDisponibilidad(fechaSeleccionada.value, hora, psychoId)
                                 } else {
-                                    mensajeEstado.value = "Hora descartada"
-                                    "no disponible"
+                                    // Caso: La hora ya está documentada (cambiar estado)
+                                    val nuevoEstado = if (horaExistente.estado == "disponible") "no disponible" else "disponible"
+                                    viewModel.cambiarEstadoHora(fechaSeleccionada.value, hora, psychoId, nuevoEstado)
                                 }
 
-                                // Cambiar el estado de la hora
-                                viewModel.cambiarEstadoHora(fechaSeleccionada.value, hora, psychoId, nuevoEstado)
-
-                                // Mostrar "Guardando..." al presionar un botón
+                                // Mostrar mensajes de guardado
                                 guardando.value = true
                                 guardadoCorrectamente.value = false
                             },
@@ -125,13 +122,16 @@ fun DisponibilidadScreen(viewModel: DisponibilidadViewModel) {
                                 containerColor = when (horaEstado) {
                                     "disponible" -> MaterialTheme.colorScheme.primary
                                     "no disponible" -> Color.Transparent
-                                    else -> Color.Transparent
+                                    else -> Color.Transparent // Para horas nuevas
                                 },
                                 contentColor = if (horaEstado == "disponible") Color.White else MaterialTheme.colorScheme.primary
                             ),
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                         ) {
-                            Text(text = hora, color = if (horaEstado == "disponible") Color.White else MaterialTheme.colorScheme.primary)
+                            Text(
+                                text = hora,
+                                color = if (horaEstado == "disponible") Color.White else MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
                 }

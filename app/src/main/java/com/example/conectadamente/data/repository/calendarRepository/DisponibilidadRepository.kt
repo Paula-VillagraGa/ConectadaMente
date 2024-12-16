@@ -1,5 +1,6 @@
 package com.example.conectadamente.data.repository.calendarRepository
 
+import android.util.Log
 import com.example.conectadamente.data.model.Disponibilidad
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -43,32 +44,41 @@ class DisponibilidadRepositorio @Inject constructor() {
         }
     }
 
-
     suspend fun guardarDisponibilidad(
         fecha: String,
         horas: List<String>, // Lista de horas seleccionadas
         psychoId: String,
         estado: String
-    ): String {
+    ): List<String> { // Cambiamos el retorno a una lista de IDs
         return try {
-            // Guardar cada hora individualmente
+            val availabilityIds = mutableListOf<String>()
+
             horas.forEach { hora ->
+                // Crea un documento vacío para generar el ID primero
+                val documentReference = db.collection("availability").document()
+
+                // Recupera el ID generado
+                val availabilityId = documentReference.id
+
+                // Agrega el availabilityId a los datos
                 val availability = hashMapOf(
+                    "availabilityId" to availabilityId, // Incluye el ID generado
                     "fecha" to fecha,
                     "hora" to hora,  // Guardamos solo una hora
                     "psychoId" to psychoId,
                     "estado" to estado // Predeterminado "disponible"
                 )
 
-                // Guardar la disponibilidad en Firestore para cada hora
-                db.collection("availability")
-                    .add(availability)
-                    .await() // Utilizamos await() para hacer esta operación de forma asincrónica
+                // Guarda los datos en Firestore usando el ID previamente generado
+                documentReference.set(availability).await()
+
+                // Añade el ID generado a la lista
+                availabilityIds.add(availabilityId)
             }
 
-            "Disponibilidad guardada con éxito"
+            availabilityIds // Retorna la lista de IDs
         } catch (exception: Exception) {
-            "Error al guardar la disponibilidad: ${exception.message}"
+            throw exception // Propaga la excepción al ViewModel
         }
     }
 

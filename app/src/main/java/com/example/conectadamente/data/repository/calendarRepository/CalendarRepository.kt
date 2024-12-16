@@ -13,7 +13,6 @@ class AgendarRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
 
-    // Obtener horarios disponibles de un psicólogo por ID, solo los que están en estado "disponible"
     suspend fun obtenerDisponibilidadPorPsychoId(psychoId: String): List<Map<String, Any>> {
         return withContext(Dispatchers.IO) {
             try {
@@ -33,19 +32,42 @@ class AgendarRepository @Inject constructor(
         }
     }
 
+
     suspend fun agendarHorario(
         availabilityId: String,
         patientId: String,
         psychoId: String,
-        modalidad: String // Modalidad es el nuevo parámetro que hemos agregado
+        modalidad: String
     ): Boolean {
+        if (availabilityId.isNullOrEmpty()) {
+            Log.e("AgendarRepository", "availabilityId no puede ser nulo o vacío.")
+            return false
+        }
+
         return withContext(Dispatchers.IO) {
             try {
-                val availabilityRef = firestore.collection("availability").document(availabilityId)
-                val appointmentsRef = firestore.collection("appointments").document()
+                val availabilityQuery = firestore.collection("availability")
+                    .whereEqualTo("availabilityId", availabilityId)
+                    .get()
+                    .await()
 
+                if (availabilityQuery.isEmpty) {
+                    Log.e("AgendarRepository", "El horario no fue encontrado.")
+                    return@withContext false
+                }
+
+                val availabilityDoc = availabilityQuery.documents.first()
+
+                // Verificar el estado
+                val estado = availabilityDoc.getString("estado")
+                if (estado != "disponible") {
+                    Log.e("AgendarRepository", "El horario ya no está disponible.")
+                    return@withContext false
+                }
+
+                // Comenzar la transacción para agendar
                 firestore.runTransaction { transaction ->
-                    val snapshot = transaction.get(availabilityRef)
+                    val snapshot = transaction.get(availabilityDoc.reference)
                     if (!snapshot.exists()) {
                         throw Exception("El horario no existe.")
                     }
@@ -55,29 +77,30 @@ class AgendarRepository @Inject constructor(
                         throw Exception("El horario ya no está disponible.")
                     }
 
-                    // Actualizar el estado del horario a "reservado"
-                    transaction.update(availabilityRef, "estado", "reservado")
+                    transaction.update(snapshot.reference, "estado", "reservado")
 
-                    // Ahora solo tenemos una "hora" en lugar de "horaInicio" y "horaFin"
                     val hora = snapshot.getString("hora") ?: throw Exception("Hora no válida.")
 
-                    // Crear un nuevo documento en la colección "appointments"
+                    // Crear el documento de cita en appointments
                     val appointment = mapOf(
                         "availabilityId" to availabilityId,
                         "patientId" to patientId,
                         "psychoId" to psychoId,
-                        "hora" to hora, // Usamos la hora directamente
+                        "hora" to hora,
                         "estado" to "pendiente",
-                        "modalidad" to modalidad // Aquí agregamos la modalidad
+                        "modalidad" to modalidad
                     )
-                    transaction.set(appointmentsRef, appointment)
-                }.await() // Espera a que la transacción termine
+
+                    transaction.set(firestore.collection("appointments").document(), appointment)
+                }.await()
+
+                Log.d("AgendarRepository", "Cita agendada exitosamente")
                 true
             } catch (e: FirebaseFirestoreException) {
-                Log.e("AgendarRepository", "Firestore error: ${e.message}")
+                Log.e("AgendarRepository", "Error en Firestore: ${e.message}")
                 false
             } catch (e: Exception) {
-                Log.e("AgendarRepository", "Unexpected error: ${e.message}")
+                Log.e("AgendarRepository", "Error inesperado: ${e.message}")
                 false
             }
         }

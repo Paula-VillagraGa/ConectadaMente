@@ -62,7 +62,6 @@ class DisponibilidadViewModel @Inject constructor(
     }
 
     fun guardarDisponibilidad(fecha: String, hora: String, psychoId: String) {
-        // Validación para asegurarse de que la fecha no esté vacía
         if (fecha.isEmpty()) {
             _estado.value = "Por favor, selecciona una fecha"
             return
@@ -71,13 +70,29 @@ class DisponibilidadViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 // Convertimos 'hora' en una lista de un solo elemento
-                val result = repository.guardarDisponibilidad(fecha, listOf(hora), psychoId, "disponible")
-                _estado.value = result
+                val availabilityIds = repository.guardarDisponibilidad(fecha, listOf(hora), psychoId, "disponible")
+
+                // Crear objetos Disponibilidad para cada hora guardada
+                val nuevasDisponibilidades = availabilityIds.map { availabilityId ->
+                    Disponibilidad(
+                        availabilityId = availabilityId,
+                        fecha = fecha,
+                        hora = hora,
+                        estado = "disponible",
+                        psychoId = psychoId
+                    )
+                }
+
+                // Actualizamos la lista local
+                _horasDisponibles.value = _horasDisponibles.value + nuevasDisponibilidades
+
+                _estado.value = "Disponibilidad guardada con éxito"
             } catch (e: Exception) {
                 _estado.value = "Error al guardar disponibilidad: ${e.message}"
             }
         }
     }
+
 
 
     // Función para eliminar la disponibilidad de una hora
