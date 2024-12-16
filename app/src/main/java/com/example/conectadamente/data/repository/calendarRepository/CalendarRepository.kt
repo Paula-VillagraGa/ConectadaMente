@@ -7,6 +7,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.QuerySnapshot
 
 
 class AgendarRepository @Inject constructor(
@@ -33,23 +35,39 @@ class AgendarRepository @Inject constructor(
         }
     }
 
-    // Agendar un horario, actualizando su estado y creando un documento en "appointments"
-    suspend fun agendarHorario(availabilityId: String, patientId: String, psychoId: String): Boolean {
+    suspend fun agendarHorario(
+        availabilityId: String,
+        patientId: String,
+        psychoId: String,
+        modalidad: String
+    ): Boolean {
+        if (availabilityId.isNullOrEmpty()) {
+            Log.e("AgendarRepository", "availabilityId no puede ser nulo o vacío.")
+            return false
+        }
+
         return withContext(Dispatchers.IO) {
             try {
                 val availabilityRef = firestore.collection("availability").document(availabilityId)
                 val appointmentsRef = firestore.collection("appointments").document()
 
                 firestore.runTransaction { transaction ->
-                    // Verificar que el horario existe y está disponible
+                    // Obtener la disponibilidad
                     val snapshot = transaction.get(availabilityRef)
                     if (!snapshot.exists()) {
                         throw Exception("El horario no existe.")
                     }
+
+                    // Verificar que el estado del horario sea "disponible"
                     val estado = snapshot.getString("estado")
                     if (estado != "disponible") {
                         throw Exception("El horario ya no está disponible.")
                     }
+
+                    // Obtener la fecha y hora de availability
+                    val fechaAvailability =
+                        snapshot.getString("fecha") ?: throw Exception("Fecha no válida.")
+                    val hora = snapshot.getString("hora") ?: throw Exception("Hora no válida.")
 
                     // Actualizar el estado del horario a "reservado"
                     transaction.update(availabilityRef, "estado", "reservado")
@@ -59,21 +77,47 @@ class AgendarRepository @Inject constructor(
                         "availabilityId" to availabilityId,
                         "patientId" to patientId,
                         "psychoId" to psychoId,
-                        "fecha" to snapshot.getString("fecha"),
-                        "horaInicio" to snapshot.getString("horaInicio"),
-                        "horaFin" to snapshot.getString("horaFin"),
-                        "estado" to "pendiente" // Estado inicial de la cita
+                        "fecha" to fechaAvailability,  // Fecha del horario (availability)
+                        "hora" to hora,  // Hora del horario
+                        "modalidad" to modalidad,
+                        "estado" to "pendiente",  // Estado inicial de la cita
+                        "agendadoEn" to Timestamp.now() // Fecha y hora de la reserva (timestamp)
                     )
+
                     transaction.set(appointmentsRef, appointment)
                 }.await()
+
+                Log.d("AgendarRepository", "Cita agendada exitosamente")
                 true
             } catch (e: FirebaseFirestoreException) {
-                Log.e("AgendarRepository", "Firestore error: ${e.message}")
+                Log.e("AgendarRepository", "Error en Firestore: ${e.message}")
                 false
             } catch (e: Exception) {
-                Log.e("AgendarRepository", "Unexpected error: ${e.message}")
+                Log.e("AgendarRepository", "Error inesperado: ${e.message}")
                 false
             }
+        }
+    }
+    suspend fun obtenerHorariosPendientes(psychoId: String): List<String> {
+        val firestore = FirebaseFirestore.getInstance()
+
+        return try {
+            val querySnapshot: QuerySnapshot = firestore.collection("appointments")
+                .whereEqualTo("psychoId", psychoId) // Filtra por psychoId
+                .whereEqualTo("estado", "pendiente") // Filtra por estado pendiente
+                .get()
+                .await() // Espera la consulta
+
+            // Extraer las horas de las citas pendientes
+            val horariosPendientes = querySnapshot.documents.mapNotNull { document ->
+                document.getString("hora") // Extrae el campo "hora"
+            }
+
+            horariosPendientes
+        } catch (e: Exception) {
+            // Manejo de errores
+            println("Error al obtener horarios pendientes: ${e.message}")
+            emptyList<String>() // Si ocurre un error, retorna una lista vacía
         }
     }
 }

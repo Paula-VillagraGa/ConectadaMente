@@ -1,10 +1,11 @@
 package com.example.conectadamente.data.model
 
 data class Disponibilidad(
-    val fecha: String = "",       // Fecha en formato "YYYY-MM-DD"
-    val horaInicio: String = "",  // Hora de inicio de disponibilidad: "10:00"
-    val horaFin: String = "",     // Hora de fin de disponibilidad: "12:00"
-    val psychoId: String = ""     // ID del psicólogo
+    val availabilityId: String = "",  // Agregar este campo para almacenar el ID de disponibilidad
+    val fecha: String = "",          // Fecha en formato "DD/MM/YYYY"
+    val hora: String = "",           // Hora en formato "HH:MM"
+    val estado: String = "",         // "disponible" o "no disponible"
+    val psychoId: String = ""        // ID del psicólogo
 )
 
 data class Cita(

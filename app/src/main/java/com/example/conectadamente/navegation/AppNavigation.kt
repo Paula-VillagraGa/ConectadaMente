@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,12 +20,13 @@ import com.example.conectadamente.ui.authPaciente.SignInScreen
 import com.example.conectadamente.ui.authPsicologo.PsychoSignInScreen
 import com.example.conectadamente.ui.authPsicologo.PsychologistLoginScreen
 import com.example.conectadamente.ui.authPsicologo.RegisterPsychoScreen
+import com.example.conectadamente.ui.homePsycho.AvailabilityScreen
 import com.example.conectadamente.ui.homePsycho.ChatPsychoScreen
-import com.example.conectadamente.ui.homePsycho.DisponibilidadScreen
 import com.example.conectadamente.ui.homePsycho.EditPsychoProfileScreen
 import com.example.conectadamente.ui.homePsycho.PsychoHomeScreen
 import com.example.conectadamente.ui.homeUser.ProfilePsyFromPatScreen
 import com.example.conectadamente.ui.homePsycho.PsychoProfileScreen
+import com.example.conectadamente.ui.homePsycho.ReservedAppointmentsScreen
 import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
 import com.example.conectadamente.ui.homeUser.EditProfilePatientScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
@@ -34,11 +34,9 @@ import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
 import com.example.conectadamente.ui.homeUser.Recomendacion.BuscarPorTagScreen
 import com.example.conectadamente.ui.homeUser.Recomendacion.RecomendacionScreen
 import com.example.conectadamente.ui.homeUser.calendar.AgendarScreen
-import com.example.conectadamente.ui.viewModel.BuscarPorTagViewModel
 import com.example.conectadamente.ui.homeUser.recommendationsPatient.ArticleScreen
 import com.example.conectadamente.ui.homeUser.recommendationsPatient.BookRecommendations
 import com.example.conectadamente.ui.homeUser.recommendationsPatient.SosDialCardScreen
-import com.example.conectadamente.ui.viewModel.PatientProfileViewModel
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
 
@@ -88,7 +86,6 @@ fun AppNavigation() {
 
             //Editar perfil paciente
             composable(NavScreen.EditPatientProfile.route) {
-                val viewModel: PatientProfileViewModel = hiltViewModel()
                 EditProfilePatientScreen(
                     onProfileSaved = {
                         navController.popBackStack()
@@ -169,7 +166,7 @@ fun AppNavigation() {
 
             //Agendar Citas
             composable(NavScreen.DisponibilidadCalendario.route) {
-                DisponibilidadScreen(viewModel = hiltViewModel())
+                AvailabilityScreen(viewModel = hiltViewModel(), navController)
             }
             composable("agendarCita/{psychoId}/{patientId}") { backStackEntry ->
                 val psychoId = backStackEntry.arguments?.getString("psychoId") ?: ""
@@ -177,6 +174,9 @@ fun AppNavigation() {
                 AgendarScreen(viewModel = hiltViewModel(), psychoId = psychoId, patientId = patientId)
             }
 
+            composable(NavScreen.CitasReservadas.route) {
+                ReservedAppointmentsScreen(viewModel = hiltViewModel(), navController)
+            }
 
             //Recomendaciones para Paciente
 
@@ -204,17 +204,21 @@ fun ScaffoldOrContent(
 ) {
     val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
 
-    if (currentDestination in scaffoldScreens) {
-        Scaffold(
-            bottomBar = { NavigationInferior(navController) },
-            content = { paddingValues -> content(paddingValues) }
-        )
-    } else if (currentDestination in scaffoldPsycho) {
-        Scaffold(
-            bottomBar = { NavigationInferiorPsycho(navController) },
-            content = { paddingValues -> content(paddingValues) }
-        )
-    } else {
-        Box(modifier = Modifier.fillMaxSize()) { content(PaddingValues()) }
+    when (currentDestination) {
+        in scaffoldScreens -> {
+            Scaffold(
+                bottomBar = { NavigationInferior(navController) },
+                content = { paddingValues -> content(paddingValues) }
+            )
+        }
+        in scaffoldPsycho -> {
+            Scaffold(
+                bottomBar = { NavigationInferiorPsycho(navController) },
+                content = { paddingValues -> content(paddingValues) }
+            )
+        }
+        else -> {
+            Box(modifier = Modifier.fillMaxSize()) { content(PaddingValues()) }
+        }
     }
 }
