@@ -10,7 +10,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @HiltViewModel
 class AppointmentViewModel @Inject constructor(
     private val appointmentRepository: AppointmentRepository // Inyectamos el repositorio de citas
@@ -22,8 +21,13 @@ class AppointmentViewModel @Inject constructor(
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> = _errorMessage
 
+    // Nuevo MutableLiveData para el estado de carga
+    private val _isLoading = MutableLiveData<Boolean>(false)
+    val isLoading: LiveData<Boolean> = _isLoading
+
     // Obtener las citas pendientes con los nombres de los pacientes para un psicólogo
     fun obtenerCitasPendientes(psychoId: String) {
+        _isLoading.value = true // Se inicia la carga
         viewModelScope.launch {
             try {
                 val citas =
@@ -33,6 +37,8 @@ class AppointmentViewModel @Inject constructor(
                 // Manejo de error
                 Log.e("AppointmentViewModel", "Error al obtener citas pendientes: ${e.message}")
                 _errorMessage.value = "Error al obtener citas pendientes."
+            } finally {
+                _isLoading.value = false // Se termina la carga, ya sea con éxito o con error
             }
         }
     }
