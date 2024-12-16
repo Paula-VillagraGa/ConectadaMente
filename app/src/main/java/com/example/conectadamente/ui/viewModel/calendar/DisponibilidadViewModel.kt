@@ -39,22 +39,30 @@ class DisponibilidadViewModel @Inject constructor(
     }
 
     // Función para cambiar el estado de la hora
-    fun cambiarEstadoHora(fecha: String, hora: String, psychoId: String, estadoActual: String) {
+    fun cambiarEstadoHora(fecha: String, hora: String, psychoId: String, nuevoEstado: String) {
         viewModelScope.launch {
+            _estado.value = "Guardando"
             try {
-                // Cambiar el estado de la hora en la base de datos
-                repository.cambiarEstadoHora(fecha, hora, psychoId, estadoActual)
+                // Verifica si la hora existe en la lista actual
+                val horaExistente = _horasDisponibles.value.find { it.hora == hora }
 
-                // Actualizar el estado de la hora en la lista local
-                _horasDisponibles.value = _horasDisponibles.value.map {
-                    if (it.hora == hora) {
-                        it.copy(estado = estadoActual) // Cambiar el estado de la hora específica
-                    } else {
-                        it // Mantener el estado de las otras horas igual
+                if (horaExistente != null) {
+                    // Cambiar el estado actual de "disponible" a "no disponible" o viceversa
+                    val nuevoEstado = if (horaExistente.estado == "disponible") "no disponible" else "disponible"
+
+                    // Actualizar en la base de datos
+                    repository.cambiarEstadoHora(fecha, hora, psychoId, nuevoEstado)
+
+                    // Actualizar el estado local
+                    _horasDisponibles.value = _horasDisponibles.value.map {
+                        if (it.hora == hora) it.copy(estado = nuevoEstado) else it
                     }
+                } else {
+                    // Si no existe, se guarda como disponible por defecto
+                    guardarDisponibilidad(fecha, hora, psychoId)
                 }
 
-                _estado.value = "Estado de la hora actualizado con éxito"
+                _estado.value = "Guardado correctamente"
             } catch (e: Exception) {
                 _estado.value = "Error al cambiar el estado: ${e.message}"
             }
@@ -68,6 +76,7 @@ class DisponibilidadViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            _estado.value = "Guardando"
             try {
                 // Convertimos 'hora' en una lista de un solo elemento
                 val availabilityIds = repository.guardarDisponibilidad(fecha, listOf(hora), psychoId, "disponible")
@@ -86,31 +95,15 @@ class DisponibilidadViewModel @Inject constructor(
                 // Actualizamos la lista local
                 _horasDisponibles.value = _horasDisponibles.value + nuevasDisponibilidades
 
-                _estado.value = "Disponibilidad guardada con éxito"
+                _estado.value = "Guardado correctamente"
             } catch (e: Exception) {
                 _estado.value = "Error al guardar disponibilidad: ${e.message}"
             }
         }
     }
 
-
-
-    // Función para eliminar la disponibilidad de una hora
-    fun eliminarDisponibilidad(fecha: String, hora: String, psychoId: String) {
-        viewModelScope.launch {
-            try {
-                repository.eliminarDisponibilidad(fecha, hora, psychoId)
-                _estado.value = "Disponibilidad eliminada con éxito"
-            } catch (e: Exception) {
-                _estado.value = "Error al eliminar disponibilidad: ${e.message}"
-            }
-        }
-    }
-
-
-
-    // Función para mostrar mensajes de error
-    fun mostrarError(mensaje: String) {
-        _estado.value = mensaje
+    // Función para limpiar el estado después de mostrar un mensaje
+    fun limpiarEstado() {
+        _estado.value = ""
     }
 }
