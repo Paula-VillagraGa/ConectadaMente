@@ -8,6 +8,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.QuerySnapshot
 
 
 class AgendarRepository @Inject constructor(
@@ -95,6 +96,28 @@ class AgendarRepository @Inject constructor(
                 Log.e("AgendarRepository", "Error inesperado: ${e.message}")
                 false
             }
+        }
+    }
+    suspend fun obtenerHorariosPendientes(psychoId: String): List<String> {
+        val firestore = FirebaseFirestore.getInstance()
+
+        return try {
+            val querySnapshot: QuerySnapshot = firestore.collection("appointments")
+                .whereEqualTo("psychoId", psychoId) // Filtra por psychoId
+                .whereEqualTo("estado", "pendiente") // Filtra por estado pendiente
+                .get()
+                .await() // Espera la consulta
+
+            // Extraer las horas de las citas pendientes
+            val horariosPendientes = querySnapshot.documents.mapNotNull { document ->
+                document.getString("hora") // Extrae el campo "hora"
+            }
+
+            horariosPendientes
+        } catch (e: Exception) {
+            // Manejo de errores
+            println("Error al obtener horarios pendientes: ${e.message}")
+            emptyList<String>() // Si ocurre un error, retorna una lista vacía
         }
     }
 }

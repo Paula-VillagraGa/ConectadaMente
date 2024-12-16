@@ -33,7 +33,7 @@ import java.util.Calendar
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun DisponibilidadScreen(viewModel: DisponibilidadViewModel) {
+fun AvailabilityScreen(viewModel: DisponibilidadViewModel) {
     val fechaSeleccionada = remember { mutableStateOf("") }
     val horasDisponibles = viewModel.horasDisponibles.collectAsState().value // Observando las horas disponibles
     val estado = viewModel.estado.collectAsState().value // Observando el estado global de la operación

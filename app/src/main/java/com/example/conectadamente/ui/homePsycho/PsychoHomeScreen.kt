@@ -82,7 +82,7 @@ fun PsychologistHomeContent(navController: NavHostController) {
                 title = "Terapias Online",
                 subtitle = "Sesiones Virtuales",
                 imageRes = R.drawable.ico_perfil, // Cambia la imagen
-                onClick = { /* Acción para terapias online */ },
+                onClick = { navController.navigate(NavScreen.CitasReservadas.route)},
                 modifier = Modifier
                     .height(250.dp)
                     .weight(0.7f),

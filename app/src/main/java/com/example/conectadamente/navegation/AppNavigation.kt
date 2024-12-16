@@ -21,12 +21,13 @@ import com.example.conectadamente.ui.authPaciente.SignInScreen
 import com.example.conectadamente.ui.authPsicologo.PsychoSignInScreen
 import com.example.conectadamente.ui.authPsicologo.PsychologistLoginScreen
 import com.example.conectadamente.ui.authPsicologo.RegisterPsychoScreen
+import com.example.conectadamente.ui.homePsycho.AvailabilityScreen
 import com.example.conectadamente.ui.homePsycho.ChatPsychoScreen
-import com.example.conectadamente.ui.homePsycho.DisponibilidadScreen
 import com.example.conectadamente.ui.homePsycho.EditPsychoProfileScreen
 import com.example.conectadamente.ui.homePsycho.PsychoHomeScreen
 import com.example.conectadamente.ui.homeUser.ProfilePsyFromPatScreen
 import com.example.conectadamente.ui.homePsycho.PsychoProfileScreen
+import com.example.conectadamente.ui.homePsycho.ReservedAppointmentsScreen
 import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
 import com.example.conectadamente.ui.homeUser.EditProfilePatientScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
@@ -169,7 +170,7 @@ fun AppNavigation() {
 
             //Agendar Citas
             composable(NavScreen.DisponibilidadCalendario.route) {
-                DisponibilidadScreen(viewModel = hiltViewModel())
+                AvailabilityScreen(viewModel = hiltViewModel())
             }
             composable("agendarCita/{psychoId}/{patientId}") { backStackEntry ->
                 val psychoId = backStackEntry.arguments?.getString("psychoId") ?: ""
@@ -177,6 +178,9 @@ fun AppNavigation() {
                 AgendarScreen(viewModel = hiltViewModel(), psychoId = psychoId, patientId = patientId)
             }
 
+            composable(NavScreen.CitasReservadas.route) {
+                ReservedAppointmentsScreen(viewModel = hiltViewModel())
+            }
 
             //Recomendaciones para Paciente
 

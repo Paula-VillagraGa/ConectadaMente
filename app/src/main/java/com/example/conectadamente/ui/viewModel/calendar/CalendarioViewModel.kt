@@ -16,6 +16,10 @@ class AgendarViewModel @Inject constructor(
     private val repository: AgendarRepository
 ) : ViewModel() {
 
+    private val _horariosPendientes = MutableLiveData<List<String>>()
+    val horariosPendientes: LiveData<List<String>> get() = _horariosPendientes
+
+
     private val _horariosDisponibles = MutableLiveData<List<Map<String, Any>>>()
     val horariosDisponibles: LiveData<List<Map<String, Any>>> get() = _horariosDisponibles
 
@@ -103,4 +107,11 @@ class AgendarViewModel @Inject constructor(
                 Log.e("ActualizarDisponibilidad", "Error al buscar el horario", e)
             }
     }
+    fun obtenerHorariosPendientes(psychoId: String) {
+        viewModelScope.launch {
+            val horarios = repository.obtenerHorariosPendientes(psychoId)
+            _horariosPendientes.postValue(horarios) // Actualiza el estado con los horarios obtenidos
+        }
+    }
 }
+
