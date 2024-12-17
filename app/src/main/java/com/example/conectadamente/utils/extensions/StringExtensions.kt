@@ -1,5 +1,9 @@
 package com.example.conectadamente.utils.extensions
 
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+
 fun String.isNumeric(): Boolean = this.all { it.isDigit() }
 fun String.capitalizeFirstLetter(): String = this.replaceFirstChar { it.uppercase() }
 
@@ -20,3 +24,12 @@ fun formatRut(rut: String): String {
     }
     return rut
 }
+
+@Composable
+fun ShowSnackBarMessage(snackbarHostState: SnackbarHostState, message: String) {
+    // Llamamos a showSnackbar para mostrar el mensaje emergente
+    LaunchedEffect(message) {
+        snackbarHostState.showSnackbar(message)
+    }
+}
+

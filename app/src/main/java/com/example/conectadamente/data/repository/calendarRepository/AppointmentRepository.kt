@@ -8,6 +8,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 class AppointmentRepository @Inject constructor(
@@ -40,12 +42,23 @@ class AppointmentRepository @Inject constructor(
                         val pacienteDoc = firestore.collection("patients").document(patientId).get().await()
                         val nombrePaciente = pacienteDoc.getString("name")
 
-                        // Crear el objeto Appointment y agregarlo a la lista
+
+
+                        val agendadoEnTimestamp = citaDocument.getTimestamp("agendadoEn")
                         val fechaHora = "${citaDocument.getString("fecha")} ${citaDocument.getString("hora")}"
                         val appointment = Appointment(
                             appointmentId = citaDocument.id,
                             fechaHora = fechaHora,
-                            paciente = nombrePaciente
+                            paciente = nombrePaciente,
+                            agendadoEn = agendadoEnTimestamp,
+                            availabilityId = citaDocument.getString("availabilityId") ?: "",
+                            estado = citaDocument.getString("estado") ?: "",
+                            fecha = citaDocument.getString("fecha") ?: "",
+                            hora = citaDocument.getString("hora") ?: "",
+                            modalidad = citaDocument.getString("modalidad") ?: "",
+                            observaciones = citaDocument.getString("observaciones") ?: "",
+                            patientId = citaDocument.getString("patientId") ?: "",
+                            psychoId = citaDocument.getString("psychoId") ?: ""
                         )
                         citas.add(appointment)
                     }
