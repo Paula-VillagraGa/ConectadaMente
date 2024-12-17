@@ -1,5 +1,6 @@
 package com.example.conectadamente.data.model
 
+import com.google.firebase.firestore.GeoPoint
 
 
 data class PsychoModel(
@@ -16,7 +17,10 @@ data class PsychoModel(
     val rating: Double = 0.0,
     val tagsSpecific: List<String> = emptyList(),
     val descriptionPsycho: String? = null,
-    val photoUrl: String? = null
+    val photoUrl: String? = null,
+    val location: String? = null, // Nuevo campo para almacenar la ubicación
+    //val location: GeoPoint? = null,  // Cambiado de String a GeoPoint
+
 )
 
 

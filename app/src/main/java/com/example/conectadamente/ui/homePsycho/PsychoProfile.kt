@@ -1,6 +1,9 @@
 package com.example.conectadamente.ui.homePsycho
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,6 +55,7 @@ import com.example.conectadamente.R
 import com.example.conectadamente.navegation.NavScreen
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.utils.constants.DataState
+import com.google.firebase.firestore.GeoPoint
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +64,8 @@ fun PsychoProfileScreen(
     viewModel: PsychoAuthViewModel = hiltViewModel()
 ) {
     val profileState by viewModel.profileState.collectAsState()
+
+    val context = LocalContext.current // Obtiene el contexto de la aplicación
 
     LaunchedEffect(Unit) {
         viewModel.loadCurrentProfile() // Cargar el perfil al entrar a la pantalla
@@ -163,6 +170,27 @@ fun PsychoProfileScreen(
                                 ContactRow(
                                     icon = Icons.Default.Phone,
                                     content = profile.phone ?: "No disponible"
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                // Ubicación
+                                profile.location?.let { location ->
+                                    Text(
+                                        text = location,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier
+                                            .clickable {
+                                                // Redirigir a Google Maps usando la ubicación
+                                                val mapsUrl = "https://www.google.com/maps/search/?api=1&query=${Uri.encode(location)}"
+                                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(mapsUrl))
+                                                context.startActivity(intent)
+                                            }
+                                    )
+                                } ?: Text(
+                                    text = "Ubicación no disponible",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                 )
 
                                 Spacer(modifier = Modifier.height(8.dp))
