@@ -94,7 +94,7 @@ fun SignInScreen(
                     }
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = Purple30,
+                    containerColor = MaterialTheme.colorScheme.secondary,
                     navigationIconContentColor = Color.White, // Color del ícono de navegación
                     titleContentColor = Color.White // Color del título
                 )

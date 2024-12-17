@@ -8,14 +8,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.*
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavHostController
@@ -35,16 +39,7 @@ fun PsychoHomeScreen(navController: NavHostController) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text("Inicio Psicólogo", fontSize = 20.sp)
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBackIosNew, contentDescription = "Back")
-                    }
-                }
-            )
+            TopAppBar() // Usamos tu TopAppBar personalizado aquí
         }
     ) { paddingValues ->
         Column(
@@ -56,7 +51,49 @@ fun PsychoHomeScreen(navController: NavHostController) {
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun TopAppBar() {
+    CenterAlignedTopAppBar(
+        navigationIcon = {
+            Image(
+                painter = painterResource(id = R.drawable.logo1), // Reemplaza con tu recurso de imagen
+                contentDescription = "Logo",
+                modifier = Modifier
+                    .size(220.dp) // Ajusta el tamaño según necesites
+                    .padding(start = 8.dp)
+                    .padding(top = 30.dp) // Aplica un recorte circular si es necesario
+            )
+        },
+        title = {
+            Text(
+                text = "", // Puedes añadir un título si lo necesitas
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        actions = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = { /* Acción para configuración */ },
+                    modifier = Modifier.padding(top = 25.dp) // Ajusta el padding superior para bajar el ícono
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu, // Ícono predeterminado de configuración
+                        contentDescription = "Settings",
+                        tint = Color(0xFF100E1B)
+                    )
+                }
+            }
+        },
+        modifier = Modifier.background(MaterialTheme.colorScheme.background)
+    )
+}
+
+
+    @Composable
 fun PsychologistHomeContent(navController: NavHostController) {
     Column(
         modifier = Modifier
@@ -70,8 +107,8 @@ fun PsychologistHomeContent(navController: NavHostController) {
         ) {
             SupportCard(
                 title = "Psicología Clínica",
-                subtitle = "Modificar Calendario",
-                imageRes = R.drawable.ico_recomen, // Cambia la imagen
+                subtitle = "Tu Disponibilidad",
+                imageRes = R.drawable.calendario, // Cambia la imagen
                 onClick = { navController.navigate(NavScreen.DisponibilidadCalendario.route) },
                 modifier = Modifier
                     .weight(0.6f)
@@ -80,13 +117,13 @@ fun PsychologistHomeContent(navController: NavHostController) {
             )
             SupportCard(
                 title = "Terapias Online",
-                subtitle = "Sesiones Virtuales",
-                imageRes = R.drawable.ico_perfil, // Cambia la imagen
+                subtitle = "Tus Citas",
+                imageRes = R.drawable.trabajos, // Cambia la imagen
                 onClick = { navController.navigate(NavScreen.CitasReservadas.route)},
                 modifier = Modifier
                     .height(250.dp)
                     .weight(0.7f),
-                color = Color(0xFFF1F8E9)
+                color = Purple20
             )
         }
 
