@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -56,7 +57,7 @@ fun EditAppointmentScreen(
     var nuevoEstado by remember { mutableStateOf("") }
 
     var observaciones by remember { mutableStateOf("") }
-    val errorMessage by viewModel.errorMessage.observeAsState("")
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     Scaffold(
         topBar = {
@@ -157,7 +158,7 @@ fun EditAppointmentScreen(
             }
 
             // Mostrar mensaje de error si existe
-            if (errorMessage.isNotEmpty()) {
+            if (errorMessage?.isNotEmpty() == true) {
                 Text("Error: $errorMessage", color = Color.Red)
             }
         }

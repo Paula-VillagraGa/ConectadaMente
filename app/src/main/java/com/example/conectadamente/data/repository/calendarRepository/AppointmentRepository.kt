@@ -115,4 +115,58 @@ class AppointmentRepository @Inject constructor(
             }
         }
     }
+    suspend fun getCompletedAppointments(psychoId: String): List<CompletedAppointment> {
+        val appointments = mutableListOf<CompletedAppointment>()
+
+        try {
+            // Obtener citas donde estado = "Realizada" y psychoId coincide
+            val appointmentQuery = firestore.collection("appointments")
+                .whereEqualTo("estado", "Realizada")
+                .whereEqualTo("psychoId", psychoId)
+                .get()
+                .await()
+
+            for (document in appointmentQuery.documents) {
+                val patientId = document.getString("patientId") ?: ""
+                val fecha = document.getString("fecha") ?: ""
+                val hora = document.getString("hora") ?: ""
+                val observaciones = document.getString("observaciones") ?: ""
+
+                // Obtener el nombre y rut del paciente desde la colección "patients"
+                val patientDoc = firestore.collection("patients")
+                    .document(patientId)
+                    .get()
+                    .await()
+
+                val patientName = patientDoc.getString("name") ?: "Nombre no disponible"
+                val patientRut = patientDoc.getString("rut") ?: "Rut no disponible"
+
+                // Crear el objeto de cita completada
+                appointments.add(
+                    CompletedAppointment(
+                        fecha = fecha,
+                        hora = hora,
+                        patientName = patientName,
+                        rut = patientRut,
+                        observaciones = observaciones
+                    )
+                )
+            }
+
+        } catch (e: Exception) {
+            Log.e("FirestoreError", "Error al obtener citas completadas: $e")
+        }
+
+        return appointments
+    }
 }
+
+// Modelo de datos actualizado
+data class CompletedAppointment(
+    val fecha: String,
+    val hora: String,
+    val patientName: String,
+    val rut: String,
+    val observaciones: String
+)
+

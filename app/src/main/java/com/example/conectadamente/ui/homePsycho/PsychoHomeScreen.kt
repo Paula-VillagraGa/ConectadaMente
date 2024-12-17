@@ -134,7 +134,7 @@ fun PsychologistHomeContent(navController: NavHostController) {
                 title = "Mis Pacientes",
                 subtitle = "Tus Pacientes",
                 imageRes = R.drawable.familia,
-                onClick = { /* Acción para terapia infantil */ },
+                onClick = { navController.navigate(NavScreen.CompletedAppointments.route) },
                 modifier = Modifier
                     .weight(0.6f)
                     .height(250.dp),

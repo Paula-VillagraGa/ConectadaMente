@@ -28,6 +28,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -49,8 +50,8 @@ fun ReservedAppointmentsScreen(
 ) {
     // Observar las citas pendientes desde el ViewModel
     val citasPendientes by viewModel.citasPendientes.observeAsState(emptyList())
-    val errorMessage by viewModel.errorMessage.observeAsState("")
-    val isLoading by viewModel.isLoading.observeAsState(false) // Estado para la carga
+    val errorMessage by viewModel.errorMessage.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState(false)
 
     // Obtenemos las citas pendientes
     LaunchedEffect(true) {
@@ -58,7 +59,7 @@ fun ReservedAppointmentsScreen(
     }
 
     // Si hay un mensaje de error, lo mostramos
-    if (errorMessage.isNotEmpty()) {
+    if (errorMessage?.isNotEmpty() == true) {
         Text(text = "Error: $errorMessage", color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(16.dp))
     }
 
