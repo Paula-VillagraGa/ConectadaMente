@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
@@ -19,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,9 +29,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.conectadamente.ui.viewModel.calendar.AppointmentViewModel
 
@@ -68,7 +75,8 @@ fun EditAppointmentScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.Start
         ) {
             // Mostrar los detalles de la cita
             val (fecha, hora) = fechaHora.split(" ")
@@ -83,18 +91,18 @@ fun EditAppointmentScreen(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }
             ) {
-                // Campo de texto solo lectura que actúa como un disparador para el menú desplegable
+
                 OutlinedTextField(
                     value = nuevoEstado,
-                    onValueChange = {}, // No permitimos edición manual
+                    onValueChange = {},
                     readOnly = true,
                     label = { Text("Nuevo Estado") },
                     placeholder = { Text("Selecciona un estado") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor() // Necesario para anclar el menú correctamente
+                    modifier = Modifier.menuAnchor()
                 )
 
-                // Menú desplegable con opciones
+
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
@@ -111,13 +119,29 @@ fun EditAppointmentScreen(
                 }
             }
 
-            // Campo para observaciones
             OutlinedTextField(
                 value = observaciones,
                 onValueChange = { observaciones = it },
-                label = { Text("Observaciones") },
-                placeholder = { Text("Escribe observaciones aquí...") }
+                label = { Text("Observaciones", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)) },
+                placeholder = {
+                    Text(
+                        "Escribe observaciones aquí...",
+                        style = TextStyle(fontSize = 16.sp, color = MaterialTheme.colorScheme.secondary)
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp), // Altura personalizada para hacerlo más grande
+                shape = RoundedCornerShape(10.dp), // Bordes más redondeados
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = Color(0xFFBDBDBD), // Color del borde cuando no está enfocado
+                    cursorColor = MaterialTheme.colorScheme.primary
+                ),
+                textStyle = TextStyle(fontSize = 18.sp), // Tamaño del texto dentro del campo
+                maxLines = 5 // Permite varias líneas
             )
+
 
             // Botón para guardar cambios
             Button(
