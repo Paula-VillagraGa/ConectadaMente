@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.*
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,12 +27,10 @@ import com.example.conectadamente.navegation.NavScreen
 import com.example.conectadamente.ui.theme.*
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PsychoHomeScreen(navController: NavHostController) {
-    // Habilitar la navegación hacia atrás
     BackHandler {
-        navController.popBackStack() // Navega hacia atrás en el stack de navegación
+        navController.popBackStack()
     }
 
     Scaffold(
@@ -67,7 +63,7 @@ fun TopAppBar() {
         },
         title = {
             Text(
-                text = "", // Puedes añadir un título si lo necesitas
+                text = "",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -78,10 +74,10 @@ fun TopAppBar() {
             ) {
                 IconButton(
                     onClick = { /* Acción para configuración */ },
-                    modifier = Modifier.padding(top = 25.dp) // Ajusta el padding superior para bajar el ícono
+                    modifier = Modifier.padding(top = 25.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Menu, // Ícono predeterminado de configuración
+                        imageVector = Icons.Filled.Menu,
                         contentDescription = "Settings",
                         tint = Color(0xFF100E1B)
                     )
@@ -129,25 +125,25 @@ fun PsychologistHomeContent(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Fila del medio con 2 tarjetas
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             SupportCard(
-                title = "Terapia Infantil",
-                subtitle = "Para niños y adolescentes",
-                imageRes = R.drawable.ico_chat, // Cambia la imagen
+                title = "Mis Pacientes",
+                subtitle = "Tus Pacientes",
+                imageRes = R.drawable.familia,
                 onClick = { /* Acción para terapia infantil */ },
                 modifier = Modifier
                     .weight(0.6f)
                     .height(250.dp),
-                color = Color(0xFFFFF59D)
+                color = Purple50
             )
             SupportCard(
                 title = "Mindfulness",
                 subtitle = "Enfoque en la meditación",
-                imageRes = R.drawable.ico_chat, // Cambia la imagen
+                imageRes = R.drawable.ico_chat,
                 onClick = { /* Acción para mindfulness */ },
                 modifier = Modifier
                     .weight(0.5f)
@@ -195,14 +191,11 @@ fun SupportCard(
 @Preview(showBackground = true)
 @Composable
 fun PsychologistHomeContentPreview() {
-    // Usamos rememberNavController para emular la navegación, aunque no se está utilizando en el preview
     val navController = rememberNavController()
 
-    // El colorScheme se puede definir para que tenga un tema claro en el preview
     MaterialTheme(
         colorScheme = lightColorScheme()
     ) {
-        // Llamamos a PsychologistHomeContent, que es el composable que deseas previsualizar
         PsychoHomeScreen(navController)
     }
 }

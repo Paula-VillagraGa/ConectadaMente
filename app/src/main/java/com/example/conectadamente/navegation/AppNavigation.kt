@@ -75,7 +75,11 @@ fun AppNavigation() {
                 SignInScreen(
                     navController = navController,
                     navigateToRegisterPacient = { navController.navigate(NavScreen.RegisterPatient.route) },
-                    navigateToPsychoHomeScreen = {navController.navigate(NavScreen.PsychoHome.route)},
+                    navigateToPsychoHomeScreen = {
+                        navController.navigate(NavScreen.PsychoHome.route) {
+                            popUpTo(NavScreen.Login.route) { inclusive = true }
+                        }},
+
                     navigateToHomeScreen = {
                         navController.navigate(NavScreen.Home.route) {
                             popUpTo(NavScreen.Login.route) { inclusive = true }
