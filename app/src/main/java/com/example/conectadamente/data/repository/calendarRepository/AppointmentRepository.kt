@@ -36,28 +36,34 @@ class AppointmentRepository @Inject constructor(
 
                 // Iterar sobre las citas encontradas
                 for (citaDocument in citasSnapshot.documents) {
-                    val patientId = citaDocument.getString("patientId") // Obtener el patientId de la cita
+                    val patientId =
+                        citaDocument.getString("patientId") // Obtener el patientId de la cita
 
                     // Verificar que el patientId exista
                     if (patientId != null) {
                         // Obtener el nombre del paciente
-                        val paciente = firestore.collection("patients").document(patientId).get().await()
-                        val nombrePaciente = paciente.getString("name") // Obtener el nombre del paciente
+                        val paciente =
+                            firestore.collection("patients").document(patientId).get().await()
+                        val nombrePaciente =
+                            paciente.getString("name") // Obtener el nombre del paciente
 
                         // Añadir la cita con el nombre del paciente a la lista
-                        val fechaHora = "${citaDocument.getString("fecha")} ${citaDocument.getString("hora")}"
+                        val fechaHora =
+                            "${citaDocument.getString("fecha")} ${citaDocument.getString("hora")}"
                         citasYPacientes.add(Pair(fechaHora, nombrePaciente))
                     }
                 }
 
                 citasYPacientes
             } catch (e: Exception) {
-                Log.e("AppointmentRepository", "Error al obtener citas pendientes y pacientes: ${e.message}")
+                Log.e(
+                    "AppointmentRepository",
+                    "Error al obtener citas pendientes y pacientes: ${e.message}"
+                )
                 emptyList() // Si ocurre un error, retornamos una lista vacía
             }
         }
     }
-
 
 
     // Actualizar el estado de una cita (cancelada, realizada, etc.)
@@ -83,19 +89,6 @@ class AppointmentRepository @Inject constructor(
             } catch (e: Exception) {
                 Log.e("AppointmentRepository", "Unexpected error: ${e.message}")
                 false
-            }
-        }
-    }
-
-    // Obtener el nombre del paciente por su ID
-    suspend fun obtenerPacientePorId(patientId: String): String? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val document = firestore.collection("patients").document(patientId).get().await()
-                document.getString("name") // Asumiendo que el campo "name" contiene el nombre
-            } catch (e: Exception) {
-                Log.e("AppointmentRepository", "Error al obtener paciente: ${e.message}")
-                null
             }
         }
     }
