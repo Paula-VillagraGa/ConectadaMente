@@ -8,9 +8,8 @@ data class Disponibilidad(
     val psychoId: String = ""        // ID del psicólogo
 )
 
-data class Cita(
-    val fecha: String = "",
-    val hora: String = "",
-    val psychoId: String = "",
-    val pacienteId: String = ""
+data class Appointment(
+    val appointmentId: String,
+    val fechaHora: String,
+    val paciente: String?
 )

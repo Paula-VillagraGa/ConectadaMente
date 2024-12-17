@@ -1,5 +1,6 @@
 package com.example.conectadamente.ui.homePsycho
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -58,7 +59,7 @@ fun ReservedAppointmentsScreen(
 
     // Si hay un mensaje de error, lo mostramos
     if (errorMessage.isNotEmpty()) {
-        Text(text = "Error: $errorMessage", color = Color.Red, modifier = Modifier.padding(16.dp))
+        Text(text = "Error: $errorMessage", color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(16.dp))
     }
 
     // Contenido de la pantalla dentro de un Scaffold
@@ -96,8 +97,14 @@ fun ReservedAppointmentsScreen(
                             .padding(paddingValues) // Asegura que el contenido de LazyColumn no se corte
                     ) {
                         items(citasPendientes) { cita ->
-                            val (fechaHora, paciente) = cita
-                            ReservedAppointmentCard(fechaHora, paciente)
+                            // Ahora 'cita' es de tipo Appointment
+                            ReservedAppointmentCard(
+                                appointmentId = cita.appointmentId, // Pasamos el appointmentId
+                                fechaHora = cita.fechaHora,
+                                paciente = cita.paciente
+                            ) { id ->
+                                navController.navigate("editarCita/$id")
+                            }
                         }
                     }
                 }
@@ -106,37 +113,27 @@ fun ReservedAppointmentsScreen(
     )
 }
 @Composable
-fun ReservedAppointmentCard(fechaHora: String, paciente: String?) {
+fun ReservedAppointmentCard(
+    appointmentId: String, // Agregar el ID de la cita
+    fechaHora: String,
+    paciente: String?,
+    onCardClick: (String) -> Unit // Callback para manejar la navegación
+) {
     // Card para mostrar la cita
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp),
+            .padding(bottom = 8.dp)
+            .clickable { onCardClick(appointmentId) }, // Acción al hacer clic
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Fecha y hora separados
-            val (fecha, hora) = fechaHora.split(" ") // Suponiendo que la fecha y hora están separadas por un espacio
-            Row {
-                Text(
-                    text = "Fecha: $fecha",
-                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary),
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Spacer(modifier = Modifier.height(4.dp)) // Un pequeño espacio entre la fecha y la hora
-            Row {
-                Text(
-                    text = "Hora: $hora",
-                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary),
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            val (fecha, hora) = fechaHora.split(" ")
+            Text("Fecha: $fecha", color= MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Hora: $hora", color= MaterialTheme.colorScheme.secondary,style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Paciente: ${paciente ?: "Paciente no disponible"}",
-                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary)
-            )
+            Text("Paciente: ${paciente ?: "Paciente no disponible"}", color= MaterialTheme.colorScheme.secondary,style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
