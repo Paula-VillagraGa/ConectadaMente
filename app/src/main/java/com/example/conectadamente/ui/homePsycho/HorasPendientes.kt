@@ -97,13 +97,15 @@ fun ReservedAppointmentsScreen(
                             .padding(paddingValues) // Asegura que el contenido de LazyColumn no se corte
                     ) {
                         items(citasPendientes) { cita ->
-                            // Ahora 'cita' es de tipo Appointment
                             ReservedAppointmentCard(
                                 appointmentId = cita.appointmentId, // Pasamos el appointmentId
                                 fechaHora = cita.fechaHora,
                                 paciente = cita.paciente
                             ) { id ->
-                                navController.navigate("editarCita/$id")
+                                navController.navigate(
+                                    "editarCita/$id?fechaHora=${cita.fechaHora}&paciente=${cita.paciente ?: ""}"
+                                )
+
                             }
                         }
                     }

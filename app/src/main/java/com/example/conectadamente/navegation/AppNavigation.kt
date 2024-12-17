@@ -14,7 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.conectadamente.data.repository.calendarRepository.EditAppointmentScreen
+import com.example.conectadamente.ui.homePsycho.EditAppointmentScreen
 import com.example.conectadamente.ui.authPaciente.LoginScreen
 import com.example.conectadamente.ui.authPaciente.RegisterPatientScreen
 import com.example.conectadamente.ui.authPaciente.SignInScreen
@@ -178,12 +178,23 @@ fun AppNavigation() {
             composable(NavScreen.CitasReservadas.route) {
                 ReservedAppointmentsScreen(viewModel = hiltViewModel(), navController)
             }
-            composable("editarCita/{appointmentId}") { backStackEntry ->
+            composable(
+                route = "editarCita/{appointmentId}?fechaHora={fechaHora}&paciente={paciente}",
+                arguments = listOf(
+                    navArgument("appointmentId") { type = NavType.StringType },
+                    navArgument("fechaHora") { type = NavType.StringType },
+                    navArgument("paciente") { type = NavType.StringType; defaultValue = "" }
+                )
+            ) { backStackEntry ->
                 val appointmentId = backStackEntry.arguments?.getString("appointmentId") ?: ""
+                val fechaHora = backStackEntry.arguments?.getString("fechaHora") ?: ""
+                val paciente = backStackEntry.arguments?.getString("paciente") ?: ""
                 EditAppointmentScreen(
-                    viewModel = hiltViewModel(),
                     appointmentId = appointmentId,
-                    navController = navController
+                    fechaHora = fechaHora,
+                    paciente = paciente,
+                    navController = navController,
+                    viewModel = hiltViewModel()
                 )
             }
 

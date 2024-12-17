@@ -264,7 +264,7 @@ fun AgendarScreen(
                                 .padding(horizontal = 16.dp),
                             shape = MaterialTheme.shapes.medium,
                             colors = ButtonDefaults.buttonColors(containerColor = Purple10),
-                            contentPadding = PaddingValues(vertical = 14.dp, horizontal = 36.dp)
+                            contentPadding = PaddingValues(vertical = 14.dp, horizontal = 50.dp)
                         ) {
                             Text(
                                 text = "Confirmar",
