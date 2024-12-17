@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.conectadamente.data.repository.calendarRepository.CompletedAppointment
 import com.example.conectadamente.ui.viewModel.calendar.AppointmentViewModel
+import com.example.conectadamente.utils.extensions.formatRut
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,7 +104,7 @@ fun CompletedAppointmentItem(appointment: CompletedAppointment) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Rut: ${appointment.rut}",
+                text = "Rut: ${formatRut(appointment.rut)}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
