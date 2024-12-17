@@ -38,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -85,7 +86,7 @@ fun AgendarScreen(
     var availabilityIdSeleccionado by remember { mutableStateOf<String?>(null) }
 
     // Cargar horarios disponibles para el psicólogo
-    remember {
+    LaunchedEffect(psychoId) {
         Log.d("AgendarScreen", "Cargando horarios disponibles para el psicólogo: $psychoId")
         viewModel.cargarHorariosDisponibles(psychoId)
     }
@@ -241,24 +242,31 @@ fun AgendarScreen(
                             .padding(top = 10.dp, bottom = 16.dp), // Márgenes arriba y abajo
                         contentAlignment = Alignment.Center // Centra el contenido dentro del Box
                     ) {
+                        // En el onClick del botón "Confirmar"
                         Button(
                             onClick = {
                                 Log.d("AgendarScreen", "Confirmando cita con los siguientes datos: availabilityId=$availabilityIdSeleccionado, patientId=$patientId, psychoId=$psychoId, modalidad=$modalidadSeleccionada")
 
-                                // Crear un documento en "appointments" con la información de la cita
+                                // Realizar la acción de agendar el horario
                                 viewModel.agendarHorario(
-                                    availabilityId = availabilityIdSeleccionado ?: "",  // El ID del horario disponible
-                                    patientId = patientId,  // El ID del paciente
-                                    psychoId = psychoId,  // El ID del psicólogo
-                                    modalidad = modalidadSeleccionada  // La modalidad seleccionada
+                                    availabilityId = availabilityIdSeleccionado ?: "",
+                                    patientId = patientId,
+                                    psychoId = psychoId,
+                                    modalidad = modalidadSeleccionada
                                 )
 
-                                // Actualizar el estado de la disponibilidad a "reservado"
+                                // Actualizar el estado de la disponibilidad
                                 viewModel.actualizarDisponibilidad(
-                                    availabilityId = availabilityIdSeleccionado ?: ""  // ID del horario seleccionado
+                                    availabilityId = availabilityIdSeleccionado ?: ""
                                 )
+
+                                // Recargar los horarios disponibles
+                                viewModel.cargarHorariosDisponibles(psychoId)
+
+                                // Ocultar el cuadro de diálogo
                                 mostrarDialogo = false
-                            },
+
+                                      },
                             modifier = Modifier
                                 .wrapContentWidth()
                                 .padding(horizontal = 16.dp),

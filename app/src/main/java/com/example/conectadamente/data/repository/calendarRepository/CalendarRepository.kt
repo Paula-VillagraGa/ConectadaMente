@@ -52,52 +52,58 @@ class AgendarRepository @Inject constructor(
                 val appointmentsRef = firestore.collection("appointments").document()
 
                 firestore.runTransaction { transaction ->
-                    // Obtener la disponibilidad
+                    // Obtener la disponibilidad más reciente
                     val snapshot = transaction.get(availabilityRef)
                     if (!snapshot.exists()) {
                         throw Exception("El horario no existe.")
                     }
 
-                    // Verificar que el estado del horario sea "disponible"
+                    // Verificar el estado de disponibilidad más reciente
                     val estado = snapshot.getString("estado")
+                    Log.d("AgendarRepository", "Estado de disponibilidad: $estado")
                     if (estado != "disponible") {
+                        // Si el horario está reservado, lanzar un error
                         throw Exception("El horario ya no está disponible.")
                     }
 
                     // Obtener la fecha y hora de availability
-                    val fechaAvailability =
-                        snapshot.getString("fecha") ?: throw Exception("Fecha no válida.")
+                    val fechaAvailability = snapshot.getString("fecha") ?: throw Exception("Fecha no válida.")
                     val hora = snapshot.getString("hora") ?: throw Exception("Hora no válida.")
 
                     // Actualizar el estado del horario a "reservado"
+                    Log.d("AgendarRepository", "Actualizando disponibilidad a 'reservado'.")
                     transaction.update(availabilityRef, "estado", "reservado")
 
-                    // Crear un nuevo documento en la colección "appointments"
+                    // Crear la cita
                     val appointment = mapOf(
                         "availabilityId" to availabilityId,
                         "patientId" to patientId,
                         "psychoId" to psychoId,
-                        "fecha" to fechaAvailability,  // Fecha del horario (availability)
-                        "hora" to hora,  // Hora del horario
+                        "fecha" to fechaAvailability,
+                        "hora" to hora,
                         "modalidad" to modalidad,
-                        "estado" to "pendiente",  // Estado inicial de la cita
-                        "agendadoEn" to Timestamp.now() // Fecha y hora de la reserva (timestamp)
+                        "estado" to "pendiente",
+                        "agendadoEn" to Timestamp.now()
                     )
 
                     transaction.set(appointmentsRef, appointment)
+                    Log.d("AgendarRepository", "Cita creada en appointments.")
                 }.await()
 
-                Log.d("AgendarRepository", "Cita agendada exitosamente")
-                true
+                // Si la reserva fue exitosa, notificar a la UI para que actualice
+                Log.d("AgendarRepository", "Cita agendada exitosamente.")
+                return@withContext true
             } catch (e: FirebaseFirestoreException) {
                 Log.e("AgendarRepository", "Error en Firestore: ${e.message}")
-                false
+                return@withContext false
             } catch (e: Exception) {
                 Log.e("AgendarRepository", "Error inesperado: ${e.message}")
-                false
+                return@withContext false
             }
         }
     }
+
+
     suspend fun obtenerHorariosPendientes(psychoId: String): List<String> {
         val firestore = FirebaseFirestore.getInstance()
 
