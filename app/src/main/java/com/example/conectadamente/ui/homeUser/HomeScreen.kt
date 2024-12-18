@@ -20,8 +20,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -91,19 +94,18 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeUserViewModel = 
             }
         }
 
-// Barra superior (TopAppBar)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBar() {
     CenterAlignedTopAppBar(
         navigationIcon = {
             Image(
-                painter = painterResource(id = R.drawable.logo2), // Reemplaza con tu recurso de imagen
+                painter = painterResource(id = R.drawable.logo1), // Reemplaza con tu recurso de imagen
                 contentDescription = "Logo",
                 modifier = Modifier
                     .size(220.dp) // Ajusta el tamaño según necesites
                     .padding(start = 8.dp)
-                    .padding(top = 30.dp)// Aplica un recorte circular si es necesario
+                    .padding(top = 30.dp) // Aplica un recorte circular si es necesario
             )
         },
         title = {
@@ -114,10 +116,15 @@ fun TopAppBar() {
             )
         },
         actions = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { /* Acción para configuración */ }) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = { /* Acción para configuración */ },
+                    modifier = Modifier.padding(top = 25.dp) // Ajusta el padding superior para bajar el ícono
+                ) {
                     Icon(
-                        imageVector = Icons.Filled.Settings, // Ícono predeterminado de configuración
+                        imageVector = Icons.Filled.Menu, // Ícono predeterminado de configuración
                         contentDescription = "Settings",
                         tint = Color(0xFF100E1B)
                     )
@@ -127,8 +134,6 @@ fun TopAppBar() {
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
     )
 }
-
-
 
 // Campo de búsqueda para psicólogos por nombre
 @OptIn(ExperimentalMaterial3Api::class)

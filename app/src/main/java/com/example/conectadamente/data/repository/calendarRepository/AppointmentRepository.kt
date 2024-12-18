@@ -1,28 +1,27 @@
 package com.example.conectadamente.data.repository.calendarRepository
 
 import android.util.Log
+import com.example.conectadamente.data.model.Appointment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 class AppointmentRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
 
-    // Obtener todas las citas pendientes para un psicólogo y obtener los nombres de los pacientes
-    suspend fun obtenerCitasPendientesYPacientesPorPsychoId(psychoId: String): List<Pair<String, String?>> {
+    suspend fun obtenerCitasPendientesYPacientesPorPsychoId(psychoId: String): List<Appointment> {
         return withContext(Dispatchers.IO) {
             try {
-                // Obtener el ID del usuario logueado (psychoId)
                 val psychoId = FirebaseAuth.getInstance().currentUser?.uid
                     ?: throw Exception("Usuario no autenticado")
 
-                // Log del psychoId para ver si se obtiene correctamente
-                Log.d("AppointmentRepository", "psychoId (current user): $psychoId")
                 // Obtener las citas pendientes para el psicólogo
                 val citasSnapshot = firestore.collection("appointments")
                     .whereEqualTo("psychoId", psychoId)
@@ -32,32 +31,46 @@ class AppointmentRepository @Inject constructor(
 
                 Log.d("Debug", "Número de citas encontradas: ${citasSnapshot.size()}")
 
-                val citasYPacientes = mutableListOf<Pair<String, String?>>()
+                val citas = mutableListOf<Appointment>()
 
                 // Iterar sobre las citas encontradas
                 for (citaDocument in citasSnapshot.documents) {
                     val patientId = citaDocument.getString("patientId") // Obtener el patientId de la cita
 
-                    // Verificar que el patientId exista
                     if (patientId != null) {
                         // Obtener el nombre del paciente
-                        val paciente = firestore.collection("patients").document(patientId).get().await()
-                        val nombrePaciente = paciente.getString("name") // Obtener el nombre del paciente
+                        val pacienteDoc = firestore.collection("patients").document(patientId).get().await()
+                        val nombrePaciente = pacienteDoc.getString("name")
 
-                        // Añadir la cita con el nombre del paciente a la lista
+
+
+                        val agendadoEnTimestamp = citaDocument.getTimestamp("agendadoEn")
                         val fechaHora = "${citaDocument.getString("fecha")} ${citaDocument.getString("hora")}"
-                        citasYPacientes.add(Pair(fechaHora, nombrePaciente))
+                        val appointment = Appointment(
+                            appointmentId = citaDocument.id,
+                            fechaHora = fechaHora,
+                            paciente = nombrePaciente,
+                            agendadoEn = agendadoEnTimestamp,
+                            availabilityId = citaDocument.getString("availabilityId") ?: "",
+                            estado = citaDocument.getString("estado") ?: "",
+                            fecha = citaDocument.getString("fecha") ?: "",
+                            hora = citaDocument.getString("hora") ?: "",
+                            modalidad = citaDocument.getString("modalidad") ?: "",
+                            observaciones = citaDocument.getString("observaciones") ?: "",
+                            patientId = citaDocument.getString("patientId") ?: "",
+                            psychoId = citaDocument.getString("psychoId") ?: ""
+                        )
+                        citas.add(appointment)
                     }
                 }
 
-                citasYPacientes
+                citas
             } catch (e: Exception) {
                 Log.e("AppointmentRepository", "Error al obtener citas pendientes y pacientes: ${e.message}")
                 emptyList() // Si ocurre un error, retornamos una lista vacía
             }
         }
     }
-
 
 
     // Actualizar el estado de una cita (cancelada, realizada, etc.)
@@ -87,16 +100,86 @@ class AppointmentRepository @Inject constructor(
         }
     }
 
-    // Obtener el nombre del paciente por su ID
-    suspend fun obtenerPacientePorId(patientId: String): String? {
+    suspend fun actualizarEstadoCitaConObservaciones(
+        appointmentId: String,
+        nuevoEstado: String,
+        observaciones: String
+    ): Boolean {
         return withContext(Dispatchers.IO) {
             try {
-                val document = firestore.collection("patients").document(patientId).get().await()
-                document.getString("name") // Asumiendo que el campo "name" contiene el nombre
+                val appointmentRef = firestore.collection("appointments").document(appointmentId)
+
+                firestore.runTransaction { transaction ->
+                    val snapshot = transaction.get(appointmentRef)
+                    if (!snapshot.exists()) throw Exception("La cita no existe.")
+
+                    transaction.update(
+                        appointmentRef, mapOf(
+                            "estado" to nuevoEstado,
+                            "observaciones" to observaciones
+                        )
+                    )
+                }.await()
+
+                true
             } catch (e: Exception) {
-                Log.e("AppointmentRepository", "Error al obtener paciente: ${e.message}")
-                null
+                Log.e("AppointmentRepository", "Error al actualizar cita: ${e.message}")
+                false
             }
         }
     }
+    suspend fun getCompletedAppointments(psychoId: String): List<CompletedAppointment> {
+        val appointments = mutableListOf<CompletedAppointment>()
+
+        try {
+            // Obtener citas donde estado = "Realizada" y psychoId coincide
+            val appointmentQuery = firestore.collection("appointments")
+                .whereEqualTo("estado", "Realizada")
+                .whereEqualTo("psychoId", psychoId)
+                .get()
+                .await()
+
+            for (document in appointmentQuery.documents) {
+                val patientId = document.getString("patientId") ?: ""
+                val fecha = document.getString("fecha") ?: ""
+                val hora = document.getString("hora") ?: ""
+                val observaciones = document.getString("observaciones") ?: ""
+
+                // Obtener el nombre y rut del paciente desde la colección "patients"
+                val patientDoc = firestore.collection("patients")
+                    .document(patientId)
+                    .get()
+                    .await()
+
+                val patientName = patientDoc.getString("name") ?: "Nombre no disponible"
+                val patientRut = patientDoc.getString("rut") ?: "Rut no disponible"
+
+                // Crear el objeto de cita completada
+                appointments.add(
+                    CompletedAppointment(
+                        fecha = fecha,
+                        hora = hora,
+                        patientName = patientName,
+                        rut = patientRut,
+                        observaciones = observaciones
+                    )
+                )
+            }
+
+        } catch (e: Exception) {
+            Log.e("FirestoreError", "Error al obtener citas completadas: $e")
+        }
+
+        return appointments
+    }
 }
+
+// Modelo de datos actualizado
+data class CompletedAppointment(
+    val fecha: String,
+    val hora: String,
+    val patientName: String,
+    val rut: String,
+    val observaciones: String
+)
+

@@ -5,36 +5,40 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.conectadamente.data.model.Appointment
 import com.example.conectadamente.data.repository.calendarRepository.AppointmentRepository
+import com.example.conectadamente.data.repository.calendarRepository.CompletedAppointment
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AppointmentViewModel @Inject constructor(
-    private val appointmentRepository: AppointmentRepository // Inyectamos el repositorio de citas
+    private val appointmentRepository: AppointmentRepository
 ) : ViewModel() {
 
-    private val _citasPendientes = MutableLiveData<List<Pair<String, String?>>>(emptyList())
-    val citasPendientes: LiveData<List<Pair<String, String?>>> = _citasPendientes
+    private val _appointments = MutableStateFlow<List<CompletedAppointment>>(emptyList())
+    val appointments: StateFlow<List<CompletedAppointment>> = _appointments
 
-    private val _errorMessage = MutableLiveData<String>()
-    val errorMessage: LiveData<String> = _errorMessage
+    private val _citasPendientes = MutableLiveData<List<Appointment>>(emptyList())
+    val citasPendientes: LiveData<List<Appointment>> = _citasPendientes
 
-    // Nuevo MutableLiveData para el estado de carga
-    private val _isLoading = MutableLiveData<Boolean>(false)
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
 
-    // Obtener las citas pendientes con los nombres de los pacientes para un psicólogo
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     fun obtenerCitasPendientes(psychoId: String) {
         _isLoading.value = true // Se inicia la carga
         viewModelScope.launch {
             try {
-                val citas =
-                    appointmentRepository.obtenerCitasPendientesYPacientesPorPsychoId(psychoId)
+                val citas = appointmentRepository.obtenerCitasPendientesYPacientesPorPsychoId(psychoId)
                 _citasPendientes.value = citas
             } catch (e: Exception) {
-                // Manejo de error
                 Log.e("AppointmentViewModel", "Error al obtener citas pendientes: ${e.message}")
                 _errorMessage.value = "Error al obtener citas pendientes."
             } finally {
@@ -43,7 +47,6 @@ class AppointmentViewModel @Inject constructor(
         }
     }
 
-    // Cambiar el estado de una cita (por ejemplo, cancelada o realizada)
     fun actualizarEstadoCita(appointmentId: String, nuevoEstado: String) {
         viewModelScope.launch {
             try {
@@ -56,6 +59,40 @@ class AppointmentViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _errorMessage.value = "Error al actualizar el estado de la cita."
+            }
+        }
+    }
+
+    fun actualizarEstadoCitaConObservaciones(
+        appointmentId: String,
+        nuevoEstado: String,
+        observaciones: String
+    ) {
+        viewModelScope.launch {
+            try {
+                val success = appointmentRepository.actualizarEstadoCitaConObservaciones(
+                    appointmentId, nuevoEstado, observaciones
+                )
+                if (!success) {
+                    _errorMessage.value = "Error al actualizar la cita."
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error inesperado: ${e.message}"
+            }
+        }
+    }
+    // Obtener citas completadas para un psicólogo (mostrando paciente, rut, fecha, hora, observaciones)
+    fun fetchCompletedAppointments(currentPsychoId: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+            try {
+                val result = appointmentRepository.getCompletedAppointments(currentPsychoId)
+                _appointments.value = result
+            } catch (e: Exception) {
+                _errorMessage.value = "Error al cargar las citas: ${e.message}"
+            } finally {
+                _isLoading.value = false
             }
         }
     }

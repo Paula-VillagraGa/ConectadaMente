@@ -1,11 +1,7 @@
 package com.example.conectadamente.ui.homeUser
 
-import android.util.Log
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,7 +24,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,7 +35,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,20 +49,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.conectadamente.R
 import com.example.conectadamente.data.model.PsychoModel
-import com.example.conectadamente.navegation.NavScreen
-import com.example.conectadamente.ui.theme.Gray50
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.ui.viewModel.reviews.ReviewViewModel
 import com.example.conectadamente.utils.constants.DataState
+import com.example.conectadamente.utils.extensions.ShowSnackBarMessage
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,7 +67,6 @@ fun ProfilePsyFromPatScreen(
     psychologistId: String?,
     navController: NavController
 ) {
-
     val patientId = FirebaseAuth.getInstance().currentUser?.uid
 
     // Estados y ViewModels
@@ -85,38 +74,49 @@ fun ProfilePsyFromPatScreen(
     val reviewViewModel: ReviewViewModel = hiltViewModel()
     val viewModel: PsychoAuthViewModel = hiltViewModel()
 
-    var isSubmitting by remember { mutableStateOf(false) }
+    val isSubmitting by reviewViewModel.isSubmitting.observeAsState(false)
     var messageToShow by remember { mutableStateOf<String?>(null) }
     var ratingPromedio by remember { mutableStateOf(0.0) }
     var rating by remember { mutableIntStateOf(0) }
     var tags by remember { mutableStateOf(listOf<String>()) }
+    var canSubmitReview by remember { mutableStateOf(false) } // Nuevo estado para verificar si se puede enviar reseña
 
     val profileState by viewModel.profileState.collectAsState()
-    val ratingState by reviewViewModel.ratingState.observeAsState()
+    val ratingState by reviewViewModel.ratingState.collectAsState()
 
-    // Snackbar para notificaciones
+    // LaunchedEffect con el estado correcto
     LaunchedEffect(ratingState) {
         when (ratingState) {
             is DataState.Success -> {
                 snackbarHostState.showSnackbar("¡Reseña enviada correctamente!")
-                isSubmitting = false
             }
+
             is DataState.Error -> {
                 snackbarHostState.showSnackbar("Error: ${(ratingState as DataState.Error).e}")
-                isSubmitting = false
             }
-            DataState.Loading -> isSubmitting = true
+
+            DataState.Loading -> {
+                // Solo mostrar "Cargando..." mientras se envía
+            }
+
             else -> {}
         }
     }
 
-    // Cargar datos iniciales
+
     LaunchedEffect(psychologistId) {
         psychologistId?.let { id ->
             viewModel.getPsychoById(id)
             ratingPromedio = reviewViewModel.getAverageRating(id)
+
+            // Verificar si la cita ha sido realizada de manera asíncrona
             val patientId = FirebaseAuth.getInstance().currentUser?.uid
             if (patientId != null) {
+                // Llamada a la función suspendida canSubmitReview
+                val canReview = reviewViewModel.canSubmitReview(patientId, id)
+                canSubmitReview = canReview // Actualizar el estado de la reseña
+
+                // Obtener reseña existente, si la hay
                 reviewViewModel.getExistingReview(id, patientId)?.let { review ->
                     rating = review.rating.toInt()
                     tags = review.tags
@@ -157,99 +157,121 @@ fun ProfilePsyFromPatScreen(
                     Divider(modifier = Modifier.padding(horizontal = 16.dp))
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    NewReviewSection(
-                        rating = rating,
-                        tags = tags,
-                        onRatingChange = { rating = it },
-                        onTagToggle = { tag ->
-                            tags = if (tags.contains(tag)) tags - tag else if (tags.size < 3) tags + tag else tags
-                        },
-                        onSubmit = {
-                            val patientId = FirebaseAuth.getInstance().currentUser?.uid
-                            if (psychologistId != null && patientId != null) {
-                                isSubmitting = true
-                                reviewViewModel.submitRating(psychologistId, patientId, tags, rating.toDouble())
-                            } else {
-                                messageToShow = "No se pudo autenticar al usuario."
-                            }
-                        },
-                        isSubmitting = isSubmitting
-                    )
+                    // Si la cita no ha sido realizada, deshabilitar la sección y mostrar mensaje
+                    if (!canSubmitReview) {
+                        Text(
+                            "Puedes calificar una vez te hayas atendido con este especialista.",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    } else {
+                        // Mostrar la sección de reseña solo si la cita ha sido realizada
+                        NewReviewSection(
+                            rating = rating,
+                            tags = tags,
+                            onRatingChange = { rating = it },
+                            onTagToggle = { tag ->
+                                tags =
+                                    if (tags.contains(tag)) tags - tag else if (tags.size < 3) tags + tag else tags
+                            },
+                            onSubmit = {
+                                val patientId = FirebaseAuth.getInstance().currentUser?.uid
+                                if (psychologistId != null && patientId != null && canSubmitReview) {
+                                    reviewViewModel.submitRating(
+                                        psychologistId,
+                                        patientId,
+                                        tags,
+                                        rating.toDouble()
+                                    )
+                                } else {
+                                    messageToShow =
+                                        "No se pudo autenticar al usuario o la cita no ha sido realizada."
+                                }
+                            },
+                            isSubmitting = isSubmitting
+                        )
+                    }
                 }
-                is DataState.Error -> Text("Error: ${state.e}", color = MaterialTheme.colorScheme.error)
+
+                is DataState.Error -> Text(
+                    "Error: ${state.e}",
+                    color = MaterialTheme.colorScheme.error
+                )
+
                 else -> Text("Cargando...")
             }
         }
     }
 }
 
-@Composable
-fun ProfileSection(
-    psycho: PsychoModel,
-    ratingPromedio: Double,
-    navController: NavController,
-    psychologistId: String?
-) {
-    // Mostrar foto, nombre, especialización y descripción
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.Start
+
+    @Composable
+    fun ProfileSection(
+        psycho: PsychoModel,
+        ratingPromedio: Double,
+        navController: NavController,
+        psychologistId: String?
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            AsyncImage(
-                model = psycho.photoUrl
-                    ?: "gs://proyectoconectadamente.firebasestorage.app/profile_pictures/hombre1.png",
-                contentDescription = "Foto de ${psycho.name}",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(psycho.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-        Text("Especialización: ${psycho.specialization?.joinToString() ?: "No disponible"}")
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow)
-            Spacer(modifier = Modifier.width(4.dp))
-            Text("%.1f / 5.0".format(ratingPromedio))
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-        Text("Descripción: ${psycho.descriptionPsycho ?: "No disponible"}")
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
+        // Mostrar foto, nombre, especialización y descripción
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.Start
         ) {
-            OutlinedButton(onClick = {
-                val patientId = FirebaseAuth.getInstance().currentUser?.uid // Obtener el ID del paciente
-                if (psychologistId != null && patientId != null) {
-                    navController.navigate("agendarCita/${psychologistId}/${patientId}") // Navegar a la pantalla de agendar con los dos IDs
-                } else {
-                    // Si no se puede obtener el patientId o el psychologistId, mostrar un mensaje o manejar el error
-                }
-            }) {
-                Icon(Icons.Default.CalendarToday, contentDescription = null)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Agendar cita")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AsyncImage(
+                    model = psycho.photoUrl
+                        ?: "gs://proyectoconectadamente.firebasestorage.app/profile_pictures/hombre1.png",
+                    contentDescription = "Foto de ${psycho.name}",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(CircleShape)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(psycho.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             }
 
-            OutlinedButton(onClick = { psychologistId?.let { navController.navigate("chatWithPsychologist/$it") } }) {
-                Icon(Icons.Default.Chat, contentDescription = null)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Especialización: ${psycho.specialization?.joinToString() ?: "No disponible"}")
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow)
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Chat")
+                Text("%.1f / 5.0".format(ratingPromedio))
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Descripción: ${psycho.descriptionPsycho ?: "No disponible"}")
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedButton(onClick = {
+                    val patientId = FirebaseAuth.getInstance().currentUser?.uid // Obtener el ID del paciente
+                    if (psychologistId != null && patientId != null) {
+                        navController.navigate("agendarCita/${psychologistId}/${patientId}") // Navegar a la pantalla de agendar con los dos IDs
+                    } else {
+                        //nada
+                    }
+                }) {
+                    Icon(Icons.Default.CalendarToday, contentDescription = null)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Agendar cita")
+                }
+
+                OutlinedButton(onClick = { psychologistId?.let { navController.navigate("chatWithPsychologist/$it") } }) {
+                    Icon(Icons.Default.Chat, contentDescription = null)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Chat")
+                }
             }
         }
     }
-}
-
 @Composable
 fun NewReviewSection(
     rating: Int,
@@ -259,6 +281,9 @@ fun NewReviewSection(
     onSubmit: () -> Unit,
     isSubmitting: Boolean
 ) {
+    // Estado que verifica si el usuario ha intentado enviar la calificación
+    var isSubmitAttempted by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
     ) {
@@ -271,15 +296,33 @@ fun NewReviewSection(
                     contentDescription = null,
                     tint = if (i <= rating) Color.Yellow else Color.Gray,
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(35.dp)
                         .clickable { onRatingChange(i) }
                 )
             }
         }
 
+        if (isSubmitAttempted && rating == 0) {
+            Text(
+                text = "Por favor, selecciona una calificación antes de enviar.",
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(5.dp))
         Text("Define al psicólogo", style = MaterialTheme.typography.bodyLarge)
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            val availableTags = listOf("Empático", "Buen oyente", "Profesional", "Amable")
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+            val availableTags = listOf(
+                "Empático", "Buen oyente", "Profesional", "Amable",
+                "Comprensivo", "Paciente", "Confiable", "Respetuoso",
+                "Comprometido", "Asertivo",
+                "Honesto", "Motivador", "Amigable", "Flexible",
+                "Sensible", "Discreto", "Dedicado", "Responsable",
+                "Analítico", "Claro en la comunicación",
+                "Ético", "Optimista"
+            )
             items(availableTags) { tag ->
                 AssistChip(
                     onClick = { onTagToggle(tag) },
@@ -293,7 +336,16 @@ fun NewReviewSection(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onSubmit, enabled = !isSubmitting) {
+
+        Button(
+            onClick = {
+                isSubmitAttempted = true
+                if (rating > 0) {
+                    onSubmit()
+                }
+            },
+            enabled = rating > 0 && !isSubmitting
+        ) {
             Text(if (isSubmitting) "Enviando..." else "Enviar calificación")
         }
     }

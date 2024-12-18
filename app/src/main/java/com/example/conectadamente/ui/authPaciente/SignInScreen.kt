@@ -48,6 +48,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -94,7 +95,7 @@ fun SignInScreen(
                     }
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = Purple30,
+                    containerColor = MaterialTheme.colorScheme.secondary,
                     navigationIconContentColor = Color.White, // Color del ícono de navegación
                     titleContentColor = Color.White // Color del título
                 )
@@ -174,25 +175,26 @@ fun SignInScreen(
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally // Centra los elementos dentro del Column
                 ) {
-                    // Campo para ingresar el correo electrónico
                     TextField(
                         value = email,
-                        onValueChange = { email = it.trim() }, // Elimina los espacios en blanco
+                        onValueChange = { email = it.trim().lowercase() }, // Convierte a minúsculas y elimina espacios
                         label = { Text("Correo Electrónico") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .focusRequester(emailFocusRequester),
                         shape = RoundedCornerShape(8.dp),
-                        keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email, // Configura el teclado para correos electrónicos
                             imeAction = ImeAction.Next // Cambia de campo cuando se presiona "Enter"
                         ),
                         keyboardActions = KeyboardActions(
-                            onNext = { passwordFocusRequester.requestFocus() } // Cambiar al campo de contraseña
+                            onNext = { passwordFocusRequester.requestFocus() } // Cambia al campo de contraseña
                         ),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = Brown10,
                             unfocusedBorderColor = Color.Transparent,
-                            focusedBorderColor = Color.Transparent)
+                            focusedBorderColor = Color.Transparent
+                        )
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))

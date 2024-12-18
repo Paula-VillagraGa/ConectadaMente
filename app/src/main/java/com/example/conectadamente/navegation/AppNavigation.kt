@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.conectadamente.ui.homePsycho.EditAppointmentScreen
 import com.example.conectadamente.ui.authPaciente.LoginScreen
 import com.example.conectadamente.ui.authPaciente.RegisterPatientScreen
 import com.example.conectadamente.ui.authPaciente.SignInScreen
@@ -22,6 +23,7 @@ import com.example.conectadamente.ui.authPsicologo.PsychologistLoginScreen
 import com.example.conectadamente.ui.authPsicologo.RegisterPsychoScreen
 import com.example.conectadamente.ui.homePsycho.AvailabilityScreen
 import com.example.conectadamente.ui.homePsycho.ChatPsychoScreen
+import com.example.conectadamente.ui.homePsycho.CompletedAppointmentsScreen
 import com.example.conectadamente.ui.homePsycho.EditPsychoProfileScreen
 import com.example.conectadamente.ui.homePsycho.PsychoHomeScreen
 import com.example.conectadamente.ui.homeUser.ProfilePsyFromPatScreen
@@ -74,7 +76,11 @@ fun AppNavigation() {
                 SignInScreen(
                     navController = navController,
                     navigateToRegisterPacient = { navController.navigate(NavScreen.RegisterPatient.route) },
-                    navigateToPsychoHomeScreen = {navController.navigate(NavScreen.PsychoHome.route)},
+                    navigateToPsychoHomeScreen = {
+                        navController.navigate(NavScreen.PsychoHome.route) {
+                            popUpTo(NavScreen.Login.route) { inclusive = true }
+                        }},
+
                     navigateToHomeScreen = {
                         navController.navigate(NavScreen.Home.route) {
                             popUpTo(NavScreen.Login.route) { inclusive = true }
@@ -176,6 +182,28 @@ fun AppNavigation() {
 
             composable(NavScreen.CitasReservadas.route) {
                 ReservedAppointmentsScreen(viewModel = hiltViewModel(), navController)
+            }
+            composable(
+                route = "editarCita/{appointmentId}?fechaHora={fechaHora}&paciente={paciente}",
+                arguments = listOf(
+                    navArgument("appointmentId") { type = NavType.StringType },
+                    navArgument("fechaHora") { type = NavType.StringType },
+                    navArgument("paciente") { type = NavType.StringType; defaultValue = "" }
+                )
+            ) { backStackEntry ->
+                val appointmentId = backStackEntry.arguments?.getString("appointmentId") ?: ""
+                val fechaHora = backStackEntry.arguments?.getString("fechaHora") ?: ""
+                val paciente = backStackEntry.arguments?.getString("paciente") ?: ""
+                EditAppointmentScreen(
+                    appointmentId = appointmentId,
+                    fechaHora = fechaHora,
+                    paciente = paciente,
+                    navController = navController,
+                    viewModel = hiltViewModel()
+                )
+            }
+            composable(NavScreen.CompletedAppointments.route) {
+                CompletedAppointmentsScreen(viewModel = hiltViewModel())
             }
 
             //Recomendaciones para Paciente

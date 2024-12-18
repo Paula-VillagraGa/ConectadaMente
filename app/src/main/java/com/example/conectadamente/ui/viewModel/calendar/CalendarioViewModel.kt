@@ -58,7 +58,12 @@ class AgendarViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 // Manejo de errores generales
-                _estadoAgendar.postValue("Error al intentar reservar el horario: ${e.message}")
+                Log.e("AgendarViewModel", "Error al intentar agendar el horario: ${e.message}")
+                if (e.message?.contains("El horario ya no está disponible") == true) {
+                    _estadoAgendar.postValue("El horario ya no está disponible.")
+                } else {
+                    _estadoAgendar.postValue("Error al intentar reservar el horario: ${e.message}")
+                }
             }
         }
     }
@@ -70,43 +75,31 @@ class AgendarViewModel @Inject constructor(
         // Buscar el documento en la colección "availability" usando availabilityId
         FirebaseFirestore.getInstance()
             .collection("availability")
-            .whereEqualTo(
-                "availabilityId",
-                availabilityId
-            ) // Usar el campo availabilityId para la búsqueda
+            .whereEqualTo("availabilityId", availabilityId)
             .get()
             .addOnSuccessListener { querySnapshot ->
-                // Si se encuentra el documento
                 if (!querySnapshot.isEmpty) {
-                    val document =
-                        querySnapshot.documents.first() // Obtén el primer documento (debe ser único)
+                    val document = querySnapshot.documents.first()
 
                     // Actualizar el estado de disponibilidad a "reservado"
                     document.reference.update("estado", "reservado")
                         .addOnSuccessListener {
-                            Log.d(
-                                "ActualizarDisponibilidad",
-                                "Disponibilidad actualizada a 'reservado'"
-                            )
+                            Log.d("ActualizarDisponibilidad", "Disponibilidad actualizada a 'reservado'")
+                            // Después de actualizar, recargar los horarios
+                            cargarHorariosDisponibles(document["psychoId"] as String)
                         }
                         .addOnFailureListener { e ->
-                            Log.e(
-                                "ActualizarDisponibilidad",
-                                "Error al actualizar la disponibilidad",
-                                e
-                            )
+                            Log.e("ActualizarDisponibilidad", "Error al actualizar la disponibilidad", e)
                         }
                 } else {
-                    Log.e(
-                        "ActualizarDisponibilidad",
-                        "No se encontró el horario con availabilityId: $availabilityId"
-                    )
+                    Log.e("ActualizarDisponibilidad", "No se encontró el horario con availabilityId: $availabilityId")
                 }
             }
             .addOnFailureListener { e ->
                 Log.e("ActualizarDisponibilidad", "Error al buscar el horario", e)
             }
     }
+
     fun obtenerHorariosPendientes(psychoId: String) {
         viewModelScope.launch {
             val horarios = repository.obtenerHorariosPendientes(psychoId)
