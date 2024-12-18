@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,12 +19,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -43,6 +47,11 @@ import androidx.navigation.NavController
 import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.utils.constants.DataState
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.widget.Autocomplete
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import com.google.android.libraries.places.api.model.Place
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +68,7 @@ fun EditPsychoProfileScreen(
     var experience by remember { mutableStateOf("") }
     var selectedSpecializations by remember { mutableStateOf(listOf<String>()) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var selectedLocation by remember { mutableStateOf("") }
 
     val specializations = listOf(
         "Clinica",
@@ -86,6 +96,14 @@ fun EditPsychoProfileScreen(
         viewModel.loadProfile() // Llama al ViewModel para cargar el perfil
     }
 
+    // Inicializa Google Places API
+    LaunchedEffect(Unit) {
+        if (!Places.isInitialized()) {
+            Places.initialize(context, "AIzaSyAH__Pc7g-tqS1oRvZz0kQPinRdh0HPN-g") // Reemplaza con tu API Key
+        }
+        viewModel.loadProfile() // Cargar el perfil
+    }
+
     // Sincronizar los datos del perfil al estado del formulario
     LaunchedEffect(profileState) {
         if (profileState is DataState.Success) {
@@ -95,9 +113,29 @@ fun EditPsychoProfileScreen(
                 description = it.descriptionPsycho.orEmpty()
                 experience = it.experience.orEmpty()
                 selectedSpecializations = it.specialization.orEmpty()
+                selectedLocation = it.location.orEmpty() // Cargar ubicación si existe
+                // Verificar si location es nulo y, si no, extraer la latitud y longitud
+                //it.location?.let { location ->
+                //    selectedLocation = "Lat: ${location.latitude}, Lon: ${location.longitude}" // Puedes almacenar la ubicación como un string
+                //} ?: run {
+                //    selectedLocation = "Ubicación no disponible"
+                //}
             }
         }
     }
+
+    // Launcher de Places Autocomplete
+    val placesLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.let { intent ->
+                val place = Autocomplete.getPlaceFromIntent(intent)
+                selectedLocation = place.address ?: "Ubicación no disponible"
+            }
+        }
+    }
+
 
     Scaffold(
         topBar = {
@@ -164,6 +202,25 @@ fun EditPsychoProfileScreen(
                     )
                 }
             }
+            // Selección de Ubicación
+            Text("Ubicación:")
+            OutlinedTextField(
+                value = selectedLocation,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = {
+                        val intent = Autocomplete.IntentBuilder(
+                            AutocompleteActivityMode.OVERLAY, listOf(Place.Field.ADDRESS)
+                        ).build(context)
+                        placesLauncher.launch(intent)
+                    }) {
+                        Icon(Icons.Default.Place, contentDescription = "Seleccionar Ubicación")
+                    }
+                },
+                label = { Text("Selecciona tu ubicación") },
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
@@ -172,6 +229,7 @@ fun EditPsychoProfileScreen(
                     description = description,
                     experience = experience,
                     specializations = selectedSpecializations,
+                    location = selectedLocation,
                     imageUri = imageUri
                 )
                 navController.popBackStack()
