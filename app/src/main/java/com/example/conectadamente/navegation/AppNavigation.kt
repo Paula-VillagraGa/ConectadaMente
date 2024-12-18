@@ -177,7 +177,7 @@ fun AppNavigation() {
             composable("agendarCita/{psychoId}/{patientId}") { backStackEntry ->
                 val psychoId = backStackEntry.arguments?.getString("psychoId") ?: ""
                 val patientId = backStackEntry.arguments?.getString("patientId") ?: ""
-                AgendarScreen(viewModel = hiltViewModel(), psychoId = psychoId, patientId = patientId)
+                AgendarScreen(viewModel = hiltViewModel(), psychoId = psychoId, patientId = patientId, navController)
             }
 
             composable(NavScreen.CitasReservadas.route) {

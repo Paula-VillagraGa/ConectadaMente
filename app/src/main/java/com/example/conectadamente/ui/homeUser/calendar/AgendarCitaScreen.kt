@@ -24,7 +24,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.ArrowCircleLeft
+import androidx.compose.material.icons.filled.ArrowCircleRight
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -36,7 +39,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,6 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.conectadamente.ui.theme.Purple10
 import com.example.conectadamente.ui.viewModel.calendar.AgendarViewModel
 import java.time.LocalTime
@@ -65,7 +72,8 @@ import java.time.format.DateTimeFormatter
 fun AgendarScreen(
     viewModel: AgendarViewModel = hiltViewModel(),
     psychoId: String,
-    patientId: String
+    patientId: String,
+    navController: NavController
 ) {
     // Estado de la disponibilidad y el estado de agendar
     val horariosDisponibles = viewModel.horariosDisponibles.observeAsState(emptyList())
@@ -91,193 +99,224 @@ fun AgendarScreen(
         viewModel.cargarHorariosDisponibles(psychoId)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
-        Text(
-            text = "Horarios disponibles",
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        CustomCalendar(
-            availableDates = horariosDisponibles.value.map { it["fecha"] as String },
-            onDateSelected = { date ->
-                Log.d("AgendarScreen", "Fecha seleccionada: $date")
-                fechaSeleccionada = date
-            }
-        )
-        fechaSeleccionada?.let { selectedDate ->
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(
-                    horariosDisponibles.value
-                        .filter { it["fecha"] == selectedDate && it["estado"] == "disponible" }
-                        .sortedBy {
-                            val horaString = it["hora"] as? String ?: ""
-                            try {
-                                LocalTime.parse(horaString, DateTimeFormatter.ofPattern("HH:mm"))
-                            } catch (e: Exception) {
-                                LocalTime.MAX
-                            }
-                        }
-                ) { horario ->
-                    HorarioItem(
-                        horario = horario,
-                        onAgendarClick = { availabilityId ->
-                            Log.d("AgendarScreen", "Horario seleccionado: ${horario["hora"]}, AvailabilityId: $availabilityId")
-                            horaSeleccionada = horario["hora"] as? String
-                            availabilityIdSeleccionado = availabilityId
-                            mostrarDialogo = true
-                        }
-                    )
-                }
-            }
-        }
-
-        if (estadoAgendar.value.isNotEmpty()) {
-            Log.d("AgendarScreen", "Estado de la acción de agendar: ${estadoAgendar.value}")
-            Text(
-                text = estadoAgendar.value,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                textAlign = TextAlign.Center
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "Agenda tu cita") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBackIosNew,
+                            contentDescription = "Volver atrás"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.primary
+                )
             )
         }
-    }
-
-    if (mostrarDialogo) {
-        Log.d("AgendarScreen", "Mostrando el cuadro de diálogo para confirmar cita.")
-        ModalBottomSheet(
-            onDismissRequest = { mostrarDialogo = false }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.4f)
-                    .padding(top = 16.dp)
-            ) {
-                Column(
+
+            CustomCalendar(
+                availableDates = horariosDisponibles.value.map { it["fecha"] as String },
+                onDateSelected = { date ->
+                    Log.d("AgendarScreen", "Fecha seleccionada: $date")
+                    fechaSeleccionada = date
+                }
+            )
+            fechaSeleccionada?.let { selectedDate ->
+                LazyColumn(modifier = Modifier.weight(1f)) {
+                    items(
+                        horariosDisponibles.value
+                            .filter { it["fecha"] == selectedDate && it["estado"] == "disponible" }
+                            .sortedBy {
+                                val horaString = it["hora"] as? String ?: ""
+                                try {
+                                    LocalTime.parse(
+                                        horaString,
+                                        DateTimeFormatter.ofPattern("HH:mm")
+                                    )
+                                } catch (e: Exception) {
+                                    LocalTime.MAX
+                                }
+                            }
+                    ) { horario ->
+                        HorarioItem(
+                            horario = horario,
+                            onAgendarClick = { availabilityId ->
+                                Log.d(
+                                    "AgendarScreen",
+                                    "Horario seleccionado: ${horario["hora"]}, AvailabilityId: $availabilityId"
+                                )
+                                horaSeleccionada = horario["hora"] as? String
+                                availabilityIdSeleccionado = availabilityId
+                                mostrarDialogo = true
+                            }
+                        )
+                    }
+                }
+            }
+
+            if (estadoAgendar.value.isNotEmpty()) {
+                Log.d("AgendarScreen", "Estado de la acción de agendar: ${estadoAgendar.value}")
+                Text(
+                    text = estadoAgendar.value,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .align(Alignment.TopStart)
-                        .padding(horizontal = 16.dp)
+                        .padding(top = 16.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        if (mostrarDialogo) {
+            Log.d("AgendarScreen", "Mostrando el cuadro de diálogo para confirmar cita.")
+            ModalBottomSheet(
+                onDismissRequest = { mostrarDialogo = false }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.4f)
+                        .padding(top = 16.dp)
                 ) {
-                    Text(
-                        text = "Confirmar cita",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-
-                    Text(
-                        text = "Fecha: $fechaSeleccionada",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = "Hora: $horaSeleccionada",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-
-                    // Selector de modalidad con botones
-                    Text(text = "Selecciona modalidad:")
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center // Centra los botones
-                    ) {
-                        Button(
-                            onClick = {
-                                Log.d("AgendarScreen", "Modalidad seleccionada: En línea")
-                                modalidadSeleccionada = "En línea"
-                            },
-                            modifier = Modifier
-                                .padding(8.dp) // Ajusta el espacio alrededor del botón
-                                .weight(1f), // Asegura que ambos botones tengan el mismo tamaño
-                            shape = MaterialTheme.shapes.medium, // Forma más estilizada
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (modalidadSeleccionada == "En línea") Purple10 else Color.Gray
-                            ),
-                            contentPadding = PaddingValues(vertical = 12.dp, horizontal = 32.dp) // Ajusta el padding para hacerlo más grande
-                        ) {
-                            Text(
-                                text = "En línea",
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), // Texto más grande y visible
-                                modifier = Modifier.align(Alignment.CenterVertically) // Alinea el texto verticalmente
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(12.dp)) // Añade un espacio entre los botones
-
-                        Button(
-                            onClick = {
-                                Log.d("AgendarScreen", "Modalidad seleccionada: Presencial")
-                                modalidadSeleccionada = "Presencial"
-                            },
-                            modifier = Modifier
-                                .padding(8.dp) // Ajusta el espacio alrededor del botón
-                                .weight(1f), // Asegura que ambos botones tengan el mismo tamaño
-                            shape = MaterialTheme.shapes.medium, // Forma más estilizada
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (modalidadSeleccionada == "Presencial") Purple10 else Color.Gray
-                            ),
-                            contentPadding = PaddingValues(vertical = 12.dp, horizontal = 32.dp) // Ajusta el padding para hacerlo más grande
-                        ) {
-                            Text(
-                                text = "Presencial",
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), // Texto más grande y visible
-                                modifier = Modifier.align(Alignment.CenterVertically) // Alinea el texto verticalmente
-                            )
-                        }
-                    }
-
-
-                    Box(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 10.dp, bottom = 16.dp), // Márgenes arriba y abajo
-                        contentAlignment = Alignment.Center // Centra el contenido dentro del Box
+                            .align(Alignment.TopStart)
+                            .padding(horizontal = 16.dp)
                     ) {
-                        // En el onClick del botón "Confirmar"
-                        Button(
-                            onClick = {
-                                Log.d("AgendarScreen", "Confirmando cita con los siguientes datos: availabilityId=$availabilityIdSeleccionado, patientId=$patientId, psychoId=$psychoId, modalidad=$modalidadSeleccionada")
+                        Text(
+                            text = "Confirmar cita",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
 
-                                // Realizar la acción de agendar el horario
-                                viewModel.agendarHorario(
-                                    availabilityId = availabilityIdSeleccionado ?: "",
-                                    patientId = patientId,
-                                    psychoId = psychoId,
-                                    modalidad = modalidadSeleccionada
-                                )
+                        Text(
+                            text = "Fecha: $fechaSeleccionada",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = "Hora: $horaSeleccionada",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
 
-                                // Actualizar el estado de la disponibilidad
-                                viewModel.actualizarDisponibilidad(
-                                    availabilityId = availabilityIdSeleccionado ?: ""
-                                )
-
-                                // Recargar los horarios disponibles
-                                viewModel.cargarHorariosDisponibles(psychoId)
-
-                                // Ocultar el cuadro de diálogo
-                                mostrarDialogo = false
-
-                                      },
-                            modifier = Modifier
-                                .wrapContentWidth()
-                                .padding(horizontal = 16.dp),
-                            shape = MaterialTheme.shapes.medium,
-                            colors = ButtonDefaults.buttonColors(containerColor = Purple10),
-                            contentPadding = PaddingValues(vertical = 14.dp, horizontal = 50.dp)
+                        // Selector de modalidad con botones
+                        Text(text = "Selecciona modalidad:")
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center // Centra los botones
                         ) {
-                            Text(
-                                text = "Confirmar",
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-                            )
+                            Button(
+                                onClick = {
+                                    Log.d("AgendarScreen", "Modalidad seleccionada: En línea")
+                                    modalidadSeleccionada = "En línea"
+                                },
+                                modifier = Modifier
+                                    .padding(8.dp) // Ajusta el espacio alrededor del botón
+                                    .weight(1f), // Asegura que ambos botones tengan el mismo tamaño
+                                shape = MaterialTheme.shapes.medium, // Forma más estilizada
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (modalidadSeleccionada == "En línea") Purple10 else Color.Gray
+                                ),
+                                contentPadding = PaddingValues(
+                                    vertical = 12.dp,
+                                    horizontal = 32.dp
+                                ) // Ajusta el padding para hacerlo más grande
+                            ) {
+                                Text(
+                                    text = "En línea",
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), // Texto más grande y visible
+                                    modifier = Modifier.align(Alignment.CenterVertically) // Alinea el texto verticalmente
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(12.dp)) // Añade un espacio entre los botones
+
+                            Button(
+                                onClick = {
+                                    Log.d("AgendarScreen", "Modalidad seleccionada: Presencial")
+                                    modalidadSeleccionada = "Presencial"
+                                },
+                                modifier = Modifier
+                                    .padding(8.dp) // Ajusta el espacio alrededor del botón
+                                    .weight(1f), // Asegura que ambos botones tengan el mismo tamaño
+                                shape = MaterialTheme.shapes.medium, // Forma más estilizada
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (modalidadSeleccionada == "Presencial") Purple10 else Color.Gray
+                                ),
+                                contentPadding = PaddingValues(
+                                    vertical = 12.dp,
+                                    horizontal = 32.dp
+                                ) // Ajusta el padding para hacerlo más grande
+                            ) {
+                                Text(
+                                    text = "Presencial",
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), // Texto más grande y visible
+                                    modifier = Modifier.align(Alignment.CenterVertically) // Alinea el texto verticalmente
+                                )
+                            }
+                        }
+
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 10.dp, bottom = 16.dp), // Márgenes arriba y abajo
+                            contentAlignment = Alignment.Center // Centra el contenido dentro del Box
+                        ) {
+                            // En el onClick del botón "Confirmar"
+                            Button(
+                                onClick = {
+                                    Log.d(
+                                        "AgendarScreen",
+                                        "Confirmando cita con los siguientes datos: availabilityId=$availabilityIdSeleccionado, patientId=$patientId, psychoId=$psychoId, modalidad=$modalidadSeleccionada"
+                                    )
+
+                                    // Realizar la acción de agendar el horario
+                                    viewModel.agendarHorario(
+                                        availabilityId = availabilityIdSeleccionado ?: "",
+                                        patientId = patientId,
+                                        psychoId = psychoId,
+                                        modalidad = modalidadSeleccionada
+                                    )
+
+                                    // Actualizar el estado de la disponibilidad
+                                    viewModel.actualizarDisponibilidad(
+                                        availabilityId = availabilityIdSeleccionado ?: ""
+                                    )
+
+                                    // Recargar los horarios disponibles
+                                    viewModel.cargarHorariosDisponibles(psychoId)
+
+                                    // Ocultar el cuadro de diálogo
+                                    mostrarDialogo = false
+
+                                },
+                                modifier = Modifier
+                                    .wrapContentWidth()
+                                    .padding(horizontal = 16.dp),
+                                shape = MaterialTheme.shapes.medium,
+                                colors = ButtonDefaults.buttonColors(containerColor = Purple10),
+                                contentPadding = PaddingValues(vertical = 14.dp, horizontal = 50.dp)
+                            ) {
+                                Text(
+                                    text = "Confirmar",
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                                )
+                            }
                         }
                     }
                 }
@@ -354,7 +393,7 @@ fun CustomCalendar(
                     contentColor = MaterialTheme.colorScheme.primary // Establece el color del icono
                 )
             ) {
-                Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Mes anterior")
+                Icon(Icons.Filled.ArrowCircleLeft, contentDescription = "Mes anterior")
             }
 
             Text(
@@ -371,7 +410,7 @@ fun CustomCalendar(
                     contentColor = MaterialTheme.colorScheme.primary // Establece el color del icono
                 )
             ) {
-                Icon(Icons.Default.ArrowForwardIos, contentDescription = "Mes siguiente")
+                Icon(Icons.Filled.ArrowCircleRight, contentDescription = "Mes siguiente")
             }
         }
 
@@ -416,15 +455,15 @@ fun CustomCalendar(
                                     .background(
                                         when {
                                             isAvailable -> Color(0xFFB39DDB) // Morado claro para fechas disponibles
-                                            else -> Color(0xFFEDE7F6) // Morado muy claro para días normales
+                                            else -> Color.Transparent
                                         }
                                     )
                                     .clickable(enabled = isAvailable) { onDateSelected(formattedDate) }
-                                    .border(
+                                    /*.border(
                                         width = if (isAvailable) 2.dp else 1.dp,
                                         color = if (isAvailable) Color(0xFF7E57C2) else Color(0xFFD1C4E9),
                                         shape = CircleShape
-                                    )
+                                    )*/
                                     .size(48.dp), // Tamaño de los días
                                 contentAlignment = Alignment.Center
                             ) {
