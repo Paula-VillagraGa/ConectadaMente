@@ -25,6 +25,7 @@ foundationLayoutAndroidVersion = "1.7.2"
 navigationSafeArgsGeneratorVersion = "2.8.4"
 composeMaterialVersion = "1.4.0"
 storageVersion = "1.5.0"
+firebaseMessagingKtxVersion = "24.1.0"
 
 
 [libraries]
@@ -32,6 +33,7 @@ accompanist-pager = { module = "com.google.accompanist:accompanist-pager", versi
 androidx-activity-compose-v172 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+google-firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -59,6 +61,7 @@ androidx-foundation-layout-android = { group = "androidx.compose.foundation", na
 androidx-navigation-safe-args-generator = { group = "androidx.navigation", name = "navigation-safe-args-generator", version.ref = "navigationSafeArgsGeneratorVersion" }
 androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "composeMaterialVersion" }
 androidx-storage = { group = "androidx.test.services", name = "storage", version.ref = "storageVersion" }
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtxVersion" }
 
 
 

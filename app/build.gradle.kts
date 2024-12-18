@@ -105,6 +105,10 @@ dependencies {
     }
 
 
+    //Notificaciones
+    implementation (libs.google.firebase.messaging.ktx)
+
+
     //Room
     implementation("androidx.room:room-runtime:$room_version")
     implementation(libs.androidx.foundation.android)
@@ -117,6 +121,7 @@ dependencies {
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.storage)
     implementation(libs.androidx.foundation.android)
+    implementation(libs.firebase.messaging.ktx)
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
 
