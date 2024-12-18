@@ -116,6 +116,7 @@ class PsychoAuthViewModel @Inject constructor(
         description: String,
         experience: String,
         specializations: List<String>,
+        therapy:String,
         imageUri: Uri?,
         location: String? // Nuevo parámetro para la ubicación
     ) {
@@ -133,6 +134,7 @@ class PsychoAuthViewModel @Inject constructor(
                     if (!location.isNullOrBlank()) {
                         profileData["location"] = location // Actualizar ubicación
                     }
+                    profileData["therapy"] = therapy
 
                     // Actualizar Firestore
                     firestore.collection("psychos").document(it).update(profileData).await()
@@ -145,7 +147,7 @@ class PsychoAuthViewModel @Inject constructor(
                         firestore.collection("psychos").document(it).update("photoUrl", downloadUrl).await()
                     }
 
-                    // Refrescar el estado después de guardar
+
                     loadProfile() // Vuelve a cargar los datos actualizados desde Firestore
                 } catch (e: Exception) {
                     _profileState.value = DataState.Error("Error al actualizar el perfil: ${e.message}")

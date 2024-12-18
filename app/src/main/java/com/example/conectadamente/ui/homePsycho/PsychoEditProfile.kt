@@ -3,11 +3,12 @@ package com.example.conectadamente.ui.homePsycho
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,17 +20,25 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -67,62 +77,26 @@ fun EditPsychoProfileScreen(
     var description by remember { mutableStateOf("") }
     var experience by remember { mutableStateOf("") }
     var selectedSpecializations by remember { mutableStateOf(listOf<String>()) }
+    var selectedTherapy by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var selectedLocation by remember { mutableStateOf("") }
 
     val specializations = listOf(
-        "Clinica",
-        "Infantil",
-        "Forense",
-        "Organizacional",
-        "Educacional",
-        "Salud",
-        "Deportiva",
-        "Social",
-        "Comunicatorio",
-        "Neuropsicológica",
-        "Terapéutica",
-        "Psicoterapia",
-        "Sexualidad",
-        "Envejecimiento",
-        "Duelo",
-        "Humanista",
-        "Integrativa"
+        "Clinica", "Infantil", "Forense", "Organizacional", "Educacional", "Salud",
+        "Deportiva", "Social", "Comunicatorio", "Neuropsicológica", "Terapéutica",
+        "Psicoterapia", "Sexualidad", "Envejecimiento", "Duelo", "Humanista", "Integrativa"
     )
-    val maxSelection = 3
+    //Terapias
+    val therapies = listOf(
+        "Terapia Cognitivo-Conductual", "Terapia Psicoanalítica", "Terapia Humanista",
+        "Terapia Gestalt", "Terapia Familiar", "Terapia de Aceptación y Compromiso",
+        "Terapia de Juego", "Terapia de Pareja", "Terapia Psicodinámica", "Terapia Existencial",
+        "Terapia Conductual", "Terapia Sistémica"
+    )
 
-    // Cargar automáticamente los datos del perfil al abrir la pantalla
-    LaunchedEffect(Unit) {
-        viewModel.loadProfile() // Llama al ViewModel para cargar el perfil
-    }
 
-    // Inicializa Google Places API
-    LaunchedEffect(Unit) {
-        if (!Places.isInitialized()) {
-            Places.initialize(context, "AIzaSyAH__Pc7g-tqS1oRvZz0kQPinRdh0HPN-g") // Reemplaza con tu API Key
-        }
-        viewModel.loadProfile() // Cargar el perfil
-    }
-
-    // Sincronizar los datos del perfil al estado del formulario
-    LaunchedEffect(profileState) {
-        if (profileState is DataState.Success) {
-            val psycho = (profileState as DataState.Success).data
-            psycho?.let {
-                phone = it.phone.orEmpty()
-                description = it.descriptionPsycho.orEmpty()
-                experience = it.experience.orEmpty()
-                selectedSpecializations = it.specialization.orEmpty()
-                selectedLocation = it.location.orEmpty() // Cargar ubicación si existe
-                // Verificar si location es nulo y, si no, extraer la latitud y longitud
-                //it.location?.let { location ->
-                //    selectedLocation = "Lat: ${location.latitude}, Lon: ${location.longitude}" // Puedes almacenar la ubicación como un string
-                //} ?: run {
-                //    selectedLocation = "Ubicación no disponible"
-                //}
-            }
-        }
-    }
+    var expanded by remember { mutableStateOf(false) }
+    var tipoTerapia by remember { mutableStateOf("") }
 
     // Launcher de Places Autocomplete
     val placesLauncher = rememberLauncherForActivityResult(
@@ -136,16 +110,34 @@ fun EditPsychoProfileScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.loadProfile() // Llama al ViewModel para cargar el perfil
+    }
+
+    // Sincroniza los datos del perfil al estado del formulario
+    LaunchedEffect(profileState) {
+        if (profileState is DataState.Success) {
+            val psycho = (profileState as DataState.Success).data
+            psycho?.let {
+                phone = it.phone.orEmpty()
+                description = it.descriptionPsycho.orEmpty()
+                experience = it.experience.orEmpty()
+                selectedSpecializations = it.specialization.orEmpty()
+                selectedTherapy = it.therapy.orEmpty()
+                selectedLocation = it.location.orEmpty() // Cargar ubicación si existe
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Editar Perfil") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Volver")
                     }
-                }
+                },
+                title = {}
             )
         }
     ) { paddingValues ->
@@ -154,52 +146,112 @@ fun EditPsychoProfileScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp) // Espaciado entre elementos
         ) {
+
+            // Título Editar Perfil
+            Text(
+                text = "Edita tu Perfil",
+                style = MaterialTheme.typography.headlineMedium, // Ajusta el estilo de texto
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(top = 10.dp) // Ajusta el espacio superior
+            )
+
             // Campo Teléfono
-            TextField(
+            OutlinedTextField(
                 value = phone,
                 onValueChange = { phone = it },
                 label = { Text("Teléfono") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = Color.Transparent,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                )
             )
 
-            // Campo Descripción
-            TextField(
+
+            OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Descripción") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = Color.Transparent,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                )
             )
 
-            // Campo Experiencia
-            TextField(
+
+            OutlinedTextField(
                 value = experience,
                 onValueChange = { experience = it },
                 label = { Text("Experiencia") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = Color.Transparent,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                )
             )
 
-            // Especializaciones (Chips con límite de selección)
-            Text("Especializaciones (máximo 3):")
+            // Especializaciones
+            Text("Especializaciones (Escoge máximo 2):")
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(specializations) { spec ->
                     val isSelected = spec in selectedSpecializations
+                    val canSelectMore = selectedSpecializations.size < 2 || isSelected
                     FilterChip(
                         selected = isSelected,
                         onClick = {
                             if (isSelected) {
                                 selectedSpecializations = selectedSpecializations - spec
-                            } else if (selectedSpecializations.size < maxSelection) {
+                            } else if (canSelectMore) {
                                 selectedSpecializations = selectedSpecializations + spec
                             }
                         },
                         label = { Text(text = spec) },
-                        modifier = Modifier.padding(4.dp)
+                        modifier = Modifier.padding(4.dp),
+                        enabled = canSelectMore // Deshabilitar cuando se alcanzó el límite
                     )
+                }
+            }
+
+
+            Text("Tipo de Terapia:")
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                OutlinedTextField(
+                    value = selectedTherapy,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Terapia") },
+                    placeholder = { Text("Selecciona") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier.menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    therapies.forEach { estado ->
+                        DropdownMenuItem(
+                            text = { Text(estado) },
+                            onClick = {
+                                selectedTherapy = estado
+                                expanded = false
+                            }
+                        )
+                    }
                 }
             }
             // Selección de Ubicación
@@ -223,6 +275,9 @@ fun EditPsychoProfileScreen(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
+
+
+            // Botón de Guardar Cambios
             Button(onClick = {
                 viewModel.updateProfile(
                     phone = phone,
@@ -230,7 +285,8 @@ fun EditPsychoProfileScreen(
                     experience = experience,
                     specializations = selectedSpecializations,
                     location = selectedLocation,
-                    imageUri = imageUri
+                    imageUri = imageUri,
+                    therapy = selectedTherapy
                 )
                 navController.popBackStack()
             }) {

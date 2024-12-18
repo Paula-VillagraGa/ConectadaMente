@@ -14,6 +14,7 @@ data class PsychoModel(
     val rut: String = "",
     val rol: String = "psicologo",
     val specialization: List<String>? = emptyList(),
+    val therapy: String? = null,
     val rating: Double = 0.0,
     val tagsSpecific: List<String> = emptyList(),
     val descriptionPsycho: String? = null,
