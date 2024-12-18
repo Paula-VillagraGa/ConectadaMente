@@ -96,7 +96,6 @@ fun EditPsychoProfileScreen(
 
 
     var expanded by remember { mutableStateOf(false) }
-    var tipoTerapia by remember { mutableStateOf("") }
 
     // Launcher de Places Autocomplete
     val placesLauncher = rememberLauncherForActivityResult(
