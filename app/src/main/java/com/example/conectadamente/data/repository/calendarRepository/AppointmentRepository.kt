@@ -199,10 +199,6 @@ class AppointmentRepository @Inject constructor(
             citas
         }
     }
-    suspend fun obtenerPsicologosPorCitas(citas: List<Appointment>): Map<String, PsychoModel> {
-        val psychoIds = citas.mapNotNull { it.psychoId }.distinct()
-        return getPsychologistsByIds(psychoIds)
-    }
     suspend fun cancelarCitaYActualizar(patientId: String, appointmentId: String, availabilityId: String): Boolean {
         return cancelarCita(appointmentId, availabilityId)
     }
@@ -247,7 +243,7 @@ class AppointmentRepository @Inject constructor(
                     // Actualizar estado de la cita
                     transaction.update(appointmentRef, "estado", "Cancelada")
                     // Actualizar disponibilidad a "Disponible"
-                    transaction.update(availabilityRef, "estado", "Disponible")
+                    transaction.update(availabilityRef, "estado", "disponible")
                 }.await()
 
                 true

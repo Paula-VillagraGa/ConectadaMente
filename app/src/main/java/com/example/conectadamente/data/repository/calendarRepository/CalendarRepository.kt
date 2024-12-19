@@ -34,7 +34,6 @@ class AgendarRepository @Inject constructor(
             }
         }
     }
-
     suspend fun agendarHorario(
         availabilityId: String,
         patientId: String,
@@ -48,6 +47,7 @@ class AgendarRepository @Inject constructor(
 
         return withContext(Dispatchers.IO) {
             try {
+                // Referencias a la colección de disponibilidad y citas
                 val availabilityRef = firestore.collection("availability").document(availabilityId)
                 val appointmentsRef = firestore.collection("appointments").document()
 
@@ -74,7 +74,7 @@ class AgendarRepository @Inject constructor(
                     Log.d("AgendarRepository", "Actualizando disponibilidad a 'reservado'.")
                     transaction.update(availabilityRef, "estado", "reservado")
 
-                    // Crear la cita
+                    // Crear la cita con el ID generado por Firestore
                     val appointment = mapOf(
                         "availabilityId" to availabilityId,
                         "patientId" to patientId,
@@ -83,25 +83,33 @@ class AgendarRepository @Inject constructor(
                         "hora" to hora,
                         "modalidad" to modalidad,
                         "estado" to "pendiente",
-                        "agendadoEn" to Timestamp.now()
+                        "agendadoEn" to Timestamp.now(),
+                        "appointmentId" to appointmentsRef.id // Aquí se agrega el ID generado
                     )
 
+                    // Setear el documento de la cita en la colección appointments
                     transaction.set(appointmentsRef, appointment)
-                    Log.d("AgendarRepository", "Cita creada en appointments.")
-                }.await()
 
-                // Si la reserva fue exitosa, notificar a la UI para que actualice
+                    // Obtener el ID generado del documento de la cita
+                    val appointmentId = appointmentsRef.id
+                    Log.d("AgendarRepository", "Cita creada con ID: $appointmentId en appointments.")
+                }.await()  // Ejecutar la transacción de forma suspensiva
+
+                // Si todo ha ido bien
                 Log.d("AgendarRepository", "Cita agendada exitosamente.")
                 return@withContext true
             } catch (e: FirebaseFirestoreException) {
+                // Manejo de excepciones de Firestore
                 Log.e("AgendarRepository", "Error en Firestore: ${e.message}")
                 return@withContext false
             } catch (e: Exception) {
+                // Manejo de excepciones generales
                 Log.e("AgendarRepository", "Error inesperado: ${e.message}")
                 return@withContext false
             }
         }
     }
+
 
 
     suspend fun obtenerHorariosPendientes(psychoId: String): List<String> {

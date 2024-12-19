@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.conectadamente.ui.theme.Purple10
+import com.example.conectadamente.ui.theme.Purple50
 import com.example.conectadamente.ui.viewModel.calendar.AgendarViewModel
 import java.time.LocalTime
 import java.time.YearMonth
@@ -309,8 +310,8 @@ fun AgendarScreen(
                                     .wrapContentWidth()
                                     .padding(horizontal = 16.dp),
                                 shape = MaterialTheme.shapes.medium,
-                                colors = ButtonDefaults.buttonColors(containerColor = Purple10),
-                                contentPadding = PaddingValues(vertical = 14.dp, horizontal = 50.dp)
+                                colors = ButtonDefaults.buttonColors(containerColor = Purple50),
+                                contentPadding = PaddingValues(vertical = 14.dp, horizontal = 60.dp)
                             ) {
                                 Text(
                                     text = "Confirmar",

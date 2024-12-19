@@ -40,7 +40,6 @@ import com.example.conectadamente.ui.homeUser.ProfilePsyFromPatScreen
 import com.example.conectadamente.ui.homePsycho.PsychoProfileScreen
 import com.example.conectadamente.ui.homePsycho.ReservedAppointmentsScreen
 import com.example.conectadamente.ui.homeUser.AppointmentPatientScreen
-import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
 import com.example.conectadamente.ui.homeUser.EditProfilePatientScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
 import com.example.conectadamente.ui.homeUser.PerfilUsuarioScreen
@@ -138,7 +137,7 @@ fun AppNavigation() {
             }
 
             composable(NavScreen.AppointmentPatient.route){
-                AppointmentPatientScreen(viewModel = hiltViewModel(), psychoId = "")
+                AppointmentPatientScreen(viewModel = hiltViewModel(), psychoId = "", navController)
             }
 
             //Psicologo ->
@@ -241,7 +240,6 @@ fun AppNavigation() {
             }
 
 
-            composable(NavScreen.Chat.route) { ChatUsuarioScreen(navController) }
             composable(NavScreen.Formativo.route) { RecomendacionScreen(navController) }
 
             // Recomendaciones

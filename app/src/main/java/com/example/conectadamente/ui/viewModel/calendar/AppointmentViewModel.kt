@@ -95,6 +95,8 @@ class AppointmentViewModel @Inject constructor(
     }
 
     private fun loadPsychologists(psychoIds: List<String>) {
+        if (psychoIds.isEmpty()) return // Evitar llamadas innecesarias
+
         viewModelScope.launch {
             try {
                 val psychologistsMap = appointmentRepository.getPsychologistsByIds(psychoIds)
@@ -104,14 +106,19 @@ class AppointmentViewModel @Inject constructor(
             }
         }
     }
-
-    // Obtener citas del paciente autenticado
     fun obtenerCitasDelPaciente(patientId: String) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
+                // Obtener las citas del paciente
                 val citas = appointmentRepository.obtenerCitasDelPaciente(patientId)
                 _citasDelPaciente.value = citas
+
+                // Extraer los psychoIds de las citas
+                val psychoIds = citas.map { it.psychoId }.distinct()
+
+                // Cargar los datos de los psicólogos relacionados
+                loadPsychologists(psychoIds)
             } catch (e: Exception) {
                 _errorMessage.value = "Error al obtener citas: ${e.message}"
             } finally {
@@ -120,14 +127,14 @@ class AppointmentViewModel @Inject constructor(
         }
     }
 
-    // Cancelar cita
     fun cancelarCita(appointmentId: String, availabilityId: String, patientId: String) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
                 val success = appointmentRepository.cancelarCitaYActualizar(patientId, appointmentId, availabilityId)
                 if (success) {
-                    obtenerCitasDelPaciente(patientId) // Actualiza la lista de citas
+                    obtenerCitasDelPaciente(patientId)
+                    _errorMessage.value=("Cita cancelada con éxito.")
                 } else {
                     _errorMessage.value = "Error al cancelar la cita."
                 }
