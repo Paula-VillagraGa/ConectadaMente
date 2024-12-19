@@ -8,6 +8,7 @@ import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Newspaper
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -35,7 +36,7 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
 
     //Recomendaciones ->
     object BookRecommendations: NavScreen("book_recommendations", "Recomendaciones", null)
-    object ArticlesRecommendations : NavScreen("articles_recommendations", "Recomendaciones", null)
+    object ArticlesRecommendations : NavScreen("articles_recommendations", "Articulos", Icons.Outlined.Newspaper)
     object CallSosRecommendations : NavScreen("call_sos_recommendations", "Recomendaciones", null)
 
     //Agendar citas
@@ -58,5 +59,5 @@ val bottomNavItems = listOf(
 val bottomNavItemsPsycho = listOf(
     NavScreen.PsychoHome,
     NavScreen.PsychoProfile,
-    NavScreen.ChatPsycho
+    NavScreen.ArticlesRecommendations
 )

@@ -68,7 +68,7 @@ fun AppNavigation() {
     val scaffoldPsycho = listOf(
         NavScreen.PsychoHome.route,
         NavScreen.PsychoProfile.route,
-        NavScreen.ChatPsycho.route
+        NavScreen.ArticlesRecommendations.route
     )
 
 

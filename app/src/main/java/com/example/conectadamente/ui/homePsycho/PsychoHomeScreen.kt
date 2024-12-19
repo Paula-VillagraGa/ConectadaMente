@@ -90,14 +90,14 @@ fun TopAppBar() {
 }
 
 
-    @Composable
+@Composable
 fun PsychologistHomeContent(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
-        // Fila superior con 2 tarjetas
+        Spacer(modifier = Modifier.height(40.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
