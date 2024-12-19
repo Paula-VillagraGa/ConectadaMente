@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -82,9 +84,9 @@ fun EditPsychoProfileScreen(
     var selectedLocation by remember { mutableStateOf("") }
 
     val specializations = listOf(
-        "Clinica", "Infantil", "Forense", "Organizacional", "Educacional", "Salud",
+        "Clinica", "Infantil", "Organizacional", "Educacional", "Salud",
         "Deportiva", "Social", "Comunicatorio", "Neuropsicológica", "Terapéutica",
-        "Psicoterapia", "Sexualidad", "Envejecimiento", "Duelo", "Humanista", "Integrativa"
+        "Psicoterapia", "Sexualidad", "Duelo", "Humanista", "Integrativa"
     )
     //Terapias
     val therapies = listOf(
@@ -111,6 +113,14 @@ fun EditPsychoProfileScreen(
 
     LaunchedEffect(Unit) {
         viewModel.loadProfile() // Llama al ViewModel para cargar el perfil
+    }
+
+    // Inicializa Google Places API
+    LaunchedEffect(Unit) {
+        if (!Places.isInitialized()) {
+            Places.initialize(context, "AIzaSyAH__Pc7g-tqS1oRvZz0kQPinRdh0HPN-g") // Reemplaza con tu API Key
+        }
+        viewModel.loadProfile() // Cargar el perfil
     }
 
     // Sincroniza los datos del perfil al estado del formulario
@@ -144,6 +154,7 @@ fun EditPsychoProfileScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .verticalScroll(rememberScrollState()) // Habilitar scroll
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp) // Espaciado entre elementos
         ) {

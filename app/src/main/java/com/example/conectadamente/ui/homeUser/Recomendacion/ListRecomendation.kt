@@ -162,7 +162,6 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
                 val specializations = listOf(
                     "Clinica",
                     "Infantil",
-                    "Forense",
                     "Organizacional",
                     "Educacional",
                     "Salud",
@@ -173,7 +172,6 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
                     "Terapéutica",
                     "Psicoterapia",
                     "Sexualidad",
-                    "Envejecimiento",
                     "Duelo",
                     "Humanista",
                     "Integrativa"
