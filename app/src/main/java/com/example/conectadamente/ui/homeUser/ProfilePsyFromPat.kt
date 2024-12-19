@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -52,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -253,12 +255,10 @@ fun ProfilePsyFromPatScreen(
             Spacer(modifier = Modifier.height(8.dp))
             Text("Descripción: ${psycho.descriptionPsycho ?: "No disponible"}")
             Spacer(modifier = Modifier.height(8.dp))
-            // Ubicación
+
             psycho.location?.let { location ->
-                Text(
-                    text = location,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .clickable {
                             // Redirigir a Google Maps usando la ubicación
@@ -266,12 +266,33 @@ fun ProfilePsyFromPatScreen(
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(mapsUrl))
                             context.startActivity(intent)
                         }
-                )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn, // Reemplazar con tu icono
+                        contentDescription = "Ubicación",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
+                    Text(
+                        text = location,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.clickable {
+                            // Redirigir a Google Maps usando la ubicación
+                            val mapsUrl = "https://www.google.com/maps/search/?api=1&query=${Uri.encode(location)}"
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(mapsUrl))
+                            context.startActivity(intent)
+                        }
+                    )
+                }
             } ?: Text(
                 text = "Ubicación no disponible",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
+
+
 
             Spacer(modifier = Modifier.height(16.dp))
             Row(
