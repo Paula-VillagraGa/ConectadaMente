@@ -202,7 +202,6 @@ fun BuscarPorTagScreen(inputText: String,tag: String, navController: NavHostCont
                     }
                 }
 
-                // Mostrar los psicólogos filtrados
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                         .background(MaterialTheme.colorScheme.background)

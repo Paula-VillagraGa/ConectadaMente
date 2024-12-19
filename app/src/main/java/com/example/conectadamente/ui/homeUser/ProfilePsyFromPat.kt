@@ -22,6 +22,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Reviews
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -52,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -70,7 +73,7 @@ fun ProfilePsyFromPatScreen(
     psychologistId: String?,
     navController: NavController
 ) {
-    val patientId = FirebaseAuth.getInstance().currentUser?.uid
+
 
     // Estados y ViewModels
     val snackbarHostState = remember { SnackbarHostState() }
@@ -210,95 +213,82 @@ fun ProfilePsyFromPatScreen(
     }
 }
 
-
-    @Composable
-    fun ProfileSection(
-        psycho: PsychoModel,
-        ratingPromedio: Double,
-        navController: NavController,
-        psychologistId: String?,
-
+@Composable
+fun ProfileSection(
+    psycho: PsychoModel,
+    ratingPromedio: Double,
+    navController: NavController,
+    psychologistId: String?,
+) {
+    // Mostrar foto, nombre, especialización y descripción
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.Start
     ) {
-        val context = LocalContext.current // Obtiene el contexto de la aplicación
-        // Mostrar foto, nombre, especialización y descripción
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AsyncImage(
-                    model = psycho.photoUrl
-                        ?: "gs://proyectoconectadamente.firebasestorage.app/profile_pictures/hombre1.png",
-                    contentDescription = "Foto de ${psycho.name}",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(psycho.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Especialización: ${psycho.specialization?.joinToString() ?: "No disponible"}")
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("%.1f / 5.0".format(ratingPromedio))
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Descripción: ${psycho.descriptionPsycho ?: "No disponible"}")
-            Spacer(modifier = Modifier.height(8.dp))
-            // Ubicación
-            psycho.location?.let { location ->
-                Text(
-                    text = location,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier
-                        .clickable {
-                            // Redirigir a Google Maps usando la ubicación
-                            val mapsUrl = "https://www.google.com/maps/search/?api=1&query=${Uri.encode(location)}"
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(mapsUrl))
-                            context.startActivity(intent)
-                        }
-                )
-            } ?: Text(
-                text = "Ubicación no disponible",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AsyncImage(
+                model = psycho.photoUrl
+                    ?: "gs://proyectoconectadamente.firebasestorage.app/profile_pictures/hombre1.png",
+                contentDescription = "Foto de ${psycho.name}",
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
             )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                psycho.name,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedButton(onClick = {
-                    val patientId = FirebaseAuth.getInstance().currentUser?.uid // Obtener el ID del paciente
-                    if (psychologistId != null && patientId != null) {
-                        navController.navigate("agendarCita/${psychologistId}/${patientId}") // Navegar a la pantalla de agendar con los dos IDs
-                    } else {
-                        //nada
-                    }
-                }) {
-                    Icon(Icons.Default.CalendarToday, contentDescription = null)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Agendar cita")
-                }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Especialización: ${psycho.specialization?.joinToString() ?: "No disponible"}")
+        Spacer(modifier = Modifier.height(8.dp))
 
-                OutlinedButton(onClick = { psychologistId?.let { navController.navigate("chatWithPsychologist/$it") } }) {
-                    Icon(Icons.Default.Chat, contentDescription = null)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Chat")
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow)
+            Spacer(modifier = Modifier.width(4.dp))
+            Text("%.1f / 5.0".format(ratingPromedio))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Descripción: ${psycho.descriptionPsycho ?: "No disponible"}")
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            OutlinedButton(onClick = {
+                val patientId =
+                    FirebaseAuth.getInstance().currentUser?.uid // Obtener el ID del paciente
+                if (psychologistId != null && patientId != null) {
+                    navController.navigate("agendarCita/${psychologistId}/${patientId}") // Navegar a la pantalla de agendar con los dos IDs
+                } else {
+                    //nada
                 }
+            }) {
+                Icon(Icons.Default.CalendarToday, contentDescription = null)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Agendar cita")
+            }
+
+            OutlinedButton(onClick = {
+                psychologistId?.let {
+                    navController.navigate("reviews_screen/$it")  // Usamos "psychologistId" aquí
+                }
+            }) {
+                Icon(Icons.Default.Reviews, contentDescription = null)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Ver reseñas")
             }
         }
     }
+    }
+
 @Composable
 fun NewReviewSection(
     rating: Int,
