@@ -10,7 +10,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,8 +51,7 @@ import com.example.conectadamente.ui.homeUser.recommendationsPatient.SosDialCard
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
 import com.example.conectadamente.ui.viewModel.PsychoViewModel
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
-import com.example.conectadamente.ui.viewModel.reviews.ReviewViewModel
-import com.google.firebase.auth.FirebaseAuth
+
 
 
 @Composable
