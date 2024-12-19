@@ -63,13 +63,6 @@ class PsychoAuthViewModel @Inject constructor(
         }
     }
 
-    fun searchPsychologists() {
-        viewModelScope.launch {
-            val filtered = authPsychoRepository.getPsychosByName(query.value)
-            _psychologistsState.value = filtered
-        }
-    }
-
     fun getPsychoById(id: String) {
         viewModelScope.launch {
             try {

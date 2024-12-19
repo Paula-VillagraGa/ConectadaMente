@@ -42,6 +42,8 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
     object CitasReservadas: NavScreen("citas_reservadas", "Citas Reservadas", null)
     object CompletedAppointments : NavScreen("completed_appointments", "Citas Realizadas", null)
 
+    //Reseñas a psicologo
+    object ReseñasDetalle: NavScreen("reseñas_detalle", "Reseñas", null)
 }
 // Lista para navegación inferior
 val bottomNavItems = listOf(

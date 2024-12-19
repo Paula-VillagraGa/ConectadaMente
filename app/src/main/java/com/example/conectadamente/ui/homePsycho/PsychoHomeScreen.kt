@@ -25,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.conectadamente.R
 import com.example.conectadamente.navegation.NavScreen
 import com.example.conectadamente.ui.theme.*
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
@@ -140,11 +141,12 @@ fun PsychologistHomeContent(navController: NavHostController) {
                     .height(250.dp),
                 color = Purple50
             )
+            val psychoId = FirebaseAuth.getInstance().currentUser?.uid
             SupportCard(
                 title = "Mindfulness",
                 subtitle = "Enfoque en la meditación",
                 imageRes = R.drawable.ico_chat,
-                onClick = { /* Acción para mindfulness */ },
+                onClick = { navController.navigate(NavScreen.ReseñasDetalle.route + "/$psychoId")},
                 modifier = Modifier
                     .weight(0.5f)
                     .height(250.dp),
