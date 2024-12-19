@@ -64,17 +64,16 @@ class UserAuthViewModel @Inject constructor(
         }
     }
 
-    // Suspended function para registrar el usuario
     private suspend fun registerUserWithEmailAndPassword(email: String, password: String): AuthResult? {
         return suspendCoroutine { continuation ->
             FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        continuation.resume(task.result) // Retorna el resultado exitoso
+                        continuation.resume(task.result)
                     } else {
                         continuation.resumeWithException(
                             task.exception ?: Exception("Error desconocido")
-                        ) // Lanza un error si algo falla
+                        )
                     }
                 }
         }

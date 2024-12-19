@@ -66,12 +66,13 @@ class AppointmentViewModel @Inject constructor(
     fun actualizarEstadoCitaConObservaciones(
         appointmentId: String,
         nuevoEstado: String,
-        observaciones: String
+        observaciones: String,
+        recomendaciones: String
     ) {
         viewModelScope.launch {
             try {
                 val success = appointmentRepository.actualizarEstadoCitaConObservaciones(
-                    appointmentId, nuevoEstado, observaciones
+                    appointmentId, nuevoEstado, observaciones, recomendaciones
                 )
                 if (!success) {
                     _errorMessage.value = "Error al actualizar la cita."

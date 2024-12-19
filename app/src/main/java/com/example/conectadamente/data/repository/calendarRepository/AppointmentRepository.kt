@@ -103,7 +103,8 @@ class AppointmentRepository @Inject constructor(
     suspend fun actualizarEstadoCitaConObservaciones(
         appointmentId: String,
         nuevoEstado: String,
-        observaciones: String
+        observaciones: String,
+        recomendaciones: String
     ): Boolean {
         return withContext(Dispatchers.IO) {
             try {
@@ -116,7 +117,8 @@ class AppointmentRepository @Inject constructor(
                     transaction.update(
                         appointmentRef, mapOf(
                             "estado" to nuevoEstado,
-                            "observaciones" to observaciones
+                            "observaciones" to observaciones,
+                            "recomendaciones" to recomendaciones
                         )
                     )
                 }.await()
