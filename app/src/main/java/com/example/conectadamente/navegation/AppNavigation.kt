@@ -1,10 +1,16 @@
 package com.example.conectadamente.navegation
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -18,6 +24,7 @@ import com.example.conectadamente.ui.homePsycho.EditAppointmentScreen
 import com.example.conectadamente.ui.authPaciente.LoginScreen
 import com.example.conectadamente.ui.authPaciente.RegisterPatientScreen
 import com.example.conectadamente.ui.authPaciente.SignInScreen
+import com.example.conectadamente.ui.authPsicologo.ProfesionalPerfilReseñasScreen
 import com.example.conectadamente.ui.authPsicologo.PsychoSignInScreen
 import com.example.conectadamente.ui.authPsicologo.PsychologistLoginScreen
 import com.example.conectadamente.ui.authPsicologo.RegisterPsychoScreen
@@ -40,7 +47,9 @@ import com.example.conectadamente.ui.homeUser.recommendationsPatient.ArticleScre
 import com.example.conectadamente.ui.homeUser.recommendationsPatient.BookRecommendations
 import com.example.conectadamente.ui.homeUser.recommendationsPatient.SosDialCardScreen
 import com.example.conectadamente.ui.viewModel.PsychoAuthViewModel
+import com.example.conectadamente.ui.viewModel.PsychoViewModel
 import com.example.conectadamente.ui.viewModel.UserAuthViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
@@ -142,15 +151,44 @@ fun AppNavigation() {
                 ProfilePsyFromPatScreen(psychologistId = psychologistId, navController=navController)
             }
 
-            //Paciente
-            composable(NavScreen.Home.route) { HomeScreen(navController) }
+            composable(
+                route = NavScreen.ReseñasDetalle.route + "/{psychoId}",
+                arguments = listOf(navArgument("psychoId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val psychoId = backStackEntry.arguments?.getString("psychoId")
+                val viewModel: PsychoViewModel = hiltViewModel()
 
-            composable(NavScreen.Perfil.route) {PerfilUsuarioScreen(
-                navController = navController,
-                navigateToEditProfile = {
-                    navController.navigate(NavScreen.EditPatientProfile.route)
+                // Llamar al ViewModel para cargar la información
+                LaunchedEffect(psychoId) {
+                    viewModel.loadPsychoInfo(psychoId)
                 }
-            )}
+
+                val psycho = viewModel.psychoInfo.observeAsState().value?.getOrNull()
+                val reviews = viewModel.reviews.observeAsState(emptyList()).value
+                val error = viewModel.error.observeAsState().value
+
+                // Si hay un error, podemos mostrar un mensaje de error o navegar a otra pantalla
+                error?.let {
+                    // Maneja el error aquí (mostrar un mensaje de error, por ejemplo)
+                    Log.e("PsychoViewModel", it)
+                    return@composable
+                }
+
+                if (psycho != null) {
+                    ProfesionalPerfilReseñasScreen(
+                        psycho = psycho,
+                        reviews = reviews,
+                        navController = navController
+                    )
+                } else {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .wrapContentSize(Alignment.Center)
+                    )
+                }
+            }
+
             composable(NavScreen.Chat.route) { ChatUsuarioScreen(navController) }
             composable(NavScreen.Formativo.route) { RecomendacionScreen(navController) }
 
