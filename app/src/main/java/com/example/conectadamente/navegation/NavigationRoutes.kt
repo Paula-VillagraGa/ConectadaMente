@@ -20,7 +20,7 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
     object RegisterPatient : NavScreen("register_patient", "Registro", null)
     object Home : NavScreen("home_screen", "Inicio", Icons.Outlined.Home)
     object Perfil : NavScreen("perfil_usuario", "Perfil", Icons.Outlined.Person)
-    object Chat : NavScreen("chat_usuario", "Chat", Icons.Outlined.Email)
+    object ArticlesRecommendations2 : NavScreen("articles_recommendations2", "Articulos", Icons.Outlined.Newspaper)
     object Formativo : NavScreen("formativo_usuario", "Asistente", Icons.Outlined.Assistant)
     object ListRecomendation : NavScreen("ListRecommendation_usuario", "ListRecomendation", null)
     object PsychologistLogin : NavScreen("psychologist_login", "Login", null)

@@ -102,6 +102,9 @@ fun AppNavigation() {
                     }
                 )
             }
+            composable(NavScreen.ArticlesRecommendations2.route){
+                ArticleScreen(navController)
+            }
 
             composable(NavScreen.Perfil.route){
                 PerfilUsuarioScreen(viewModel= hiltViewModel(), navigateToEditProfile = {navController.navigate(NavScreen.EditPatientProfile.route) }, navController = navController)

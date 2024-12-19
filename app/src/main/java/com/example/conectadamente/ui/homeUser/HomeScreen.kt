@@ -11,19 +11,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,7 +33,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.example.conectadamente.R
 import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.navegation.NavScreen
@@ -60,7 +61,6 @@ import com.example.conectadamente.ui.theme.Purple20
 import com.example.conectadamente.ui.theme.Purple30
 import com.example.conectadamente.ui.theme.Purple50
 import com.example.conectadamente.ui.theme.Purple60
-import com.example.conectadamente.ui.theme.Purple80
 import com.example.conectadamente.ui.viewModel.HomeUserViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -134,7 +134,6 @@ fun TopAppBar() {
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
     )
 }
-
 // Campo de búsqueda para psicólogos por nombre
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -200,41 +199,49 @@ fun SearchField(
             navController = navController
         )
     }
-
 }
-    @Composable
-    fun SearchResults(psychologists: List<PsychoModel>, navController: NavHostController) {
-        LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+@Composable
+fun SearchResults(
+    psychologists: List<PsychoModel>,
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        LazyColumn {
             items(psychologists) { psychologist ->
-                SearchResultCard(psychologist,  navController = navController)
+                SearchResultCard(psychologist, navController)
             }
         }
     }
-// Componente para cada resultado
+}
+
 @Composable
 fun SearchResultCard(psychologist: PsychoModel, navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 2.dp)
-            .background(Color(0xFFDCDBDB), RoundedCornerShape(8.dp))
-            .clickable {
-                navController.navigate("profile/${psychologist.id}")
-            }
-            .padding(8.dp)
+            .padding(vertical = 4.dp, horizontal = 8.dp)
+            .clickable { navController.navigate("profile/${psychologist.id}") }
+            .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+            .padding(12.dp)
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ico_perfil),
-            contentDescription = "Psicólogo",
-            tint = Color(0xFF5A4E97),
-            modifier = Modifier.size(40.dp)
+        AsyncImage(
+            model = psychologist.photoUrl, // URL de la foto
+            contentDescription = "Foto del psicólogo",
+            placeholder = painterResource(id = R.drawable.ico_perfil), // Imagen mientras se carga
+            error = painterResource(id = R.drawable.ico_perfil), // Imagen si hay error
+            contentScale = ContentScale.Crop, // Ajuste de la imagen
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.secondary)
         )
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = psychologist.name,
-            fontSize = 14.sp,
+            fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Purple50
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -285,7 +292,7 @@ fun ContentSection(navController: NavHostController) {
                 title = "Título 3",
                 subtitle = "Ciencia y Salud Mental",
                 imageRes = R.drawable.salud_mental5,
-                onClick = { navController.navigate(NavScreen.ArticlesRecommendations.route) },
+                onClick = { navController.navigate(NavScreen.ArticlesRecommendations2.route) },
                 modifier = Modifier
                     .weight(0.6f)
                     .height(250.dp),
@@ -355,9 +362,9 @@ fun SupportCardC(
             .clickable { onClick() }
             .padding(bottom = 10.dp)
     ) {
-        Box( // Usamos un Box para controlar la posición de la imagen
+        Box(
             modifier = Modifier
-                .fillMaxWidth() // Hace que la imagen ocupe el ancho del contenedor
+                .fillMaxWidth()
         )
         Image(
             painter = painterResource(id = imageRes),
