@@ -163,7 +163,9 @@ fun RecomendacionScreen(navController: NavHostController) {
                                     isLoading.value = false // Desactivar indicador de carga
                                     // Realizar la navegación automáticamente después de 4 segundos
                                     if (resultText.value.isNotEmpty()) {
-                                        navController.navigate("${NavScreen.ListRecomendation.route}/${resultText.value}")
+                                        //navController.navigate("${NavScreen.ListRecomendation.route}/${resultText.value}")
+                                        // Navegación desde la pantalla actual hacia ListRecomendation
+                                        navController.navigate("${NavScreen.ListRecomendation.route}/${inputText.value}/${resultText.value}")
                                     } else {
                                         Toast.makeText(context, "No hay predicción para buscar", Toast.LENGTH_SHORT).show()
                                     }

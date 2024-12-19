@@ -1,6 +1,7 @@
 package com.example.conectadamente.navegation
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -194,16 +196,26 @@ fun AppNavigation() {
 
             // Recomendaciones
             composable(
-                route = "${NavScreen.ListRecomendation.route}/{tag}",
-                arguments = listOf(navArgument("tag") { type = NavType.StringType })
+                route = "${NavScreen.ListRecomendation.route}/{inputText}/{tag}",
+                arguments = listOf(
+                    navArgument("inputText") { type = NavType.StringType },
+                    navArgument("tag") { type = NavType.StringType }
+                )
             ) { backStackEntry ->
-                // Obtener el tag de la entrada de la pila de navegación
+                // Obtener los parámetros de la entrada de la pila de navegación
+                val inputText = backStackEntry.arguments?.getString("inputText")
                 val tag = backStackEntry.arguments?.getString("tag")
-                if (tag != null) {
-                    // Pasar el tag y el navController a la pantalla
-                    BuscarPorTagScreen(tag = tag, navController = navController)
+
+                if (!inputText.isNullOrEmpty() && !tag.isNullOrEmpty()) {
+                    // Pasar los parámetros a la pantalla de recomendaciones
+                    BuscarPorTagScreen(inputText = inputText, tag = tag, navController = navController)
+                } else {
+                    val context = LocalContext.current
+                    // Manejo de error si los parámetros no son válidos
+                    Toast.makeText(context, "Faltan parámetros en la navegación", Toast.LENGTH_SHORT).show()
                 }
             }
+
 
 
 

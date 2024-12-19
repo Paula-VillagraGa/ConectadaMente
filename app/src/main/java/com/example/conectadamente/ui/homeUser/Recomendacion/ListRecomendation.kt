@@ -48,7 +48,7 @@ import com.example.conectadamente.navegation.NavScreen
 import com.example.conectadamente.ui.viewModel.BuscarPorTagViewModel
 
 @Composable
-fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
+fun BuscarPorTagScreen(inputText: String,tag: String, navController: NavHostController) {
     // Usamos hiltViewModel para obtener el ViewModel
     val viewModel: BuscarPorTagViewModel = hiltViewModel()
 
@@ -58,9 +58,16 @@ fun BuscarPorTagScreen(tag: String, navController: NavHostController) {
     // Estado para mostrar/ocultar el popup
     val showPopup = remember { mutableStateOf(false) }
 
-    // Mostrar el popup si el tag es "culpa" o "miedo"
-    LaunchedEffect(tag) {
-        if (tag == "culpa" || tag == "miedo") {
+    // Estado para el texto del usuario
+
+    fun checkForKeywords(input: String): Boolean {
+        val keywords = listOf("culpa", "miedo", "ansiedad", "depresión", "suicidio", "matar", "acabar", "vida")
+        return keywords.any { keyword -> input.contains(keyword, ignoreCase = true) }
+    }
+
+    // Mostrar el popup si el tag es "culpa" o "miedo", o si el texto contiene esas palabras
+    LaunchedEffect(tag, inputText) {
+        if (tag == "culpa" || tag == "miedo" || checkForKeywords(inputText)) {
             showPopup.value = true
         }
     }
@@ -274,7 +281,7 @@ fun FilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
-            .background(if (isSelected) Color(0xFF1980E6) else Color(0xFFF0F2F4))
+            .background(if (isSelected) Color(0xFF5A4E97) else Color(0xFFF0F2F4))
             .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center
