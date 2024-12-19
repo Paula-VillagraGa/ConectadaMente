@@ -39,6 +39,7 @@ import com.example.conectadamente.ui.homePsycho.PsychoHomeScreen
 import com.example.conectadamente.ui.homeUser.ProfilePsyFromPatScreen
 import com.example.conectadamente.ui.homePsycho.PsychoProfileScreen
 import com.example.conectadamente.ui.homePsycho.ReservedAppointmentsScreen
+import com.example.conectadamente.ui.homeUser.AppointmentPatientScreen
 import com.example.conectadamente.ui.homeUser.ChatUsuarioScreen
 import com.example.conectadamente.ui.homeUser.EditProfilePatientScreen
 import com.example.conectadamente.ui.homeUser.HomeScreen
@@ -62,7 +63,7 @@ fun AppNavigation() {
     val scaffoldScreens = listOf(
         NavScreen.Home.route,
         NavScreen.Perfil.route,
-        NavScreen.Chat.route,
+        NavScreen.AppointmentPatient.route,
         NavScreen.Formativo.route
     )
     val scaffoldPsycho = listOf(
@@ -103,6 +104,10 @@ fun AppNavigation() {
                 )
             }
 
+            composable(NavScreen.Perfil.route){
+                PerfilUsuarioScreen(viewModel= hiltViewModel(), navigateToEditProfile = {navController.navigate(NavScreen.EditPatientProfile.route) }, navController = navController)
+            }
+
             //Editar perfil paciente
             composable(NavScreen.EditPatientProfile.route) {
                 EditProfilePatientScreen(
@@ -131,6 +136,11 @@ fun AppNavigation() {
                 val userAuthViewModel: UserAuthViewModel = hiltViewModel()
                 RegisterPatientScreen(viewModel = userAuthViewModel, navigateToRegisterPsycho = {navController.navigate(NavScreen.RegisterPsycho.route)})
             }
+
+            composable(NavScreen.AppointmentPatient.route){
+                AppointmentPatientScreen(viewModel = hiltViewModel(), psychoId = "")
+            }
+
             //Psicologo ->
 
 

@@ -202,11 +202,10 @@ fun ReservedAppointmentCard(
         ) {
             Image(
                 painter = painterResource(R.drawable.mosca),
-                contentDescription = "",
+                contentDescription = "Foto del usuario",
                 modifier = Modifier
-                    .size(60.dp) // Ajusta el tamaño de la imagen según lo que desees
+                    .size(48.dp)
                     .clip(CircleShape)
-                    .align(Alignment.CenterVertically) // Alinea la imagen verticalmente con el texto
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.padding(16.dp)) {

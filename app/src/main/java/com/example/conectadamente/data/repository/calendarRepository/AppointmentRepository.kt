@@ -2,6 +2,7 @@ package com.example.conectadamente.data.repository.calendarRepository
 
 import android.util.Log
 import com.example.conectadamente.data.model.Appointment
+import com.example.conectadamente.data.model.PsychoModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -174,7 +175,90 @@ class AppointmentRepository @Inject constructor(
 
         return appointments
     }
+    suspend fun obtenerCitasDelPaciente(patientId: String): List<Appointment> {
+        return withContext(Dispatchers.IO) {
+            val citas = mutableListOf<Appointment>()
+            try {
+                // Consulta las citas donde patientId coincida con el usuario autenticado
+                val appointmentsSnapshot = firestore.collection("appointments")
+                    .whereEqualTo("patientId", patientId)
+                    .get()
+                    .await()
+
+                for (doc in appointmentsSnapshot.documents) {
+                    // Convertir cada cita a un objeto Appointment
+                    val cita = doc.toObject(Appointment::class.java)
+                    if (cita != null) {
+                        // Agregar al listado
+                        citas.add(cita)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("AppointmentRepository", "Error al obtener citas: ${e.message}")
+            }
+            citas
+        }
+    }
+    suspend fun obtenerPsicologosPorCitas(citas: List<Appointment>): Map<String, PsychoModel> {
+        val psychoIds = citas.mapNotNull { it.psychoId }.distinct()
+        return getPsychologistsByIds(psychoIds)
+    }
+    suspend fun cancelarCitaYActualizar(patientId: String, appointmentId: String, availabilityId: String): Boolean {
+        return cancelarCita(appointmentId, availabilityId)
+    }
+
+
+    suspend fun getPsychologistsByIds(psychoIds: List<String>): Map<String, PsychoModel> {
+        return withContext(Dispatchers.IO) {
+            val psychologistsMap = mutableMapOf<String, PsychoModel>()
+            try {
+                val querySnapshot = firestore.collection("psychos")
+                    .whereIn("id", psychoIds)
+                    .get()
+                    .await()
+
+                for (doc in querySnapshot.documents) {
+                    val psycho = doc.toObject(PsychoModel::class.java)
+                    if (psycho != null) {
+                        psychologistsMap[psycho.id] = psycho
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("AppointmentRepository", "Error al obtener psicólogos: ${e.message}")
+            }
+            psychologistsMap
+        }
+    }
+
+    // Cancelar cita y actualizar disponibilidad
+    suspend fun cancelarCita(appointmentId: String, availabilityId: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val appointmentRef = firestore.collection("appointments").document(appointmentId)
+                val availabilityRef = firestore.collection("availability").document(availabilityId)
+
+                firestore.runTransaction { transaction ->
+                    val appointmentSnapshot = transaction.get(appointmentRef)
+                    val availabilitySnapshot = transaction.get(availabilityRef)
+
+                    if (!appointmentSnapshot.exists()) throw Exception("Cita no encontrada.")
+                    if (!availabilitySnapshot.exists()) throw Exception("Disponibilidad no encontrada.")
+
+                    // Actualizar estado de la cita
+                    transaction.update(appointmentRef, "estado", "Cancelada")
+                    // Actualizar disponibilidad a "Disponible"
+                    transaction.update(availabilityRef, "estado", "Disponible")
+                }.await()
+
+                true
+            } catch (e: Exception) {
+                Log.e("AppointmentRepository", "Error al cancelar la cita: ${e.message}")
+                false
+            }
+        }
+    }
 }
+
 
 // Modelo de datos actualizado
 data class CompletedAppointment(
