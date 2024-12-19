@@ -143,9 +143,9 @@ fun PsychologistHomeContent(navController: NavHostController) {
             )
             val psychoId = FirebaseAuth.getInstance().currentUser?.uid
             SupportCard(
-                title = "Mindfulness",
-                subtitle = "Enfoque en la meditación",
-                imageRes = R.drawable.ico_chat,
+                title = "Reseñas",
+                subtitle = "Tus Reseñas",
+                imageRes = R.drawable.cartas2,
                 onClick = { navController.navigate(NavScreen.ReseñasDetalle.route + "/$psychoId")},
                 modifier = Modifier
                     .weight(0.5f)

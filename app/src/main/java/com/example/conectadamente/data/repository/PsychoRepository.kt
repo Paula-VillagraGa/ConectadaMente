@@ -1,5 +1,6 @@
 package com.example.conectadamente.data.repository
 
+import com.example.conectadamente.data.model.PatientModel
 import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.data.model.ReviewModel
 import com.google.android.gms.tasks.Tasks
@@ -8,7 +9,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.tasks.await // Usamos `await()` para las tareas asincrónicas
 import javax.inject.Inject
-
 
 
 class PsychoRepository @Inject constructor(
@@ -35,18 +35,27 @@ class PsychoRepository @Inject constructor(
     }
 
     suspend fun getReviews(psychoId: String): List<ReviewModel> {
-        if (psychoId.isBlank()) return emptyList()
-
         return try {
-            val reviewsRef = firestore.collection("reviews").whereEqualTo("psychoId", psychoId)
+            val reviewsRef = firestore.collection("reviews")
+                .whereEqualTo("psychoId", psychoId)
             val reviewsSnapshot = reviewsRef.get().await()
 
             reviewsSnapshot.documents.mapNotNull { doc ->
                 doc.toObject(ReviewModel::class.java)
             }
         } catch (e: Exception) {
-            // Puedes registrar el error aquí
-            emptyList()
+            emptyList() // En caso de error, retorna una lista vacía
+        }
+    }
+
+    suspend fun getPatientName(patientId: String): String? {
+        return try {
+            val patientRef = firestore.collection("patients").document(patientId)
+            val patientSnapshot = patientRef.get().await()
+            val patient = patientSnapshot.toObject(PatientModel::class.java)
+            patient?.name
+        } catch (e: Exception) {
+            null
         }
     }
 }

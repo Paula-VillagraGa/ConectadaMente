@@ -18,7 +18,6 @@ class PsychoViewModel @Inject constructor(
     private val psychoRepository: PsychoRepository
 ) : ViewModel() {
 
-    // No necesitamos obtener psychoId de Firebase en el ViewModel. Lo pasamos como argumento.
     private val _psychoInfo = MutableLiveData<Result<PsychoModel>>()
     val psychoInfo: LiveData<Result<PsychoModel>> get() = _psychoInfo
 
@@ -28,25 +27,31 @@ class PsychoViewModel @Inject constructor(
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> get() = _error
 
-
+    /**
+     * Función principal para cargar información del psicólogo y sus reseñas.
+     */
     fun loadPsychoInfo(psychoId: String?) {
         if (psychoId.isNullOrEmpty()) {
-            _error.value = "psychoId is null or empty"
+            _error.value = "El ID del psicólogo no puede estar vacío."
             return
         }
 
         viewModelScope.launch {
-            // Intentamos obtener la información del psicólogo
+            // Obtener la información del psicólogo.
             val psychoResult = psychoRepository.getPsychoInfo(psychoId)
             _psychoInfo.value = psychoResult
 
-            // Si la información del psicólogo fue cargada con éxito, cargamos las reseñas
             if (psychoResult.isSuccess) {
-                val reviews = psychoRepository.getReviews(psychoId)
-                _reviews.value = reviews
+                // Si la información del psicólogo es correcta, cargar las reseñas.
+                val reviewsList = psychoRepository.getReviews(psychoId)
+                val reviewsWithNames = reviewsList.map { review ->
+                    val patientName = psychoRepository.getPatientName(review.patientId)
+                    review.copy(patientName = patientName ?: "Desconocido")
+                }
+                _reviews.value = reviewsWithNames
             } else {
-                // En caso de error al obtener la información del psicólogo
-                _error.value = "Failed to load psycho information"
+                // Manejar errores en caso de falla al cargar la información.
+                _error.value = psychoResult.exceptionOrNull()?.localizedMessage ?: "Error desconocido."
             }
         }
     }
