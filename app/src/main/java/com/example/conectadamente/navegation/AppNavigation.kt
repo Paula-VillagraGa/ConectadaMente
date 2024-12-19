@@ -240,6 +240,9 @@ fun AppNavigation() {
                     viewModel = hiltViewModel()
                 )
             }
+            composable(NavScreen.Home.route){
+                HomeScreen(navController)
+            }
             composable(NavScreen.CompletedAppointments.route) {
                 CompletedAppointmentsScreen(viewModel = hiltViewModel())
             }

@@ -283,8 +283,8 @@ fun SignInScreen(
                 }
 
                 is DataState.Error -> {
-                    isLoading = false // Detener el loading
-                    message = state.e ?: "Error desconocido"
+                    isLoading = false
+                    message = state.e
                 }
 
                 else -> {
