@@ -1,5 +1,6 @@
 package com.example.conectadamente.ui.homePsycho
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,7 +27,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.conectadamente.R
 import com.example.conectadamente.navegation.NavScreen
 import com.example.conectadamente.ui.theme.*
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 
 
 @Composable
@@ -36,7 +40,7 @@ fun PsychoHomeScreen(navController: NavHostController) {
 
     Scaffold(
         topBar = {
-            TopAppBar() // Usamos tu TopAppBar personalizado aquí
+            TopAppBar(navController = navController) // Usamos tu TopAppBar personalizado aquí
         }
     ) { paddingValues ->
         Column(
@@ -50,7 +54,8 @@ fun PsychoHomeScreen(navController: NavHostController) {
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBar() {
+fun TopAppBar(navController: NavHostController) {
+    val context = LocalContext.current
     CenterAlignedTopAppBar(
         navigationIcon = {
             Image(
@@ -64,7 +69,7 @@ fun TopAppBar() {
         },
         title = {
             Text(
-                text = "",
+                text = "", // Puedes añadir un título si lo necesitas
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -74,11 +79,17 @@ fun TopAppBar() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { /* Acción para configuración */ },
-                    modifier = Modifier.padding(top = 25.dp)
+                    onClick = {
+                        Firebase.auth.signOut()
+                        Toast.makeText(context, "Sesión cerrada", Toast.LENGTH_SHORT).show()
+                        navController.navigate(NavScreen.Login.route) {
+                            popUpTo(NavScreen.Home.route) { inclusive = true } // Limpia la pila de navegación
+                        }
+                    },
+                    modifier = Modifier.padding(top = 25.dp) // Ajusta el padding superior para bajar el ícono
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Menu,
+                        imageVector = Icons.Filled.Menu, // Ícono predeterminado de configuración
                         contentDescription = "Settings",
                         tint = Color(0xFF100E1B)
                     )

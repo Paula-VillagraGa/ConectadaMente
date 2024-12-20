@@ -1,5 +1,6 @@
 package com.example.conectadamente.ui.homeUser
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -53,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.conectadamente.R
 import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.navegation.NavScreen
@@ -62,15 +65,17 @@ import com.example.conectadamente.ui.theme.Purple50
 import com.example.conectadamente.ui.theme.Purple60
 import com.example.conectadamente.ui.theme.Purple80
 import com.example.conectadamente.ui.viewModel.HomeUserViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun HomeScreen(navController: NavHostController, viewModel: HomeUserViewModel = hiltViewModel()) {
-
+    val context = LocalContext.current
     Scaffold(
-        topBar = { TopAppBar() },
+        topBar = { TopAppBar(navController = navController) },
     ) { paddingValues ->
         Surface(
             modifier = Modifier
@@ -96,7 +101,8 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeUserViewModel = 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBar() {
+fun TopAppBar(navController: NavHostController) {
+    val context = LocalContext.current
     CenterAlignedTopAppBar(
         navigationIcon = {
             Image(
@@ -120,7 +126,13 @@ fun TopAppBar() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { /* Acción para configuración */ },
+                    onClick = {
+                        Firebase.auth.signOut()
+                        Toast.makeText(context, "Sesión cerrada", Toast.LENGTH_SHORT).show()
+                        navController.navigate(NavScreen.Login.route) {
+                            popUpTo(NavScreen.Home.route) { inclusive = true } // Limpia la pila de navegación
+                        }
+                    },
                     modifier = Modifier.padding(top = 25.dp) // Ajusta el padding superior para bajar el ícono
                 ) {
                     Icon(
