@@ -4,8 +4,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Assistant
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Chat
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Newspaper
@@ -20,7 +18,7 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
     object RegisterPatient : NavScreen("register_patient", "Registro", null)
     object Home : NavScreen("home_screen", "Inicio", Icons.Outlined.Home)
     object Perfil : NavScreen("perfil_usuario", "Perfil", Icons.Outlined.Person)
-    object Chat : NavScreen("chat_usuario", "Chat", Icons.Outlined.Email)
+    object ArticlesRecommendations2 : NavScreen("articles_recommendations2", "Articulos", Icons.Outlined.Newspaper)
     object Formativo : NavScreen("formativo_usuario", "Asistente", Icons.Outlined.Assistant)
     object ListRecomendation : NavScreen("ListRecommendation_usuario", "ListRecomendation", null)
     object PsychologistLogin : NavScreen("psychologist_login", "Login", null)
@@ -41,7 +39,6 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
 
     //Agendar citas
     object DisponibilidadCalendario: NavScreen("disponibilidad_calendario", "Disponibilidad", null)
-    object AgendarCita: NavScreen("agendar_cita", "Agendar Cita", null)
     object CitasReservadas: NavScreen("citas_reservadas", "Citas Reservadas", null)
     object CompletedAppointments : NavScreen("completed_appointments", "Citas Realizadas", null)
 
