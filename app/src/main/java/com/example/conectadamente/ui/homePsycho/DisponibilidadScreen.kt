@@ -1,6 +1,9 @@
 package com.example.conectadamente.ui.homePsycho
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +46,7 @@ import java.util.Calendar
 @SuppressLint("DefaultLocale")
 @Composable
 fun AvailabilityScreen(viewModel: DisponibilidadViewModel, navController: NavController) {
+    val context = LocalContext.current
     val fechaSeleccionada = remember { mutableStateOf("") }
     val horasDisponibles = viewModel.horasDisponibles.collectAsState().value // Observando las horas disponibles
     val estado = viewModel.estado.collectAsState().value // Observando el estado global de la operación
@@ -100,6 +104,23 @@ fun AvailabilityScreen(viewModel: DisponibilidadViewModel, navController: NavCon
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            Button(
+                onClick = { abrirGoogleCalendar(context) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .height(50.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary
+                )
+            ) {
+                Text(
+                    text = "Usar Google Calendar",
+                    color = Color.White
                 )
             }
 
@@ -206,8 +227,20 @@ fun AvailabilityScreen(viewModel: DisponibilidadViewModel, navController: NavCon
                     modifier = Modifier.padding(top = 16.dp)
                 )
             }
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+
         }
     }
+}
+
+
+fun abrirGoogleCalendar(context: Context) {
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        data = Uri.parse("https://calendar.google.com/calendar/u/0/r") // URL de Google Calendar
+    }
+    context.startActivity(intent)
 }
 
 

@@ -100,6 +100,7 @@ fun AppNavigation() {
                     }
                 )
             }
+
             composable(NavScreen.ArticlesRecommendations2.route){
                 ArticleScreen(navController)
             }

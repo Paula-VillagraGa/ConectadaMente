@@ -214,22 +214,21 @@ fun SearchField(
     }
 
 }
-    @Composable
+@Composable
     fun SearchResults(psychologists: List<PsychoModel>, navController: NavHostController) {
         LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
             items(psychologists) { psychologist ->
                 SearchResultCard(psychologist,  navController = navController)
             }
-        }
-    }
+        } }
 // Componente para cada resultado
 @Composable
 fun SearchResultCard(psychologist: PsychoModel, navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 2.dp)
-            .background(Color(0xFFDCDBDB), RoundedCornerShape(8.dp))
+            .padding(vertical = 4.dp)
+            .background(Color(0xFFFFFFFF), RoundedCornerShape(8.dp))
             .clickable {
                 navController.navigate("profile/${psychologist.id}")
             }
@@ -297,7 +296,7 @@ fun ContentSection(navController: NavHostController) {
                 title = "Título 3",
                 subtitle = "Ciencia y Salud Mental",
                 imageRes = R.drawable.salud_mental5,
-                onClick = { navController.navigate(NavScreen.ArticlesRecommendations.route) },
+                onClick = { navController.navigate(NavScreen.ArticlesRecommendations2.route) },
                 modifier = Modifier
                     .weight(0.6f)
                     .height(250.dp),
