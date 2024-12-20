@@ -156,7 +156,7 @@ fun CompletedAppointmentItem(appointment: CompletedAppointmentPatient) {
                 if (appointment.recomendaciones.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Recomendaciones: ${appointment.recomendaciones}",
+                        text = "Tareas: ${appointment.recomendaciones}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
