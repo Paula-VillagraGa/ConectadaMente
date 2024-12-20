@@ -1,5 +1,7 @@
 package com.example.conectadamente.ui.homeUser
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,8 +40,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.conectadamente.data.model.Appointment
@@ -58,6 +62,7 @@ fun AppointmentPatientScreen(
     psychoId: String,
     navController: NavController
 ) {
+    val context = LocalContext.current
     val appointments by viewModel.citasDelPaciente.collectAsState()
     val psychologists by viewModel.psychologists.collectAsState(emptyMap())
 
@@ -159,6 +164,11 @@ fun AppointmentPatientScreen(
                                         color = MaterialTheme.colorScheme.primary
                                     )
                                     Text(
+                                        "Modalidad: ${appointment.modalidad}",
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                    Text(
                                         "Estado: $estado",
                                         color = MaterialTheme.colorScheme.secondary
                                     )
@@ -167,24 +177,54 @@ fun AppointmentPatientScreen(
                                         Spacer(modifier = Modifier.height(8.dp))
 
                                         // Botón de cancelar cita
-                                        Button(
-                                            onClick = {
-                                                appointmentToCancel = appointment
-                                                showDialog = true
-                                            },
-                                            modifier = Modifier
-                                                .padding(top = 8.dp)
-                                                .fillMaxWidth(),
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = MaterialTheme.colorScheme.primary,
-                                                contentColor = Color.White
-                                            ),
-                                            shape = MaterialTheme.shapes.small
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                                         ) {
-                                            Text(
-                                                text = "Cancelar Cita",
-                                                style = MaterialTheme.typography.bodySmall,
-                                            )
+                                            Button(
+                                                onClick = {
+                                                    appointmentToCancel = appointment
+                                                    showDialog = true
+                                                },
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .fillMaxWidth(),
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = MaterialTheme.colorScheme.primary,
+                                                    contentColor = Color.White
+                                                ),
+                                                shape = MaterialTheme.shapes.small
+                                            ) {
+                                                Text(
+                                                    text = "Cancelar Cita",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                )
+                                            }
+
+                                            // Si la modalidad es en línea, muestra el botón para ir a Google Meet
+                                            if (appointment.modalidad.equals("En línea", ignoreCase = true)) {
+                                                Button(
+                                                    onClick = {
+                                                        // Intenta abrir la aplicación de Google Meet
+                                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://meet.google.com"))
+                                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // Asegura que se inicie en una nueva tarea
+                                                        context.startActivity(intent)
+                                                    },
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .fillMaxWidth(),
+                                                    colors = ButtonDefaults.buttonColors(
+                                                        containerColor = MaterialTheme.colorScheme.secondary,
+                                                        contentColor = Color.White
+                                                    ),
+                                                    shape = MaterialTheme.shapes.small
+                                                ) {
+                                                    Text(
+                                                        text = "Ir a Google Meet",
+                                                        style = MaterialTheme.typography.bodySmall,
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -219,7 +259,7 @@ fun AppointmentPatientScreen(
                     },
                     dismissButton = {
                         Button(
-                            onClick = { showDialog = false } // Cierra el diálogo sin hacer nada
+                            onClick = { showDialog = false }
                         ) {
                             Text("Cancelar")
                         }

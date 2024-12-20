@@ -307,7 +307,7 @@ fun AppNavigation() {
                 HomeScreen(navController)
             }
             composable(NavScreen.CompletedAppointments.route) {
-                CompletedAppointmentsScreen(viewModel = hiltViewModel())
+                CompletedAppointmentsScreen(viewModel = hiltViewModel(), navController)
             }
             composable(NavScreen.CompletedAppointmentsPatient.route){
                 ActivityAppointmentsScreen(viewModel = hiltViewModel(), navController)

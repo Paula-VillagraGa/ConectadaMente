@@ -10,10 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallTopAppBar
@@ -27,14 +31,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.conectadamente.data.repository.calendarRepository.CompletedAppointment
+import com.example.conectadamente.ui.theme.Purple80
 import com.example.conectadamente.ui.viewModel.calendar.AppointmentViewModel
 import com.example.conectadamente.utils.extensions.formatRut
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CompletedAppointmentsScreen(viewModel: AppointmentViewModel) {
+fun CompletedAppointmentsScreen(viewModel: AppointmentViewModel, navController: NavController) {
     val appointments by viewModel.appointments.collectAsState() // Aquí usamos collectAsState
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
@@ -48,8 +54,19 @@ fun CompletedAppointmentsScreen(viewModel: AppointmentViewModel) {
     }
 
     Scaffold(
+        modifier = Modifier.padding(0.dp),
         topBar = {
-            SmallTopAppBar(title = { Text("Mis Pacientes") })
+            androidx.compose.material3.TopAppBar(
+                title = { Text("Mis Pacientes") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            Icons.Filled.ArrowBackIosNew,
+                            contentDescription = "Regresar",
+                            tint = Purple80
+                        )
+                    }
+                })
         }
     ) { paddingValues ->
         Column(
@@ -120,6 +137,14 @@ fun CompletedAppointmentItem(appointment: CompletedAppointment) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Observaciones: ${appointment.observaciones}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
+            if (appointment.recomendaciones.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Tareas dejadas: ${appointment.recomendaciones}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )

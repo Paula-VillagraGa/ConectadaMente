@@ -119,6 +119,7 @@ class AppointmentRepository @Inject constructor(
                 val fecha = document.getString("fecha") ?: ""
                 val hora = document.getString("hora") ?: ""
                 val observaciones = document.getString("observaciones") ?: ""
+                val recomendaciones = document.getString("recomendaciones") ?: ""
 
                 // Obtener el nombre y rut del paciente desde la colección "patients"
                 val patientDoc = firestore.collection("patients")
@@ -136,7 +137,8 @@ class AppointmentRepository @Inject constructor(
                         hora = hora,
                         patientName = patientName,
                         rut = patientRut,
-                        observaciones = observaciones
+                        observaciones = observaciones,
+                        recomendaciones = recomendaciones
                     )
                 )
             }
@@ -278,7 +280,8 @@ data class CompletedAppointment(
     val hora: String,
     val patientName: String,
     val rut: String,
-    val observaciones: String
+    val observaciones: String,
+    val recomendaciones: String
 )
 
 // Modelo de datos actualizado
