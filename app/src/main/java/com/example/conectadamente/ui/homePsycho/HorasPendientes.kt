@@ -64,6 +64,9 @@ fun ReservedAppointmentsScreen(
     val errorMessage by viewModel.errorMessage.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState(false)
 
+    val fechaActual = LocalDate.now()
+
+
     var searchQuery by remember { mutableStateOf("") }
 
     LaunchedEffect(true) {
@@ -79,16 +82,16 @@ fun ReservedAppointmentsScreen(
     }
 
 
-    val citasOrdenadas = citasPendientes.sortedBy { cita ->
+    val citasFiltradasPorFecha = citasPendientes.filter { cita ->
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-        LocalDate.parse(
-            cita.fechaHora.split(" ")[0],
-            formatter
-        )
+        val fechaCita = LocalDate.parse(cita.fecha.split(" ")[0], formatter)
+        !fechaCita.isBefore(fechaActual)
     }
 
-    val citasFiltradas = citasOrdenadas.filter { cita ->
-        cita.paciente?.contains(searchQuery, ignoreCase = true) == true
+
+    val citasFiltradas = citasFiltradasPorFecha.sortedBy { cita ->
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        LocalDate.parse(cita.fecha.split(" ")[0], formatter)
     }
 
     Scaffold(
@@ -158,7 +161,7 @@ fun ReservedAppointmentsScreen(
                         ) {
                             items(citasFiltradas) { cita ->
                                 ReservedAppointmentCard(
-                                    appointmentId = cita.appointmentId, // Pasamos el appointmentId
+                                    appointmentId = cita.appointmentId,
                                     fechaHora = cita.fechaHora,
                                     paciente = cita.paciente
                                 ) { id ->
@@ -183,15 +186,15 @@ fun ReservedAppointmentCard(
     paciente: String?,
     onCardClick: (String) -> Unit // Callback para manejar la navegación
 ) {
-    // Card para mostrar la cita
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-            .clickable { onCardClick(appointmentId) }, // Acción al hacer clic
+            .clickable { onCardClick(appointmentId) },
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface // Aquí puedes elegir el color deseado
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {

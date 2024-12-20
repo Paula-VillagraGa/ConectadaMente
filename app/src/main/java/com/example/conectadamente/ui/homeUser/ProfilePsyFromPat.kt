@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Reviews
 import androidx.compose.material.icons.filled.Star
@@ -220,7 +221,7 @@ fun ProfileSection(
     navController: NavController,
     psychologistId: String?,
 ) {
-    // Mostrar foto, nombre, especialización y descripción
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -258,6 +259,57 @@ fun ProfileSection(
         Text("Descripción: ${psycho.descriptionPsycho ?: "No disponible"}")
         Spacer(modifier = Modifier.height(8.dp))
 
+        Column {
+            Text(
+                text = "Ir a ubicación de la consulta",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
+            // Ubicación
+            psycho.location?.let { location ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clickable {
+                            // Redirigir a Google Maps usando la ubicación
+                            val mapsUrl = "https://www.google.com/maps/search/?api=1&query=${Uri.encode(location)}"
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(mapsUrl))
+                            context.startActivity(intent)
+                        }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = "Ubicación",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = location,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            } ?: Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.LocationOff,
+                    contentDescription = "Ubicación no disponible",
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Ubicación no disponible",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
@@ -287,7 +339,7 @@ fun ProfileSection(
             }
         }
     }
-    }
+}
 
 @Composable
 fun NewReviewSection(

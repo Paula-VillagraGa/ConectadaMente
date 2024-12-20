@@ -46,6 +46,8 @@ import com.example.conectadamente.data.model.Appointment
 import com.example.conectadamente.ui.theme.Purple80
 import com.example.conectadamente.ui.viewModel.calendar.AppointmentViewModel
 import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,11 +97,16 @@ fun AppointmentPatientScreen(
                         textAlign = TextAlign.Center
                     )
                 } else {
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val sortedAppointments = appointments.sortedBy { appointment ->
+                        dateFormat.parse(appointment.fecha)
+                    }
+
                     LazyColumn(
                         contentPadding = PaddingValues(vertical = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(appointments) { appointment ->
+                        items(sortedAppointments) { appointment ->
                             val psychologist = psychologists[appointment.psychoId]
 
                             Card(
@@ -147,7 +154,6 @@ fun AppointmentPatientScreen(
                                         // Botón de cancelar cita
                                         Button(
                                             onClick = {
-                                                // Al seleccionar cancelar, guardamos la cita a cancelar
                                                 appointmentToCancel = appointment
                                                 showDialog = true
                                             },
