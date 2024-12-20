@@ -73,34 +73,6 @@ class AppointmentRepository @Inject constructor(
         }
     }
 
-
-    // Actualizar el estado de una cita (cancelada, realizada, etc.)
-    suspend fun actualizarEstadoCita(appointmentId: String, nuevoEstado: String): Boolean {
-        return withContext(Dispatchers.IO) {
-            try {
-                val appointmentRef = firestore.collection("appointments").document(appointmentId)
-
-                firestore.runTransaction { transaction ->
-                    val snapshot = transaction.get(appointmentRef)
-                    if (!snapshot.exists()) {
-                        throw Exception("La cita no existe.")
-                    }
-
-                    // Actualizar el estado de la cita
-                    transaction.update(appointmentRef, "estado", nuevoEstado)
-                }.await()
-
-                true
-            } catch (e: FirebaseFirestoreException) {
-                Log.e("AppointmentRepository", "Firestore error: ${e.message}")
-                false
-            } catch (e: Exception) {
-                Log.e("AppointmentRepository", "Unexpected error: ${e.message}")
-                false
-            }
-        }
-    }
-
     suspend fun actualizarEstadoCitaConObservaciones(
         appointmentId: String,
         nuevoEstado: String,
@@ -175,6 +147,52 @@ class AppointmentRepository @Inject constructor(
 
         return appointments
     }
+    suspend fun obtenerCitasRealizadasPorPaciente(patientId: String): List<CompletedAppointmentPatient> {
+        val appointments = mutableListOf<CompletedAppointmentPatient>()
+
+        try {
+            // Obtener citas donde estado = "Realizada" y psychoId coincide
+            val appointmentQuery = firestore.collection("appointments")
+                .whereEqualTo("estado", "Realizada")
+                .whereEqualTo("patientId", patientId)
+                .get()
+                .await()
+
+            for (document in appointmentQuery.documents) {
+                val psychoId = document.getString("psychoId") ?: ""
+                val fecha = document.getString("fecha") ?: ""
+                val hora = document.getString("hora") ?: ""
+                val recomendaciones= document.getString("recomendaciones") ?: ""
+
+
+                val psychoDoc = firestore.collection("psychos")
+                    .document(psychoId)
+                    .get()
+                    .await()
+
+                val psychoName = psychoDoc.getString("name") ?: "Nombre no disponible"
+                val psychoPhoto= psychoDoc.getString("photoUrl")?: "Sin foto"
+
+
+                // Crear el objeto de cita completada
+                appointments.add(
+                    CompletedAppointmentPatient(
+                        fecha = fecha,
+                        hora = hora,
+                        psychoName = psychoName,
+                        rut = "",
+                        recomendaciones = recomendaciones,
+                        psychoPhoto = psychoPhoto
+                    )
+                )
+            }
+
+        } catch (e: Exception) {
+            Log.e("FirestoreError", "Error al obtener citas completadas: $e")
+        }
+
+        return appointments
+    }
     suspend fun obtenerCitasDelPaciente(patientId: String): List<Appointment> {
         return withContext(Dispatchers.IO) {
             val citas = mutableListOf<Appointment>()
@@ -186,10 +204,8 @@ class AppointmentRepository @Inject constructor(
                     .await()
 
                 for (doc in appointmentsSnapshot.documents) {
-                    // Convertir cada cita a un objeto Appointment
                     val cita = doc.toObject(Appointment::class.java)
                     if (cita != null) {
-                        // Agregar al listado
                         citas.add(cita)
                     }
                 }
@@ -265,3 +281,12 @@ data class CompletedAppointment(
     val observaciones: String
 )
 
+// Modelo de datos actualizado
+data class CompletedAppointmentPatient(
+    val fecha: String,
+    val hora: String,
+    val psychoName: String,
+    val rut: String,
+    val recomendaciones: String,
+    val psychoPhoto: String
+)

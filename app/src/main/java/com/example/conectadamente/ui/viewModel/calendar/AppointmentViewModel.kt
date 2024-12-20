@@ -9,6 +9,7 @@ import com.example.conectadamente.data.model.Appointment
 import com.example.conectadamente.data.model.PsychoModel
 import com.example.conectadamente.data.repository.calendarRepository.AppointmentRepository
 import com.example.conectadamente.data.repository.calendarRepository.CompletedAppointment
+import com.example.conectadamente.data.repository.calendarRepository.CompletedAppointmentPatient
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,9 @@ class AppointmentViewModel @Inject constructor(
     // Estados observables
     private val _appointments = MutableStateFlow<List<CompletedAppointment>>(emptyList())
     val appointments: StateFlow<List<CompletedAppointment>> = _appointments
+
+    private val _appointmentsPatient = MutableStateFlow<List<CompletedAppointmentPatient>>(emptyList())
+    val appointmentPatient: StateFlow<List<CompletedAppointmentPatient>> =_appointmentsPatient
 
     private val _citasDelPaciente = MutableStateFlow<List<Appointment>>(emptyList())
     val citasDelPaciente: StateFlow<List<Appointment>> = _citasDelPaciente
@@ -142,6 +146,21 @@ class AppointmentViewModel @Inject constructor(
                 _errorMessage.value = "Error al cancelar la cita: ${e.message}"
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+    fun obtenerCitasRealizadasPorPaciente(currentPatientId: String) {
+        _isLoading.value = true // Inicia la carga
+        _errorMessage.value = null
+        viewModelScope.launch {
+            try {
+                // Obtener citas realizadas asociadas al paciente
+                val result = appointmentRepository.obtenerCitasRealizadasPorPaciente(currentPatientId)
+                _appointmentsPatient.value = result
+            } catch (e: Exception) {
+                _errorMessage.value = "Error al obtener citas realizadas: ${e.message}"
+            } finally {
+                _isLoading.value = false // Finaliza la carga
             }
         }
     }

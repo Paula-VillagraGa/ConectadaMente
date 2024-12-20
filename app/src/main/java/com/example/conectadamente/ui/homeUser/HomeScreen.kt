@@ -304,9 +304,9 @@ fun ContentSection(navController: NavHostController) {
             )
             SupportCard(
                 title = "Título 4",
-                subtitle = "Actividades",
+                subtitle = "Tareas de Consulta",
                 imageRes = R.drawable.danza2,
-                onClick = { },
+                onClick = { navController.navigate(NavScreen.CompletedAppointmentsPatient.route)},
                 modifier = Modifier
                     .weight(0.5f)
                     .height(250.dp),

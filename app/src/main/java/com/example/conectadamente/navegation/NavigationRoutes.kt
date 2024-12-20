@@ -24,6 +24,7 @@ sealed class NavScreen(val route: String, val title: String, val icon: ImageVect
     object PsychologistLogin : NavScreen("psychologist_login", "Login", null)
     object EditPatientProfile: NavScreen("edit_perfil_patient", "Editar Perfil", Icons.Outlined.Info)
     object AppointmentPatient: NavScreen("appointment_patient", "Citas", Icons.Outlined.CalendarMonth)
+    object CompletedAppointmentsPatient: NavScreen("completed_appointments_patient", "Citas Realizadas", null)
     //Psicologo ->
     object PsychoSignIn : NavScreen("psycho_sign_in", "Iniciar Sesión Psicólogo", null)
     object PsychoProfile: NavScreen("psycho_profile", "Perfil", Icons.Outlined.Person)
