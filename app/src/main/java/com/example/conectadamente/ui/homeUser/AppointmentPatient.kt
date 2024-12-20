@@ -47,6 +47,8 @@ import com.example.conectadamente.ui.theme.Purple80
 import com.example.conectadamente.ui.viewModel.calendar.AppointmentViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,6 +103,7 @@ fun AppointmentPatientScreen(
                     val sortedAppointments = appointments.sortedBy { appointment ->
                         dateFormat.parse(appointment.fecha)
                     }
+                    val today = LocalDate.now()
 
                     LazyColumn(
                         contentPadding = PaddingValues(vertical = 8.dp),
@@ -108,6 +111,18 @@ fun AppointmentPatientScreen(
                     ) {
                         items(sortedAppointments) { appointment ->
                             val psychologist = psychologists[appointment.psychoId]
+                            val appointmentDate = LocalDate.parse(
+                                appointment.fecha,
+                                DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                            )
+
+                            val estado = if (appointment.estado.equals("pendiente", ignoreCase = true)
+                                && appointmentDate.isBefore(today)
+                            ) {
+                                "Cancelada"
+                            } else {
+                                appointment.estado.replaceFirstChar { it.uppercase() }
+                            }
 
                             Card(
                                 modifier = Modifier
@@ -144,11 +159,11 @@ fun AppointmentPatientScreen(
                                         color = MaterialTheme.colorScheme.primary
                                     )
                                     Text(
-                                        "Estado: ${appointment.estado.replaceFirstChar { it.uppercase() }}",
+                                        "Estado: $estado",
                                         color = MaterialTheme.colorScheme.secondary
                                     )
 
-                                    if (appointment.estado.equals("pendiente", ignoreCase = true)) {
+                                    if (estado.equals("Pendiente", ignoreCase = true)) {
                                         Spacer(modifier = Modifier.height(8.dp))
 
                                         // Botón de cancelar cita
